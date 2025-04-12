@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我們的回憶</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Noto+Serif+TC&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body, html {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Noto Serif TC', serif;
+    }
+    .slideshow {
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+    }
+    .slide {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      animation: fade 25s infinite;
+    }
+    .slide:nth-child(1) { background-image: url('https://picsum.photos/id/1011/1200/800'); animation-delay: 0s; }
+    .slide:nth-child(2) { background-image: url('https://picsum.photos/id/1015/1200/800'); animation-delay: 5s; }
+    .slide:nth-child(3) { background-image: url('https://picsum.photos/id/1021/1200/800'); animation-delay: 10s; }
+    .slide:nth-child(4) { background-image: url('https://picsum.photos/id/1035/1200/800'); animation-delay: 15s; }
+    .slide:nth-child(5) { background-image: url('https://picsum.photos/id/1043/1200/800'); animation-delay: 20s; }
+
+    @keyframes fade {
+      0%, 100% { opacity: 0; transform: scale(1.05); }
+      10%, 20% { opacity: 1; transform: scale(1); }
+      25%, 100% { opacity: 0; }
+    }
+
+    .text-box {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      background-color: rgba(0,0,0,0.4);
+      padding: 20px 40px;
+      border-radius: 20px;
+      font-size: 1.5rem;
+      text-align: center;
+      font-family: 'Dancing Script', cursive;
+      animation: textFade 25s infinite;
+    }
+
+    @keyframes textFade {
+      0%, 100% { opacity: 0; }
+      10%, 20% { opacity: 1; }
+      25%, 100% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="slideshow">
+    <div class="slide"></div>
+    <div class="slide"></div>
+    <div class="slide"></div>
+    <div class="slide"></div>
+    <div class="slide"></div>
+    <div class="text-box">在時光的縫隙中，我們編織了無數回憶。</div>
+  </div>
+</body>
+</html>
