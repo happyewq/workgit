@@ -27,7 +27,7 @@
       position: relative;
       padding: 20px;
     }
-    #startBtn {
+    #startBtn, #pauseBtn {
       margin-bottom: 20px;
       padding: 10px 30px;
       font-size: 1.2rem;
@@ -40,7 +40,7 @@
       z-index: 10;
       transition: background-color 0.3s;
     }
-    #startBtn:hover {
+    #startBtn:hover, #pauseBtn:hover {
       background-color: rgba(255, 255, 255, 0.3);
     }
     .frame {
@@ -106,7 +106,7 @@
         border-width: 10px;
         border-radius: 20px;
       }
-      #startBtn {
+      #startBtn, #pauseBtn {
         font-size: 1rem;
         padding: 8px 20px;
       }
@@ -116,6 +116,7 @@
 <body>
   <div class="slideshow">
     <button id="startBtn">開始回憶</button>
+    <button id="pauseBtn" style="display: none;">暫停回憶</button>
     <div class="frame" id="frame">
       <!-- 預設圖片 -->
       <div class="default-slide" id="defaultSlide" style="background-image: url('https://happyewq.github.io/workgit/work1/work1_0.jpg');"></div>
@@ -148,52 +149,65 @@
     const frame = document.getElementById('frame');
     const captionBox = document.getElementById('caption');
     const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
     const bgm = document.getElementById('bgm');
     const defaultSlide = document.getElementById('defaultSlide');
 
     let slides = [];
     let currentIndex = 0;
     let intervalId = null;
+    let isPaused = false;
 
- // 建立所有 slide 元素
-imageUrls.forEach((url) => {
-  const div = document.createElement('div');
-  div.classList.add('slide');
-  // 刪除這行：if (idx === 0) div.classList.add('active');
-  div.style.backgroundImage = `url('${url}')`;
-  frame.appendChild(div);
-  slides.push(div);
-});
+    // 建立所有 slide 元素
+    imageUrls.forEach((url) => {
+      const div = document.createElement('div');
+      div.classList.add('slide');
+      div.style.backgroundImage = `url('${url}')`;
+      frame.appendChild(div);
+      slides.push(div);
+    });
 
-function startSlideshow() {
-  startBtn.style.display = 'none';
-  bgm.play();
+    function startSlideshow() {
+      startBtn.style.display = 'none';
+      pauseBtn.style.display = 'inline-block';
+      bgm.play();
 
-  // 淡出預設圖片
-  defaultSlide.style.opacity = 0;
+      defaultSlide.style.opacity = 0;
+      slides[currentIndex].classList.add('active');
 
-  // 顯示第一張 slide
-  slides[currentIndex].classList.add('active');
+      captionBox.style.opacity = 0;
+      setTimeout(() => {
+        captionBox.textContent = captions[currentIndex];
+        captionBox.style.opacity = 1;
+      }, 500);
 
-  // 顯示對應文字
-  captionBox.style.opacity = 0;
-  setTimeout(() => {
-    captionBox.textContent = captions[currentIndex];
-    captionBox.style.opacity = 1;
-  }, 500);
+      intervalId = setInterval(nextSlide, 6000);
+    }
 
-  intervalId = setInterval(() => {
-    slides[currentIndex].classList.remove('active');
-    currentIndex = (currentIndex + 1) % slides.length;
-    slides[currentIndex].classList.add('active');
+    function nextSlide() {
+      slides[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex + 1) % slides.length;
+      slides[currentIndex].classList.add('active');
 
-    captionBox.style.opacity = 0;
-    setTimeout(() => {
-      captionBox.textContent = captions[currentIndex];
-      captionBox.style.opacity = 1;
-    }, 500);
-  }, 6000);
-}
+      captionBox.style.opacity = 0;
+      setTimeout(() => {
+        captionBox.textContent = captions[currentIndex];
+        captionBox.style.opacity = 1;
+      }, 500);
+    }
+
+    pauseBtn.addEventListener('click', () => {
+      if (isPaused) {
+        pauseBtn.textContent = '暫停回憶';
+        bgm.play();
+        intervalId = setInterval(nextSlide, 6000);
+      } else {
+        pauseBtn.textContent = '繼續回憶';
+        bgm.pause();
+        clearInterval(intervalId);
+      }
+      isPaused = !isPaused;
+    });
 
     startBtn.addEventListener('click', startSlideshow);
   </script>
