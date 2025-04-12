@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>我們的回憶</title>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Noto+Serif+TC&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Noto+Serif+TC&display=swap" rel="stylesheet"/>
   <style>
     * {
       margin: 0;
@@ -19,12 +19,29 @@
     }
     .slideshow {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       height: 100vh;
       width: 100vw;
       position: relative;
       padding: 20px;
+    }
+    #startBtn {
+      margin-bottom: 20px;
+      padding: 10px 30px;
+      font-size: 1.2rem;
+      font-family: 'Noto Serif TC', serif;
+      background-color: rgba(255,255,255,0.1);
+      color: white;
+      border: 2px solid white;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 10;
+      transition: background-color 0.3s;
+    }
+    #startBtn:hover {
+      background-color: rgba(255, 255, 255, 0.3);
     }
     .frame {
       position: relative;
@@ -37,7 +54,7 @@
       overflow: hidden;
       background-color: #111;
     }
-    .slide {
+    .slide, .default-slide {
       position: absolute;
       top: 0;
       left: 0;
@@ -46,19 +63,18 @@
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
-      opacity: 0;
-      animation: fade 30s infinite;
+      transition: opacity 1s ease-in-out;
     }
-    .slide:nth-child(1) { background-image: url('https://happyewq.github.io/workgit/work1/work1_1.jpg'); animation-delay: 0s; }
-    .slide:nth-child(2) { background-image: url('https://happyewq.github.io/workgit/work1/work1_2.jpg'); animation-delay: 6s; }
-    .slide:nth-child(3) { background-image: url('https://happyewq.github.io/workgit/work1/work1_3.jpg'); animation-delay: 12s; }
-    .slide:nth-child(4) { background-image: url('https://happyewq.github.io/workgit/work1/work1_4.jpg'); animation-delay: 18s; }
-    .slide:nth-child(5) { background-image: url('https://happyewq.github.io/workgit/work1/work1_5.jpg'); animation-delay: 24s; }
-
-    @keyframes fade {
-      0%, 100% { opacity: 0; transform: scale(1.05); }
-      10%, 20% { opacity: 1; transform: scale(1); }
-      25%, 100% { opacity: 0; }
+    .slide {
+      opacity: 0;
+      z-index: 1;
+    }
+    .slide.active {
+      opacity: 1;
+    }
+    .default-slide {
+      opacity: 1;
+      z-index: 2;
     }
 
     .text-box {
@@ -75,7 +91,7 @@
       font-family: 'Dancing Script', cursive;
       backdrop-filter: blur(4px);
       box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      z-index: 2;
+      z-index: 3;
       width: 80%;
       max-width: 700px;
       transition: opacity 1s;
@@ -90,26 +106,37 @@
         border-width: 10px;
         border-radius: 20px;
       }
+      #startBtn {
+        font-size: 1rem;
+        padding: 8px 20px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="slideshow">
-    <div class="frame">
-      <div class="slide"></div>
-      <div class="slide"></div>
-      <div class="slide"></div>
-      <div class="slide"></div>
-      <div class="slide"></div>
+    <button id="startBtn">開始回憶</button>
+    <div class="frame" id="frame">
+      <!-- 預設圖片 -->
+      <div class="default-slide" id="defaultSlide" style="background-image: url('https://happyewq.github.io/workgit/work1/work1_0.jpg');"></div>
     </div>
-    <div class="text-box" id="caption">我們一起走過的路，每一步都藏著愛。</div>
+    <div class="text-box" id="caption">點擊上方按鈕，一起回憶美好時光。</div>
   </div>
-  <audio id="bgm" autoplay loop>
+
+  <audio id="bgm" loop>
     <source src="https://happyewq.github.io/workgit/work1/work1.mp3" type="audio/mpeg">
     您的瀏覽器不支援音樂播放。
   </audio>
 
   <script>
+    const imageUrls = [
+      'https://happyewq.github.io/workgit/work1/work1_1.jpg',
+      'https://happyewq.github.io/workgit/work1/work1_2.jpg',
+      'https://happyewq.github.io/workgit/work1/work1_3.jpg',
+      'https://happyewq.github.io/workgit/work1/work1_4.jpg',
+      'https://happyewq.github.io/workgit/work1/work1_5.jpg'
+    ];
+
     const captions = [
       "在時光的縫隙中，我們編織了無數回憶。",
       "第一次牽妳的手，我的心跳快得像鼓聲。",
@@ -117,17 +144,55 @@
       "陽光下的妳，笑容比任何風景都耀眼。",
       "我們一起走過的路，每一步都藏著愛。"
     ];
-    const captionBox = document.getElementById('caption');
-    let index = 0;
 
-    setInterval(() => {
-      captionBox.style.opacity = 0;
-      setTimeout(() => {
-        captionBox.textContent = captions[index];
-        captionBox.style.opacity = 1;
-        index = (index + 1) % captions.length;
-      }, 500);
-    }, 6000);
+    const frame = document.getElementById('frame');
+    const captionBox = document.getElementById('caption');
+    const startBtn = document.getElementById('startBtn');
+    const bgm = document.getElementById('bgm');
+    const defaultSlide = document.getElementById('defaultSlide');
+
+    let slides = [];
+    let currentIndex = 0;
+    let intervalId = null;
+
+    // 建立所有 slide 元素
+    imageUrls.forEach((url, idx) => {
+      const div = document.createElement('div');
+      div.classList.add('slide');
+      if (idx === 0) div.classList.add('active');
+      div.style.backgroundImage = `url('${url}')`;
+      frame.appendChild(div);
+      slides.push(div);
+    });
+
+    function startSlideshow() {
+  startBtn.style.display = 'none';
+  bgm.play();
+
+  // 淡出預設圖片
+  defaultSlide.style.opacity = 0;
+
+  // 🔧 淡出預設文字，然後顯示第一張幻燈片的文字
+  captionBox.style.opacity = 0;
+  setTimeout(() => {
+    captionBox.textContent = captions[currentIndex];
+    captionBox.style.opacity = 1;
+  }, 500);
+
+  intervalId = setInterval(() => {
+    slides[currentIndex].classList.remove('active');
+    currentIndex = (currentIndex + 1) % slides.length;
+    slides[currentIndex].classList.add('active');
+
+    captionBox.style.opacity = 0;
+    setTimeout(() => {
+      captionBox.textContent = captions[currentIndex];
+      captionBox.style.opacity = 1;
+    }, 500);
+  }, 6000);
+}
+
+    startBtn.addEventListener('click', startSlideshow);
   </script>
 </body>
 </html>
