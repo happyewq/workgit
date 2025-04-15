@@ -70,7 +70,6 @@
       opacity: 1;
       z-index: 2;
     }
-
     .text-box {
       margin-top: 10px;
       text-align: center;
@@ -85,28 +84,48 @@
       transition: opacity 1s;
     }
     .photo-wall {
-  margin: 40px auto;
-  max-width: 800px;
-  padding: 10px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 10px;
-  justify-items: center;
-}
-
-.photo-wall img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-}
-
-.photo-wall img:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 20px rgba(255,255,255,0.4);
-}
+      margin: 40px auto;
+      max-width: 800px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      justify-items: center;
+    }
+    .photo-wall img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .photo-wall img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 20px rgba(255,255,255,0.4);
+    }
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(255,255,255,0.3);
+      transition: transform 0.3s ease;
+    }
+    .lightbox.active {
+      display: flex;
+    }
     @media (max-width: 600px) {
       .text-box {
         font-size: 1.2rem;
@@ -141,7 +160,10 @@
     <img src="https://happyewq.github.io/workgit/work1/work1_3.jpg" alt="記憶3">
     <img src="https://happyewq.github.io/workgit/work1/work1_4.jpg" alt="記憶4">
     <img src="https://happyewq.github.io/workgit/work1/work1_5.jpg" alt="記憶5">
-    <!-- 如需更多圖片可繼續加 -->
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <img id="lightboxImg" src="" alt="放大圖片">
   </div>
 
   <audio id="bgm" loop>
@@ -172,6 +194,8 @@
     const pauseBtn = document.getElementById('pauseBtn');
     const bgm = document.getElementById('bgm');
     const defaultSlide = document.getElementById('defaultSlide');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
 
     let slides = [];
     let currentIndex = 0;
@@ -225,6 +249,17 @@
     });
 
     startBtn.addEventListener('click', startSlideshow);
+
+    document.querySelectorAll('.photo-wall img').forEach(img => {
+      img.addEventListener('click', () => {
+        lightboxImg.src = img.src;
+        lightbox.classList.add('active');
+      });
+    });
+
+    lightbox.addEventListener('click', () => {
+      lightbox.classList.remove('active');
+    });
   </script>
 </body>
 </html>
