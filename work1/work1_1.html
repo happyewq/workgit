@@ -8,10 +8,10 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body, html {
-      font-family: 'Noto Serif TC', serif;
-      background-color: #000;
-      color: #fff;
-    }
+  font-family: 'Noto Serif TC', serif;
+  background: linear-gradient(to bottom, #fffaf4, #fde8e8);
+  color: #333;
+}
     .slideshow {
       display: flex;
       flex-direction: column;
@@ -21,17 +21,21 @@
     }
     #startBtn, #pauseBtn {
       margin: 10px 10px 20px;
-      padding: 10px 30px;
+      padding: 12px 36px;
       font-size: 1.2rem;
-      background-color: rgba(255,255,255,0.1);
-      color: white;
-      border: 2px solid white;
-      border-radius: 10px;
+      background: linear-gradient(to right, #fbd3e9, #bbdffb);
+      color: #333;
+      border: none;
+      border-radius: 30px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+      font-weight: bold;
+      font-family: 'Dancing Script', cursive;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     #startBtn:hover, #pauseBtn:hover {
-      background-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     }
     .frame {
       position: relative;
@@ -58,19 +62,32 @@
     .slide { opacity: 0; z-index: 1; }
     .slide.active { opacity: 1; }
     .default-slide { opacity: 1; z-index: 2; }
+
     .text-box {
-      margin-top: 10px;
+      margin-top: 20px;
       text-align: center;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-family: 'Dancing Script', cursive;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 15px 30px;
-      border-radius: 20px;
-      backdrop-filter: blur(4px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      max-width: 700px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px 30px;
+      border-radius: 30px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.08);
+      max-width: 720px;
       transition: opacity 1s;
     }
+    .text-box span {
+      display: block;
+      background: linear-gradient(to right, #e77f99, #ee9ca7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: bold;
+      letter-spacing: 1px;
+      padding: 5px 0;
+      line-height: 1.6;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+    }
+
     .photo-wall {
       margin: 40px auto;
       max-width: 800px;
@@ -117,18 +134,16 @@
     @media (max-width: 600px) {
       .text-box {
         font-size: 1.2rem;
-        padding: 10px 20px;
-      }
-      .frame {
-        border-width: 10px;
+        padding: 14px 20px;
         border-radius: 20px;
+        max-width: 90%;
       }
       #startBtn, #pauseBtn {
         font-size: 1rem;
-        padding: 8px 20px;
+        padding: 10px 24px;
+        border-radius: 24px;
       }
     }
-    
   </style>
 </head>
 <body>
@@ -140,7 +155,9 @@
     <div class="frame" id="frame">
       <div class="default-slide" id="defaultSlide" style="background-image: url('https://happyewq.github.io/workgit/work1/work1_0.jpg');"></div>
     </div>
-    <div class="text-box" id="caption">有些回憶，值得細細收藏，現在，一起打開吧。</div>
+    <div class="text-box" id="caption">
+      <span> 有些回憶，值得細細收藏，現在，一起打開吧。</span>
+    </div> 
   </div>
 
   <div class="photo-wall">
@@ -208,7 +225,7 @@
       slides[currentIndex].classList.add('active');
       captionBox.style.opacity = 0;
       setTimeout(() => {
-        captionBox.textContent = captions[currentIndex];
+        captionBox.innerHTML = `<span> ${captions[currentIndex]}</span>`;
         captionBox.style.opacity = 1;
       }, 500);
       intervalId = setInterval(nextSlide, 6000);
@@ -220,7 +237,7 @@
       slides[currentIndex].classList.add('active');
       captionBox.style.opacity = 0;
       setTimeout(() => {
-        captionBox.textContent = captions[currentIndex];
+        captionBox.innerHTML = `<span> ${captions[currentIndex]}</span>`;
         captionBox.style.opacity = 1;
       }, 500);
     }
@@ -256,7 +273,7 @@
 
     document.addEventListener('keydown', (e) => {
       if (!lightbox.classList.contains('active')) return;
-    
+
       if (e.key === 'ArrowLeft') {
         currentPhotoIndex = (currentPhotoIndex - 1 + photoWallImages.length) % photoWallImages.length;
         lightboxImg.src = photoWallImages[currentPhotoIndex].src;
@@ -267,20 +284,19 @@
         lightbox.classList.remove('active');
       }
     });
-    
-    // 👉 加上這段 touch 支援
+
     let startX = 0;
     let endX = 0;
-    
+
     lightbox.addEventListener('touchstart', (e) => {
       startX = e.touches[0].clientX;
     });
-    
+
     lightbox.addEventListener('touchend', (e) => {
       endX = e.changedTouches[0].clientX;
       handleSwipe();
     });
-    
+
     function handleSwipe() {
       const swipeThreshold = 50;
       const diff = endX - startX;
@@ -294,13 +310,13 @@
       }
     }
 
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'F12' || 
-        (e.ctrlKey && e.shiftKey && e.key === 'I') || 
-        (e.ctrlKey && e.key === 'U')) {
-      e.preventDefault();
-    }
-  });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+          (e.ctrlKey && e.key === 'U')) {
+        e.preventDefault();
+      }
+    });
 
     document.addEventListener('contextmenu', e => e.preventDefault());
   </script>
