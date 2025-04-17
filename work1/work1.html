@@ -134,13 +134,13 @@
 <body>
   <div class="slideshow">
     <div>
-      <button id="startBtn">開始回憶</button>
-      <button id="pauseBtn" style="display: none;">暫停回憶</button>
+      <button id="startBtn">Start</button>
+      <button id="pauseBtn" style="display: none;">Pause</button>
     </div>
     <div class="frame" id="frame">
       <div class="default-slide" id="defaultSlide" style="background-image: url('https://happyewq.github.io/workgit/work1/work1_0.jpg');"></div>
     </div>
-    <div class="text-box" id="caption">點擊上方按鈕，一起回憶美好時光。</div>
+    <div class="text-box" id="caption"></div>
   </div>
 
   <div class="photo-wall">
@@ -227,11 +227,11 @@
 
     pauseBtn.addEventListener('click', () => {
       if (isPaused) {
-        pauseBtn.textContent = '暫停回憶';
+        pauseBtn.textContent = 'Pause';
         bgm.play();
         intervalId = setInterval(nextSlide, 6000);
       } else {
-        pauseBtn.textContent = '繼續回憶';
+        pauseBtn.textContent = 'Continue';
         bgm.pause();
         clearInterval(intervalId);
       }
