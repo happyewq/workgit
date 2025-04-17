@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>我們的回憶</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Noto+Serif+TC&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body, html {
+      font-family: 'Noto Serif TC', serif;
+      background-color: #fff;
+      color: #fff;
+    }
+    .slideshow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+    }
+    #startBtn, #pauseBtn {
+      margin: 10px 10px 20px;
+      padding: 10px 30px;
+      font-size: 1.2rem;
+      background-color: rgba(255,255,255,0.1);
+      color: rgb(19, 15, 15);
+      border: 2px solid rgb(99, 80, 80);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #startBtn:hover, #pauseBtn:hover {
+      background-color: rgba(82, 59, 59, 0.3);
+    }
+    .frame {
+      position: relative;
+      width: 90vw;
+      max-width: 800px;
+      aspect-ratio: 16/9;
+      border: 20px solid #333;
+      border-radius: 30px;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      overflow: hidden;
+      background-color: #111;
+    }
+    .slide, .default-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      transition: opacity 1s ease-in-out;
+    }
+    .slide { opacity: 0; z-index: 1; }
+    .slide.active { opacity: 1; }
+    .default-slide { opacity: 1; z-index: 2; }
+    .text-box {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-family: 'Dancing Script', cursive;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 15px 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      max-width: 700px;
+      transition: opacity 1s;
+    }
+    .photo-wall {
+      margin: 40px auto;
+      max-width: 800px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      justify-items: center;
+    }
+    .photo-wall img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .photo-wall img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 20px rgba(255,255,255,0.4);
+    }
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(255,255,255,0.3);
+      transition: transform 0.3s ease;
+    }
+    .lightbox.active {
+      display: flex;
+    }
+    @media (max-width: 600px) {
+      .text-box {
+        font-size: 1.2rem;
+        padding: 10px 20px;
+      }
+      .frame {
+        border-width: 10px;
+        border-radius: 20px;
+      }
+      #startBtn, #pauseBtn {
+        font-size: 1rem;
+        padding: 8px 20px;
+      }
+    }
+    
+  </style>
+</head>
+<body>
+  <div class="slideshow">
+    <div>
+      <button id="startBtn">Start</button>
+      <button id="pauseBtn" style="display: none;">Pause</button>
+    </div>
+    <div class="frame" id="frame">
+      <div class="default-slide" id="defaultSlide" style="background-image: url('https://happyewq.github.io/workgit/work1/work1_0.jpg');"></div>
+    </div>
+    <div class="text-box" id="caption">有些回憶，值得細細收藏，現在，一起打開吧。</div>
+  </div>
+
+  <div class="photo-wall">
+    <img src="https://happyewq.github.io/workgit/work1/work1_0.jpg" alt="記憶0">
+    <img src="https://happyewq.github.io/workgit/work1/work1_1.jpg" alt="記憶1">
+    <img src="https://happyewq.github.io/workgit/work1/work1_2.jpg" alt="記憶2">
+    <img src="https://happyewq.github.io/workgit/work1/work1_3.jpg" alt="記憶3">
+    <img src="https://happyewq.github.io/workgit/work1/work1_4.jpg" alt="記憶4">
+    <img src="https://happyewq.github.io/workgit/work1/work1_5.jpg" alt="記憶5">
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <img id="lightboxImg" src="" alt="放大圖片">
+  </div>
+
+  <audio id="bgm" loop>
+    <source src="https://happyewq.github.io/workgit/work1/work1.mp3" type="audio/mpeg">
+    您的瀏覽器不支援音樂播放。
+  </audio>
+
+  <script>
+    const imageUrls = [
+      'https://happyewq.github.io/workgit/work1/work1_1.jpg',
+      'https://happyewq.github.io/workgit/work1/work1_2.jpg',
+      'https://happyewq.github.io/workgit/work1/work1_3.jpg',
+      'https://happyewq.github.io/workgit/work1/work1_4.jpg',
+      'https://happyewq.github.io/workgit/work1/work1_5.jpg'
+    ];
+    const captions = [
+      "在時光的縫隙中，我們編織了無數回憶。",
+      "第一次牽妳的手，我的心跳快得像鼓聲。",
+      "那場雨天，我們在屋簷下笑得像孩子。",
+      "陽光下的妳，笑容比任何風景都耀眼。",
+      "我們一起走過的路，每一步都藏著愛。"
+    ];
+    const frame = document.getElementById('frame');
+    const captionBox = document.getElementById('caption');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const bgm = document.getElementById('bgm');
+    const defaultSlide = document.getElementById('defaultSlide');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+
+    let slides = [];
+    let currentIndex = 0;
+    let intervalId = null;
+    let isPaused = false;
+    let currentPhotoIndex = 0;
+    const photoWallImages = document.querySelectorAll('.photo-wall img');
+
+    imageUrls.forEach((url) => {
+      const div = document.createElement('div');
+      div.classList.add('slide');
+      div.style.backgroundImage = `url('${url}')`;
+      frame.appendChild(div);
+      slides.push(div);
+    });
+
+    function startSlideshow() {
+      startBtn.style.display = 'none';
+      pauseBtn.style.display = 'inline-block';
+      bgm.play();
+      defaultSlide.style.opacity = 0;
+      slides[currentIndex].classList.add('active');
+      captionBox.style.opacity = 0;
+      setTimeout(() => {
+        captionBox.textContent = captions[currentIndex];
+        captionBox.style.opacity = 1;
+      }, 500);
+      intervalId = setInterval(nextSlide, 6000);
+    }
+
+    function nextSlide() {
+      slides[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex + 1) % slides.length;
+      slides[currentIndex].classList.add('active');
+      captionBox.style.opacity = 0;
+      setTimeout(() => {
+        captionBox.textContent = captions[currentIndex];
+        captionBox.style.opacity = 1;
+      }, 500);
+    }
+
+    pauseBtn.addEventListener('click', () => {
+      if (isPaused) {
+        pauseBtn.textContent = 'Pause';
+        bgm.play();
+        intervalId = setInterval(nextSlide, 6000);
+      } else {
+        pauseBtn.textContent = 'Continue';
+        bgm.pause();
+        clearInterval(intervalId);
+      }
+      isPaused = !isPaused;
+    });
+
+    startBtn.addEventListener('click', startSlideshow);
+
+    photoWallImages.forEach((img, index) => {
+      img.addEventListener('click', () => {
+        lightboxImg.src = img.src;
+        lightbox.classList.add('active');
+        currentPhotoIndex = index;
+      });
+    });
+
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox || e.target === lightboxImg) {
+        lightbox.classList.remove('active');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('active')) return;
+    
+      if (e.key === 'ArrowLeft') {
+        currentPhotoIndex = (currentPhotoIndex - 1 + photoWallImages.length) % photoWallImages.length;
+        lightboxImg.src = photoWallImages[currentPhotoIndex].src;
+      } else if (e.key === 'ArrowRight') {
+        currentPhotoIndex = (currentPhotoIndex + 1) % photoWallImages.length;
+        lightboxImg.src = photoWallImages[currentPhotoIndex].src;
+      } else if (e.key === 'Escape') {
+        lightbox.classList.remove('active');
+      }
+    });
+    
+    // 👉 加上這段 touch 支援
+    let startX = 0;
+    let endX = 0;
+    
+    lightbox.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+    });
+    
+    lightbox.addEventListener('touchend', (e) => {
+      endX = e.changedTouches[0].clientX;
+      handleSwipe();
+    });
+    
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const diff = endX - startX;
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+          currentPhotoIndex = (currentPhotoIndex - 1 + photoWallImages.length) % photoWallImages.length;
+        } else {
+          currentPhotoIndex = (currentPhotoIndex + 1) % photoWallImages.length;
+        }
+        lightboxImg.src = photoWallImages[currentPhotoIndex].src;
+      }
+    }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+        (e.ctrlKey && e.key === 'U')) {
+      e.preventDefault();
+    }
+  });
+
+    document.addEventListener('contextmenu', e => e.preventDefault());
+  </script>
+</body>
+</html>
