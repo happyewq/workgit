@@ -6,11 +6,7 @@
   <title>我們的回憶</title>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Noto+Serif+TC&display=swap" rel="stylesheet"/>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body, html {
       font-family: 'Noto Serif TC', serif;
       background-color: #000;
@@ -59,17 +55,9 @@
       background-position: center;
       transition: opacity 1s ease-in-out;
     }
-    .slide {
-      opacity: 0;
-      z-index: 1;
-    }
-    .slide.active {
-      opacity: 1;
-    }
-    .default-slide {
-      opacity: 1;
-      z-index: 2;
-    }
+    .slide { opacity: 0; z-index: 1; }
+    .slide.active { opacity: 1; }
+    .default-slide { opacity: 1; z-index: 2; }
     .text-box {
       margin-top: 10px;
       text-align: center;
@@ -140,6 +128,17 @@
         padding: 8px 20px;
       }
     }
+
+    .photo-wall img {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    
+    .photo-wall img.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body>
@@ -155,6 +154,7 @@
   </div>
 
   <div class="photo-wall">
+    <img src="https://happyewq.github.io/workgit/work1/work1_0.jpg" alt="記憶0">
     <img src="https://happyewq.github.io/workgit/work1/work1_1.jpg" alt="記憶1">
     <img src="https://happyewq.github.io/workgit/work1/work1_2.jpg" alt="記憶2">
     <img src="https://happyewq.github.io/workgit/work1/work1_3.jpg" alt="記憶3">
@@ -179,7 +179,6 @@
       'https://happyewq.github.io/workgit/work1/work1_4.jpg',
       'https://happyewq.github.io/workgit/work1/work1_5.jpg'
     ];
-
     const captions = [
       "在時光的縫隙中，我們編織了無數回憶。",
       "第一次牽妳的手，我的心跳快得像鼓聲。",
@@ -187,7 +186,6 @@
       "陽光下的妳，笑容比任何風景都耀眼。",
       "我們一起走過的路，每一步都藏著愛。"
     ];
-
     const frame = document.getElementById('frame');
     const captionBox = document.getElementById('caption');
     const startBtn = document.getElementById('startBtn');
@@ -201,6 +199,8 @@
     let currentIndex = 0;
     let intervalId = null;
     let isPaused = false;
+    let currentPhotoIndex = 0;
+    const photoWallImages = document.querySelectorAll('.photo-wall img');
 
     imageUrls.forEach((url) => {
       const div = document.createElement('div');
@@ -250,15 +250,43 @@
 
     startBtn.addEventListener('click', startSlideshow);
 
-    document.querySelectorAll('.photo-wall img').forEach(img => {
+    photoWallImages.forEach((img, index) => {
       img.addEventListener('click', () => {
         lightboxImg.src = img.src;
         lightbox.classList.add('active');
+        currentPhotoIndex = index;
       });
     });
 
-    lightbox.addEventListener('click', () => {
-      lightbox.classList.remove('active');
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox || e.target === lightboxImg) {
+        lightbox.classList.remove('active');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('active')) return;
+
+      if (e.key === 'ArrowLeft') {
+        currentPhotoIndex = (currentPhotoIndex - 1 + photoWallImages.length) % photoWallImages.length;
+        lightboxImg.src = photoWallImages[currentPhotoIndex].src;
+      } else if (e.key === 'ArrowRight') {
+        currentPhotoIndex = (currentPhotoIndex + 1) % photoWallImages.length;
+        lightboxImg.src = photoWallImages[currentPhotoIndex].src;
+      } else if (e.key === 'Escape') {
+        lightbox.classList.remove('active');
+      }
+    });
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.2 });
+    
+    photoWallImages.forEach(img => {
+      observer.observe(img);
     });
   </script>
 </body>
