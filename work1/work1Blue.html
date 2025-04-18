@@ -310,15 +310,23 @@
       }
     }
 
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'F12' ||
-          (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-          (e.ctrlKey && e.key === 'U')) {
-        e.preventDefault();
-      }
-    });
+  // 禁用 F12、Ctrl+Shift+I、Ctrl+U、Ctrl+S
+  document.addEventListener("keydown", function (e) {
+    if (
+      e.key === "F12" ||
+      (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") || // Ctrl+Shift+I
+      (e.ctrlKey && e.key.toLowerCase() === "u") ||               // Ctrl+U
+      (e.ctrlKey && e.key.toLowerCase() === "s")                  // Ctrl+S
+    ) {
+      e.preventDefault();
+      return false;
+    }
+  });
 
-    document.addEventListener('contextmenu', e => e.preventDefault());
+  // 禁用右鍵
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+  });
   </script>
 </body>
 </html>
