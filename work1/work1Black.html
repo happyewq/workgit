@@ -338,14 +338,23 @@ if (enableFallingIcons) {
 }
 
 // ✅ 控制鎖頭
+// ✅ 控制鎖頭與信封功能
 const enableLockAndLetter = true; // 設為 false 完全停用
+// 設定信封開啟日（JavaScript 月份從 0 開始）👉 2025 年 4 月 19 日
+const letterOpenDate = new Date(2025, 3, 18);  // (年, 月 - 1, 日)
+// 動態更新提醒圖示的 title
+const reminderLock = document.querySelector(".reminder-lock");
+const displayMonth = letterOpenDate.getMonth() + 1;
+const displayDay = letterOpenDate.getDate();
+reminderLock.setAttribute("title", `記得 ${displayMonth}/${displayDay} 打開小信封喔 💌`);
 
 if (enableLockAndLetter) {
   const today = new Date();
-  const openMonth = 3;  // 注意：JavaScript 的月份從 0 開始，所以 3 代表「4 月」
-  const openDate = 18;  // 設定你的信封開啟日
 
-  const isOpenDay = today.getMonth() === openMonth && today.getDate() === openDate;
+  const isOpenDay =
+    today.getFullYear() === letterOpenDate.getFullYear() &&
+    today.getMonth() === letterOpenDate.getMonth() &&
+    today.getDate() === letterOpenDate.getDate();
 
   if (isOpenDay) {
     // 👉 是開啟日：直接顯示信件，不顯示鎖頭
@@ -363,7 +372,7 @@ if (enableLockAndLetter) {
       </div>`;
     document.body.appendChild(letter);
   } else {
-    // 👉 不是開啟日：顯示鎖頭，並可點擊提示
+    // 👉 不是開啟日：顯示鎖頭，點擊出現提示
     document.querySelector(".reminder-lock").style.display = "flex";
     document.querySelector(".reminder-lock").addEventListener("click", () => {
       document.getElementById("lock-message").style.display = "flex";

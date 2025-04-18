@@ -171,7 +171,7 @@
       z-index: 1000;
     }
     .reminder-lock:hover::after {
-      content: "記得 4/19 查看小信封喔 💌";
+      content: attr(title); /* 這樣可以直接使用上面 JS 動態產生的 title */
       position: absolute;
       bottom: 70px;
       right: 0;
@@ -304,7 +304,7 @@
     您的瀏覽器不支援音樂播放。
   </audio>
   <div id="falling-container"></div>
-  <div class="reminder-lock" title="記得 4/19 打開小信封喔" style="display: none;">🔒</div>
+  <div class="reminder-lock" title="小信封" style="display: none;">🔒</div>
 
   <!-- 鎖頭提示視窗 -->
   <div id="lock-message" class="lock-message" style="display: none;">
@@ -471,13 +471,21 @@ if (enableFallingIcons) {
 // ✅ 控制鎖頭
 // ✅ 控制鎖頭與信封功能
 const enableLockAndLetter = true; // 設為 false 完全停用
+// 設定信封開啟日（JavaScript 月份從 0 開始）👉 2025 年 4 月 19 日
+const letterOpenDate = new Date(2025, 3, 19);  // (年, 月 - 1, 日)
+// 動態更新提醒圖示的 title
+const reminderLock = document.querySelector(".reminder-lock");
+const displayMonth = letterOpenDate.getMonth() + 1;
+const displayDay = letterOpenDate.getDate();
+reminderLock.setAttribute("title", `記得 ${displayMonth}/${displayDay} 打開小信封喔 💌`);
 
 if (enableLockAndLetter) {
   const today = new Date();
-  const openMonth = 3;  // 注意：JavaScript 的月份從 0 開始，所以 3 代表「4 月」
-  const openDate = 19;  // 設定你的信封開啟日
 
-  const isOpenDay = today.getMonth() === openMonth && today.getDate() === openDate;
+  const isOpenDay =
+    today.getFullYear() === letterOpenDate.getFullYear() &&
+    today.getMonth() === letterOpenDate.getMonth() &&
+    today.getDate() === letterOpenDate.getDate();
 
   if (isOpenDay) {
     // 👉 是開啟日：直接顯示信件，不顯示鎖頭
@@ -495,13 +503,14 @@ if (enableLockAndLetter) {
       </div>`;
     document.body.appendChild(letter);
   } else {
-    // 👉 不是開啟日：顯示鎖頭，並可點擊提示
+    // 👉 不是開啟日：顯示鎖頭，點擊出現提示
     document.querySelector(".reminder-lock").style.display = "flex";
     document.querySelector(".reminder-lock").addEventListener("click", () => {
       document.getElementById("lock-message").style.display = "flex";
     });
   }
 }
+
 
 
   // 禁用 F12、Ctrl+Shift+I、Ctrl+U、Ctrl+S
