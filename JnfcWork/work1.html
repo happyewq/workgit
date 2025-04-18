@@ -101,7 +101,7 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: rgba(255, 192, 203, 0.8);
+      background: rgba(255, 182, 203, 0.8);
       border-radius: 50%;
       width: 60px;
       height: 60px;
@@ -162,6 +162,14 @@
     <div class="love-duration" id="loveDuration"></div>
   </div>
   <div class="reminder-lock" title="記得 4/18 打開小信封喔">🔒</div>
+
+  <!-- 🔒 鎖頭提示框 -->
+<div id="lock-message" class="lock-message">
+  <div class="lock-message-box">
+    <p>信封尚未開放或已經結束，敬請期待 💌</p>
+    <button onclick="document.getElementById('lock-message').style.display='none'">知道了</button>
+  </div>
+</div>
   <script>
     const startDate = new Date("2021-08-15");
     const poeticPhrases = [
@@ -243,6 +251,13 @@
         document.body.appendChild(letter);
       }
     });
+    document.querySelector(".reminder-lock").addEventListener("click", () => {
+      const today = new Date();
+      // 如果不是 4/18，顯示提示框
+      if (!(today.getMonth() === 3 && today.getDate() === 18)) {
+        document.getElementById("lock-message").style.display = "flex";
+      }
+    });
     setInterval(createFallingIcon, 500);
     setInterval(updateTimeSmooth, 5000);
     updateTimeSmooth();
@@ -294,6 +309,46 @@
     @keyframes fadeIn {
       0% { opacity: 0; transform: scale(0.9); }
       100% { opacity: 1; transform: scale(1); }
+    }
+
+    .lock-message {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9998;
+    }
+    
+    .lock-message-box {
+      background: #fff0f5;
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      text-align: center;
+      font-family: 'Noto Serif TC', serif;
+      color: #d64b7f;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .lock-message-box p {
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+    }
+    
+    .lock-message-box button {
+      background: #ffb6c1;
+      color: white;
+      padding: 8px 18px;
+      border: none;
+      border-radius: 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
   </style>
 </body>
