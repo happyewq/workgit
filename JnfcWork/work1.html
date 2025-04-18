@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我們的時光</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&family=Noto+Serif+TC&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body, html {
+      height: 100%;
+      font-family: 'Noto Serif TC', serif;
+      background: linear-gradient(to bottom, #fffaf4, #fdeff0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 800px;
+      width: 100%;
+      opacity: 0;
+      transform: rotateY(90deg);
+      animation: pageFlip 1.2s ease forwards;
+      animation-delay: 0.5s;
+    }
+
+    @keyframes pageFlip {
+      0% { opacity: 0; transform: rotateY(90deg); }
+      100% { opacity: 1; transform: rotateY(0deg); }
+    }
+
+    .q-image {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      margin-bottom: 30px;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .q-image:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .text-section {
+      font-family: 'Zhi Mang Xing', cursive;
+      font-size: 2.5rem;
+      color: #c86c6c;
+      margin-bottom: 30px;
+    }
+
+    .video-section {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      height: 0;
+      margin-bottom: 30px;
+    }
+
+    .video-section iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border: none;
+    }
+
+    .time-section {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .love-duration {
+      font-size: 1.2rem;
+      color: #ff6f91;
+      font-weight: bold;
+      font-family: 'Zhi Mang Xing', cursive;
+    }
+
+    @media (max-width: 600px) {
+      .text-section { font-size: 2rem; }
+      .time-section, .love-duration { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Q版圖 -->
+    <img class="q-image" src="https://happyewq.github.io/workgit/work1/work1_0.jpg" alt="Q版形象圖">
+
+    <!-- 文字 -->
+    <div class="text-section">我們一起走過的每一刻，都值得被珍藏</div>
+
+    <!-- 影片 -->
+    <div class="video-section">
+      <iframe 
+        src="https://www.youtube.com/embed/YOUR_VIDEO_ID" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <!-- 現在時間 -->
+    <div class="time-section" id="time"></div>
+
+    <!-- 已在一起多久 -->
+    <div class="love-duration" id="loveDuration"></div>
+  </div>
+
+  <script>
+    function updateTime() {
+      const now = new Date();
+      const timeString = now.toLocaleString("zh-TW", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+      document.getElementById("time").textContent = `現在時間：${timeString}`;
+    }
+
+    function updateLoveDuration() {
+      const startDate = new Date("2021-05-20"); // ❤️ 改這裡為你們在一起的日子
+      const now = new Date();
+      const diffTime = now - startDate;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      document.getElementById("loveDuration").textContent = `我們已經一起走過了 ${diffDays} 天囉 ❤️`;
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+    updateLoveDuration();
+  </script>
+</body>
+</html>
