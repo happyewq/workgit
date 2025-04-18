@@ -10,7 +10,7 @@
 
     body, html {
       height: 100%;
-      font-family: 'Noto Serif TC', serif;
+      font-family: 'Noto Sans TC', sans-serif;
       background: linear-gradient(to bottom, #fffaf4, #fdeff0);
       overflow-x: hidden;
       position: relative;
@@ -102,11 +102,13 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       border: none;
     }
-
+    
     .time-section, .love-duration {
+      font-family: 'Ma Shan Zheng', cursive;
       font-size: 1.2rem;
       color: #666;
       margin-bottom: 10px;
+      transition: opacity 0.6s ease-in-out;
     }
 
     .love-duration {
@@ -150,34 +152,55 @@
 
   <!-- JS 功能 -->
   <script>
-    // ❤️ 記得改這個日期
+    // 愛的起點日期
     const startDate = new Date("2021-08-15");
-
-    function updateTime() {
-      const now = new Date();
-      const timeString = now.toLocaleString("zh-TW", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-      document.getElementById("time").textContent = `現在時間：${timeString}`;
+  
+    // 浪漫語句們
+    const poeticPhrases = [
+      "此時此刻，愛還在繼續",
+      "在這一刻，我們正在一起",
+      "愛的時間流動中",
+      "愛情日記的這一頁",
+      "屬於我們的現在是",
+      "你出現在我的每一秒",
+      "我們的故事，繼續書寫著",
+      "這一刻，我們共享同一個時光"
+    ];
+  
+    const timeEl = document.getElementById("time");
+  
+    function updateTimeSmooth() {
+      // 先淡出
+      timeEl.style.opacity = 0;
+  
+      setTimeout(() => {
+        const now = new Date();
+        const timeString = now.toLocaleString("zh-TW", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+        const phrase = poeticPhrases[Math.floor(Math.random() * poeticPhrases.length)];
+        timeEl.textContent = `${phrase}：${timeString}`;
+        timeEl.style.opacity = 1; // 淡入
+      }, 1000); // 1秒後再換字，讓淡出完成
     }
-
+  
     function updateLoveDuration() {
       const now = new Date();
       const diffTime = now - startDate;
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
       document.getElementById("loveDuration").textContent = `我們已經一起走過了 ${diffDays} 天囉 ❤️`;
     }
-
-    // 愛心 & 星星落下
+  
+    // 愛心星星落下動畫
     const icons = ['💖', '💫', '🌟', '💕', '✨'];
     const container = document.getElementById('falling-container');
-
+  
     function createFallingIcon() {
       const el = document.createElement('div');
       el.classList.add('falling');
@@ -188,11 +211,26 @@
       container.appendChild(el);
       setTimeout(() => container.removeChild(el), 5000);
     }
+    
+   // 禁用 F12、Ctrl+Shift+I、Ctrl+U
+   document.addEventListener("keydown", function (e) {
+    if (
+      e.key === "F12" ||
+      (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") ||
+      (e.ctrlKey && e.key.toLowerCase() === "u")
+    ) {
+      e.preventDefault();
+    }
+  });
 
+  // 禁用右鍵選單
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+  });
     // 初始化
     setInterval(createFallingIcon, 300);
-    setInterval(updateTime, 1000);
-    updateTime();
+    setInterval(updateTimeSmooth, 3000); // 每 3 秒切換一次
+    updateTimeSmooth();
     updateLoveDuration();
   </script>
 </body>
