@@ -171,6 +171,11 @@
   </div>
 </div>
   <script>
+
+    // 控制是否啟用功能
+const enableFallingIcons = true; // 掉落星星與愛心
+const enableTextDisplay = true;  // 顯示時間詩句
+const enableLockAndLetter = true; // 顯示鎖與信封
     const startDate = new Date("2021-08-15");
     const poeticPhrases = [
       "此時此刻，愛還在繼續",
@@ -233,33 +238,47 @@
     document.addEventListener("contextmenu", function (e) {
       e.preventDefault();
     });
-    window.addEventListener("DOMContentLoaded", () => {
-      const today = new Date();
-      if (today.getMonth() === 3 && today.getDate() === 19) {
-        const letter = document.createElement("div");
-        letter.id = "love-letter";
-        letter.className = "letter-overlay";
-        letter.innerHTML = `
-          <div class="letter">
-            <div class="letter-content">
-              <p>親愛的：</p>
-              <p>今天是屬於我們的特別日子。<br>感謝你陪我走過每個微笑與眼淚的片段。</p>
-              <p>願我們的故事，繼續在每個日常裡閃閃發光～❤️</p>
-              <button onclick="document.getElementById('love-letter').style.display='none'">我知道了</button>
-            </div>
-          </div>`;
-        document.body.appendChild(letter);
-      }
-    });
-    document.querySelector(".reminder-lock").addEventListener("click", () => {
-      const today = new Date();
-      // 如果不是 4/19，顯示提示框
-      if (!(today.getMonth() === 3 && today.getDate() === 19)) {
-        document.getElementById("lock-message").style.display = "flex";
-      }
-    });
-    setInterval(createFallingIcon, 500);
-    setInterval(updateTimeSmooth, 5000);
+
+    
+    if (enableLockAndLetter) {
+      window.addEventListener("DOMContentLoaded", () => {
+        const today = new Date();
+        if (today.getMonth() === 3 && today.getDate() === 19) {
+          const letter = document.createElement("div");
+          letter.id = "love-letter";
+          letter.className = "letter-overlay";
+          letter.innerHTML = `
+            <div class="letter">
+              <div class="letter-content">
+                <p>親愛的：</p>
+                <p>今天是屬於我們的特別日子。<br>感謝你陪我走過每個微笑與眼淚的片段。</p>
+                <p>願我們的故事，繼續在每個日常裡閃閃發光～❤️</p>
+                <button onclick="document.getElementById('love-letter').style.display='none'">我知道了</button>
+              </div>
+            </div>`;
+          document.body.appendChild(letter);
+        }
+      });
+    
+      document.querySelector(".reminder-lock").addEventListener("click", () => {
+        const today = new Date();
+        if (!(today.getMonth() === 3 && today.getDate() === 19)) {
+          document.getElementById("lock-message").style.display = "flex";
+        }
+      });
+    } else {
+      // 若不啟用，隱藏 HTML 鎖頭元素
+      document.querySelector(".reminder-lock").style.display = "none";
+    }
+    
+    
+    if (enableFallingIcons) {
+      setInterval(createFallingIcon, 500);
+    }
+    if (enableTextDisplay) {
+      setInterval(updateTimeSmooth, 5000);
+      updateTimeSmooth();
+    }
     updateTimeSmooth();
     updateLoveDuration();
   </script>

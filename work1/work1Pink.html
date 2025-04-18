@@ -144,6 +144,150 @@
         border-radius: 24px;
       }
     }
+
+    #falling-container {
+      position: fixed;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .falling {
+      position: absolute;
+      animation: fall linear;
+      opacity: 0.8;
+    }
+    @keyframes fall {
+      0% {
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .reminder-lock {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(255, 182, 203, 0.8);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.8rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .reminder-lock:hover::after {
+      content: "記得 4/18 打開小信封喔 💌";
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      background: #fff0f5;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      color: #c86c6c;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+  
+    .lock-message {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9998;
+    }
+  
+    .lock-message-box {
+      background: #fff0f5;
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      text-align: center;
+      font-family: 'Noto Serif TC', serif;
+      color: #d64b7f;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+  
+    .lock-message-box p {
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+    }
+  
+    .lock-message-box button {
+      background: #ffb6c1;
+      color: white;
+      padding: 8px 18px;
+      border: none;
+      border-radius: 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+  
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+
+    .letter-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(250, 235, 240, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      font-family: 'Zhi Mang Xing', cursive;
+    }
+    .letter {
+      background: #fffaf4;
+      border: 2px solid #f5c6cb;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      text-align: left;
+      animation: fadeIn 0.8s ease-out;
+    }
+    .letter-content p {
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+      color: #c86c6c;
+    }
+    .letter-content button {
+      display: block;
+      margin: 0 auto;
+      background: #ffb6c1;
+      color: white;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
@@ -172,12 +316,20 @@
   <div class="lightbox" id="lightbox">
     <img id="lightboxImg" src="" alt="放大圖片">
   </div>
-
   <audio id="bgm" loop>
     <source src="https://happyewq.github.io/workgit/work1/work1.mp3" type="audio/mpeg">
     您的瀏覽器不支援音樂播放。
   </audio>
+  <div id="falling-container"></div>
+  <div class="reminder-lock" title="記得 4/18 打開小信封喔" style="display: none;">🔒</div>
 
+  <!-- 鎖頭提示視窗 -->
+  <div id="lock-message" class="lock-message" style="display: none;">
+    <div class="lock-message-box">
+      <p>信封尚未開放或已經結束，敬請期待 💌</p>
+      <button onclick="document.getElementById('lock-message').style.display='none'">知道了</button>
+    </div>
+  </div>
   <script>
     const imageUrls = [
       'https://happyewq.github.io/workgit/work1/work1_1.jpg',
@@ -309,6 +461,62 @@
         lightboxImg.src = photoWallImages[currentPhotoIndex].src;
       }
     }
+
+// ✅ 控制是否啟用掉落動畫
+const enableFallingIcons = true; // 設為 false 就會停用
+
+if (enableFallingIcons) {
+  const icons = ['💖', '💫', '🌟', '💕', '✨'];
+  const container = document.getElementById('falling-container');
+
+  function createFallingIcon() {
+    const el = document.createElement('div');
+    el.classList.add('falling');
+    el.textContent = icons[Math.floor(Math.random() * icons.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.animationDuration = (2 + Math.random() * 3) + 's';
+    el.style.fontSize = (20 + Math.random() * 20) + 'px';
+    el.style.top = '-30px';
+    container.appendChild(el);
+    setTimeout(() => container.removeChild(el), 5000);
+  }
+
+  setInterval(createFallingIcon, 500);
+}
+
+// ✅ 控制鎖頭
+const enableLockAndLetter = true; // 設為 false 就會停用
+if (enableLockAndLetter) {
+  const today = new Date();
+
+  // 顯示信封內容（限定 4/18）
+  if (today.getMonth() === 3 && today.getDate() === 18) {
+    const letter = document.createElement("div");
+    letter.id = "love-letter";
+    letter.className = "letter-overlay";
+    letter.innerHTML = `
+      <div class="letter">
+        <div class="letter-content">
+          <p>親愛的：</p>
+          <p>今天是屬於我們的特別日子。<br>感謝你陪我走過每個微笑與眼淚的片段。</p>
+          <p>願我們的故事，繼續在每個日常裡閃閃發光～❤️</p>
+          <button onclick="document.getElementById('love-letter').style.display='none'">我知道了</button>
+        </div>
+      </div>`;
+    document.body.appendChild(letter);
+  }
+
+  // 顯示鎖頭圖示
+  document.querySelector(".reminder-lock").style.display = "flex";
+
+  // 點鎖頭提示
+  document.querySelector(".reminder-lock").addEventListener("click", () => {
+    const today = new Date();
+    if (!(today.getMonth() === 3 && today.getDate() === 18)) {
+      document.getElementById("lock-message").style.display = "flex";
+    }
+  });
+}
 
   // 禁用 F12、Ctrl+Shift+I、Ctrl+U、Ctrl+S
   document.addEventListener("keydown", function (e) {
