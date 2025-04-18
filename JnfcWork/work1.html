@@ -101,7 +101,7 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: rgba(255, 182, 203, 0.8);
+      background: rgba(255, 192, 203, 0.8);
       border-radius: 50%;
       width: 60px;
       height: 60px;
@@ -114,7 +114,7 @@
       z-index: 1000;
     }
     .reminder-lock:hover::after {
-      content: "記得 4/18 打開小信封喔 💌";
+      content: "記得 4/19 打開小信封喔 💌";
       position: absolute;
       bottom: 70px;
       right: 0;
@@ -161,7 +161,7 @@
     <div class="time-section" id="time"></div>
     <div class="love-duration" id="loveDuration"></div>
   </div>
-  <div class="reminder-lock" title="記得 4/18 打開小信封喔">🔒</div>
+  <div class="reminder-lock" title="記得 4/19 打開小信封喔">🔒</div>
 
   <!-- 🔒 鎖頭提示框 -->
 <div id="lock-message" class="lock-message">
@@ -235,7 +235,7 @@
     });
     window.addEventListener("DOMContentLoaded", () => {
       const today = new Date();
-      if (today.getMonth() === 3 && today.getDate() === 18) {
+      if (today.getMonth() === 3 && today.getDate() === 19) {
         const letter = document.createElement("div");
         letter.id = "love-letter";
         letter.className = "letter-overlay";
@@ -253,8 +253,8 @@
     });
     document.querySelector(".reminder-lock").addEventListener("click", () => {
       const today = new Date();
-      // 如果不是 4/18，顯示提示框
-      if (!(today.getMonth() === 3 && today.getDate() === 18)) {
+      // 如果不是 4/19，顯示提示框
+      if (!(today.getMonth() === 3 && today.getDate() === 19)) {
         document.getElementById("lock-message").style.display = "flex";
       }
     });
@@ -343,7 +343,7 @@
     .lock-message-box button {
       background: #ffb6c1;
       color: white;
-      padding: 8px 18px;
+      padding: 8px 19px;
       border: none;
       border-radius: 20px;
       font-size: 1rem;
