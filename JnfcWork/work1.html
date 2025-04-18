@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>我們的時光</title>
-  <link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&family=Noto+Serif+TC&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&family=Noto+Serif+TC&family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body, html {
       height: 100%;
       font-family: 'Noto Sans TC', sans-serif;
@@ -15,7 +14,6 @@
       overflow-x: hidden;
       position: relative;
     }
-
     #falling-container {
       position: fixed;
       pointer-events: none;
@@ -25,25 +23,16 @@
       height: 100%;
       z-index: 1;
     }
-
     .falling {
       position: absolute;
       font-size: 24px;
       animation: fall linear;
       opacity: 0.8;
     }
-
     @keyframes fall {
-      0% {
-        transform: translateY(-10px) rotate(0deg);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(100vh) rotate(360deg);
-        opacity: 0;
-      }
+      0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
     }
-
     .container {
       position: relative;
       z-index: 2;
@@ -57,12 +46,10 @@
       opacity: 0;
       animation-delay: 0.5s;
     }
-
     @keyframes pageFlip {
       0% { opacity: 0; transform: rotateY(90deg); }
       100% { opacity: 1; transform: rotateY(0deg); }
     }
-
     .q-image {
       width: 220px;
       height: auto;
@@ -71,19 +58,16 @@
       margin-bottom: 30px;
       transition: transform 0.4s ease, box-shadow 0.4s ease;
     }
-
     .q-image:hover {
       transform: scale(1.05);
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
     }
-
     .text-section {
       font-family: 'Zhi Mang Xing', cursive;
       font-size: 2.5rem;
       color: #c86c6c;
       margin-bottom: 30px;
     }
-
     .video-section {
       position: relative;
       width: 100%;
@@ -91,7 +75,6 @@
       height: 0;
       margin-bottom: 30px;
     }
-
     .video-section iframe {
       position: absolute;
       top: 0;
@@ -102,7 +85,6 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       border: none;
     }
-    
     .time-section, .love-duration {
       font-family: 'Ma Shan Zheng', cursive;
       font-size: 1.2rem;
@@ -110,54 +92,78 @@
       margin-bottom: 10px;
       transition: opacity 0.6s ease-in-out;
     }
-
     .love-duration {
       color: #ff6f91;
       font-weight: bold;
       font-family: 'Zhi Mang Xing', cursive;
     }
-
+    .reminder-lock {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(255, 192, 203, 0.8);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.8rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .reminder-lock:hover::after {
+      content: "記得 4/18 打開小信封喔 💌";
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      background: #fff0f5;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      color: #c86c6c;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
     @media (max-width: 600px) {
       .text-section { font-size: 2rem; }
       .time-section, .love-duration { font-size: 1rem; }
       .q-image { width: 160px; }
+      .reminder-lock {
+        width: 50px;
+        height: 50px;
+        font-size: 1.4rem;
+        bottom: 15px;
+        right: 15px;
+      }
+      .reminder-lock:hover::after {
+        bottom: 60px;
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- 浪漫掉落特效 -->
   <div id="falling-container"></div>
-
-  <!-- 主內容 -->
   <div class="container">
-    <!-- Q版圖 -->
     <img class="q-image" src="https://happyewq.github.io/workgit/work1/work1_0.jpg" alt="Q版形象圖">
-
-    <!-- 浪漫文字 -->
     <div class="text-section">我們一起走過的每一刻，都值得被珍藏</div>
-
-    <!-- 影片 -->
     <div class="video-section">
       <iframe
-      src="https://www.youtube.com/embed/gr486ZW6eCk"
-      title="Our Precious Moments"
-      frameborder="0"
-      allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen>
-    </iframe>
+        src="https://www.youtube.com/embed/gr486ZW6eCk"
+        title="Our Precious Moments"
+        frameborder="0"
+        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
     </div>
-
-    <!-- 時間與天數 -->
     <div class="time-section" id="time"></div>
     <div class="love-duration" id="loveDuration"></div>
   </div>
-
-  <!-- JS 功能 -->
+  <div class="reminder-lock" title="記得 4/18 打開小信封喔">🔒</div>
   <script>
-    // 愛的起點日期
     const startDate = new Date("2021-08-15");
-  
-    // 浪漫語句們
     const poeticPhrases = [
       "此時此刻，愛還在繼續",
       "在這一刻，我們正在一起",
@@ -168,13 +174,9 @@
       "我們的故事，繼續書寫著",
       "這一刻，我們共享同一個時光"
     ];
-  
     const timeEl = document.getElementById("time");
-  
     function updateTimeSmooth() {
-      // 先淡出
       timeEl.style.opacity = 0;
-  
       setTimeout(() => {
         const now = new Date();
         const timeString = now.toLocaleString("zh-TW", {
@@ -188,21 +190,17 @@
         });
         const phrase = poeticPhrases[Math.floor(Math.random() * poeticPhrases.length)];
         timeEl.textContent = `${phrase}：${timeString}`;
-        timeEl.style.opacity = 1; // 淡入
-      }, 1000); // 1秒後再換字，讓淡出完成
+        timeEl.style.opacity = 1;
+      }, 1000);
     }
-  
     function updateLoveDuration() {
       const now = new Date();
       const diffTime = now - startDate;
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
       document.getElementById("loveDuration").textContent = `我們已經一起走過了 ${diffDays} 天囉 ❤️`;
     }
-  
-    // 愛心星星落下動畫
     const icons = ['💖', '💫', '🌟', '💕', '✨'];
     const container = document.getElementById('falling-container');
-  
     function createFallingIcon() {
       const el = document.createElement('div');
       el.classList.add('falling');
@@ -213,29 +211,90 @@
       container.appendChild(el);
       setTimeout(() => container.removeChild(el), 5000);
     }
-
-  // 禁用 F12、Ctrl+Shift+I、Ctrl+U、Ctrl+S
-  document.addEventListener("keydown", function (e) {
-    if (
-      e.key === "F12" ||
-      (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") || // Ctrl+Shift+I
-      (e.ctrlKey && e.key.toLowerCase() === "u") ||               // Ctrl+U
-      (e.ctrlKey && e.key.toLowerCase() === "s")                  // Ctrl+S
-    ) {
+    document.addEventListener("keydown", function (e) {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") ||
+        (e.ctrlKey && e.key.toLowerCase() === "u") ||
+        (e.ctrlKey && e.key.toLowerCase() === "s")
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    });
+    document.addEventListener("contextmenu", function (e) {
       e.preventDefault();
-      return false;
-    }
-  });
-
-  // 禁用右鍵
-  document.addEventListener("contextmenu", function (e) {
-    e.preventDefault();
-  });
-    // 初始化
+    });
+    window.addEventListener("DOMContentLoaded", () => {
+      const today = new Date();
+      if (today.getMonth() === 3 && today.getDate() === 18) {
+        const letter = document.createElement("div");
+        letter.id = "love-letter";
+        letter.className = "letter-overlay";
+        letter.innerHTML = `
+          <div class="letter">
+            <div class="letter-content">
+              <p>親愛的：</p>
+              <p>今天是屬於我們的特別日子。<br>感謝你陪我走過每個微笑與眼淚的片段。</p>
+              <p>願我們的故事，繼續在每個日常裡閃閃發光～❤️</p>
+              <button onclick="document.getElementById('love-letter').style.display='none'">我知道了</button>
+            </div>
+          </div>`;
+        document.body.appendChild(letter);
+      }
+    });
     setInterval(createFallingIcon, 500);
-    setInterval(updateTimeSmooth, 5000); // 每 3 秒切換一次
+    setInterval(updateTimeSmooth, 5000);
     updateTimeSmooth();
     updateLoveDuration();
   </script>
+  <style>
+    .letter-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(250, 235, 240, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      font-family: 'Zhi Mang Xing', cursive;
+    }
+    .letter {
+      background: #fffaf4;
+      border: 2px solid #f5c6cb;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      text-align: left;
+      animation: fadeIn 0.8s ease-out;
+    }
+    .letter-content p {
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+      color: #c86c6c;
+    }
+    .letter-content button {
+      display: block;
+      margin: 0 auto;
+      background: #ffb6c1;
+      color: white;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+  </style>
 </body>
 </html>
