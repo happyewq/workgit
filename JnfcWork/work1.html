@@ -214,18 +214,20 @@
       setTimeout(() => container.removeChild(el), 5000);
     }
 
-   // 禁用 F12、Ctrl+Shift+I、Ctrl+U
-   document.addEventListener("keydown", function (e) {
+  // 禁用 F12、Ctrl+Shift+I、Ctrl+U、Ctrl+S
+  document.addEventListener("keydown", function (e) {
     if (
       e.key === "F12" ||
-      (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") ||
-      (e.ctrlKey && e.key.toLowerCase() === "u")
+      (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") || // Ctrl+Shift+I
+      (e.ctrlKey && e.key.toLowerCase() === "u") ||               // Ctrl+U
+      (e.ctrlKey && e.key.toLowerCase() === "s")                  // Ctrl+S
     ) {
       e.preventDefault();
+      return false;
     }
   });
 
-  // 禁用右鍵選單
+  // 禁用右鍵
   document.addEventListener("contextmenu", function (e) {
     e.preventDefault();
   });
