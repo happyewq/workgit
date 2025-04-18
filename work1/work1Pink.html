@@ -485,12 +485,17 @@ if (enableFallingIcons) {
 }
 
 // ✅ 控制鎖頭
-const enableLockAndLetter = true; // 設為 false 就會停用
+const enableLockAndLetter = true; // 設為 false 完全停用
+
 if (enableLockAndLetter) {
   const today = new Date();
+  const openMonth = 3;  // 注意：JavaScript 的月份從 0 開始，所以 3 代表「4 月」
+  const openDate = 18;  // 設定你的信封開啟日
 
-  // 顯示信封內容（限定 4/18）
-  if (today.getMonth() === 3 && today.getDate() === 18) {
+  const isOpenDay = today.getMonth() === openMonth && today.getDate() === openDate;
+
+  if (isOpenDay) {
+    // 👉 是開啟日：直接顯示信件，不顯示鎖頭
     const letter = document.createElement("div");
     letter.id = "love-letter";
     letter.className = "letter-overlay";
@@ -504,20 +509,14 @@ if (enableLockAndLetter) {
         </div>
       </div>`;
     document.body.appendChild(letter);
-  }
-
-  // 顯示鎖頭圖示
-  document.querySelector(".reminder-lock").style.display = "flex";
-
-  // 點鎖頭提示
-  document.querySelector(".reminder-lock").addEventListener("click", () => {
-    const today = new Date();
-    if (!(today.getMonth() === 3 && today.getDate() === 18)) {
+  } else {
+    // 👉 不是開啟日：顯示鎖頭，並可點擊提示
+    document.querySelector(".reminder-lock").style.display = "flex";
+    document.querySelector(".reminder-lock").addEventListener("click", () => {
       document.getElementById("lock-message").style.display = "flex";
-    }
-  });
+    });
+  }
 }
-
   // 禁用 F12、Ctrl+Shift+I、Ctrl+U、Ctrl+S
   document.addEventListener("keydown", function (e) {
     if (

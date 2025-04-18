@@ -158,7 +158,7 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: rgba(255, 182, 203, 0.8);
+      background: rgba(255, 192, 203, 0.8);
       border-radius: 50%;
       width: 60px;
       height: 60px;
@@ -171,7 +171,7 @@
       z-index: 1000;
     }
     .reminder-lock:hover::after {
-      content: "記得 4/18 查看小信封喔 💌";
+      content: "記得 4/19 查看小信封喔 💌";
       position: absolute;
       bottom: 70px;
       right: 0;
@@ -216,7 +216,7 @@
     .lock-message-box button {
       background: #ffb6c1;
       color: white;
-      padding: 8px 18px;
+      padding: 8px 19px;
       border: none;
       border-radius: 20px;
       font-size: 1rem;
@@ -304,7 +304,7 @@
     您的瀏覽器不支援音樂播放。
   </audio>
   <div id="falling-container"></div>
-  <div class="reminder-lock" title="記得 4/18 打開小信封喔" style="display: none;">🔒</div>
+  <div class="reminder-lock" title="記得 4/19 打開小信封喔" style="display: none;">🔒</div>
 
   <!-- 鎖頭提示視窗 -->
   <div id="lock-message" class="lock-message" style="display: none;">
@@ -469,12 +469,18 @@ if (enableFallingIcons) {
 }
 
 // ✅ 控制鎖頭
-const enableLockAndLetter = true; // 設為 false 就會停用
+// ✅ 控制鎖頭與信封功能
+const enableLockAndLetter = true; // 設為 false 完全停用
+
 if (enableLockAndLetter) {
   const today = new Date();
+  const openMonth = 3;  // 注意：JavaScript 的月份從 0 開始，所以 3 代表「4 月」
+  const openDate = 19;  // 設定你的信封開啟日
 
-  // 顯示信封內容（限定 4/18）
-  if (today.getMonth() === 3 && today.getDate() === 18) {
+  const isOpenDay = today.getMonth() === openMonth && today.getDate() === openDate;
+
+  if (isOpenDay) {
+    // 👉 是開啟日：直接顯示信件，不顯示鎖頭
     const letter = document.createElement("div");
     letter.id = "love-letter";
     letter.className = "letter-overlay";
@@ -488,18 +494,13 @@ if (enableLockAndLetter) {
         </div>
       </div>`;
     document.body.appendChild(letter);
-  }
-
-  // 顯示鎖頭圖示
-  document.querySelector(".reminder-lock").style.display = "flex";
-
-  // 點鎖頭提示
-  document.querySelector(".reminder-lock").addEventListener("click", () => {
-    const today = new Date();
-    if (!(today.getMonth() === 3 && today.getDate() === 18)) {
+  } else {
+    // 👉 不是開啟日：顯示鎖頭，並可點擊提示
+    document.querySelector(".reminder-lock").style.display = "flex";
+    document.querySelector(".reminder-lock").addEventListener("click", () => {
       document.getElementById("lock-message").style.display = "flex";
-    }
-  });
+    });
+  }
 }
 
 
