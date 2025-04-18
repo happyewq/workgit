@@ -12,21 +12,49 @@
       height: 100%;
       font-family: 'Noto Serif TC', serif;
       background: linear-gradient(to bottom, #fffaf4, #fdeff0);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      padding: 20px;
       overflow-x: hidden;
+      position: relative;
+    }
+
+    #falling-container {
+      position: fixed;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .falling {
+      position: absolute;
+      font-size: 24px;
+      animation: fall linear;
+      opacity: 0.8;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
     }
 
     .container {
+      position: relative;
+      z-index: 2;
       text-align: center;
       max-width: 800px;
       width: 100%;
-      opacity: 0;
-      transform: rotateY(90deg);
+      margin: 0 auto;
+      padding: 30px 20px;
       animation: pageFlip 1.2s ease forwards;
+      transform: rotateY(90deg);
+      opacity: 0;
       animation-delay: 0.5s;
     }
 
@@ -36,8 +64,8 @@
     }
 
     .q-image {
-      width: 100%;
-      max-width: 300px;
+      width: 220px;
+      height: auto;
       border-radius: 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       margin-bottom: 30px;
@@ -75,14 +103,13 @@
       border: none;
     }
 
-    .time-section {
+    .time-section, .love-duration {
       font-size: 1.2rem;
       color: #666;
       margin-bottom: 10px;
     }
 
     .love-duration {
-      font-size: 1.2rem;
       color: #ff6f91;
       font-weight: bold;
       font-family: 'Zhi Mang Xing', cursive;
@@ -91,15 +118,20 @@
     @media (max-width: 600px) {
       .text-section { font-size: 2rem; }
       .time-section, .love-duration { font-size: 1rem; }
+      .q-image { width: 160px; }
     }
   </style>
 </head>
 <body>
+  <!-- 浪漫掉落特效 -->
+  <div id="falling-container"></div>
+
+  <!-- 主內容 -->
   <div class="container">
     <!-- Q版圖 -->
     <img class="q-image" src="https://happyewq.github.io/workgit/work1/work1_0.jpg" alt="Q版形象圖">
 
-    <!-- 文字 -->
+    <!-- 浪漫文字 -->
     <div class="text-section">我們一起走過的每一刻，都值得被珍藏</div>
 
     <!-- 影片 -->
@@ -111,14 +143,16 @@
       </iframe>
     </div>
 
-    <!-- 現在時間 -->
+    <!-- 時間與天數 -->
     <div class="time-section" id="time"></div>
-
-    <!-- 已在一起多久 -->
     <div class="love-duration" id="loveDuration"></div>
   </div>
 
+  <!-- JS 功能 -->
   <script>
+    // ❤️ 記得改這個日期
+    const startDate = new Date("2021-08-15");
+
     function updateTime() {
       const now = new Date();
       const timeString = now.toLocaleString("zh-TW", {
@@ -134,13 +168,29 @@
     }
 
     function updateLoveDuration() {
-      const startDate = new Date("2021-05-20"); // ❤️ 改這裡為你們在一起的日子
       const now = new Date();
       const diffTime = now - startDate;
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
       document.getElementById("loveDuration").textContent = `我們已經一起走過了 ${diffDays} 天囉 ❤️`;
     }
 
+    // 愛心 & 星星落下
+    const icons = ['💖', '💫', '🌟', '💕', '✨'];
+    const container = document.getElementById('falling-container');
+
+    function createFallingIcon() {
+      const el = document.createElement('div');
+      el.classList.add('falling');
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.animationDuration = 2 + Math.random() * 3 + 's';
+      el.style.fontSize = 20 + Math.random() * 20 + 'px';
+      el.textContent = icons[Math.floor(Math.random() * icons.length)];
+      container.appendChild(el);
+      setTimeout(() => container.removeChild(el), 5000);
+    }
+
+    // 初始化
+    setInterval(createFallingIcon, 300);
     setInterval(updateTime, 1000);
     updateTime();
     updateLoveDuration();
