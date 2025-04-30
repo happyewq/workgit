@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - och管理系統</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 240px;
+            background-color: #343a40;
+            color: white;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+        }
+
+            .sidebar a {
+                color: #fff;
+                padding: 15px 20px;
+                text-decoration: none;
+                display: block;
+            }
+
+                .sidebar a:hover {
+                    background-color: #495057;
+                }
+
+        .main-content {
+            margin-left: 240px;
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .topbar {
+            height: 60px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: fixed;
+            left: 240px;
+            right: 0;
+            top: 0;
+            z-index: 1030;
+        }
+
+        .main-content > header {
+            margin-top: 80px; /* 預留 topbar 的高度 */
+        }
+    </style>
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var userNMC = localStorage.getItem('userNMC');
+            if (userNMC) {
+                document.getElementById('currentUser').innerText = '登入者：' + userNMC;
+            } else {
+                document.getElementById('currentUser').innerText = '尚未登入';
+            }
+        });
+    </script>
+    <!-- 側邊欄 -->
+    <div class="sidebar">
+        <h4 class="p-3 mb-0 border-bottom">och管理系統</h4>
+        <a asp-area="" asp-controller="Login" asp-action="Index">首頁</a>
+        <a asp-area="" asp-controller="Dashboard" asp-action="Index">儀表板</a>
+        <a asp-area="" asp-controller="Users" asp-action="Index">用戶管理</a>
+        <a asp-area="" asp-controller="Settings" asp-action="Index">設定</a>
+        <a asp-area="" asp-controller="Home" asp-action="Privacy">隱私政策</a>
+    </div>
+
+    <!-- 上方欄 (Topbar) -->
+    <div class="topbar">
+        <div>och管理系統</div>
+        <div id="currentUser">尚未登入</div>
+    </div>
+
+    <!-- 主內容 -->
+    <div class="main-content">
+        <header class="mb-4">
+            <h2>@ViewData["Title"]</h2>
+        </header>
+
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+
+        <footer class="border-top footer text-muted mt-4">
+            <div class="container">
+                &copy; 2025 - och管理系統 - <a asp-area="" asp-controller="Home" asp-action="Privacy">隱私權政策</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

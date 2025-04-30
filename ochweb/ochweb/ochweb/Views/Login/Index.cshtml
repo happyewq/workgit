@@ -1,0 +1,37 @@
+﻿@model ochweb.Models.LoginView
+@{
+    //Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header text-center bg-primary text-white">
+                    <h3>登入</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.UserID, htmlAttributes: new { @class = "form-label" })
+                        @Html.EditorFor(model => model.UserID, new { htmlAttributes = new { @class = "form-control", @placeholder = "請輸入帳號" } })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "form-label" })
+                        @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", @placeholder = "請輸入密碼", type = "password" } })
+                    </div>
+
+                    <div class="text-center">
+                        @* 這裡改用 text-center 讓按鈕置中 *@
+                        <button type="button" class="btn btn-primary px-5" onclick="login.onLoginClick(this)">登入</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/Script/login.js"></script>
+}
