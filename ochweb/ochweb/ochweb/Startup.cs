@@ -54,13 +54,17 @@ namespace ochweb
 					pattern: "{controller=Login}/{action=Index}/{id?}");
 			});
 
-			// 額外開放 Script 資料夾裡面放JS
-			app.UseStaticFiles(new StaticFileOptions
-			{
-				FileProvider = new PhysicalFileProvider(
-					Path.Combine(env.ContentRootPath, "Script")),
-				RequestPath = "/Script"
-			});
-		}
-	}
+            // 額外開放 Script 資料夾裡面放JS
+            var scriptPath = Path.Combine(env.ContentRootPath, "Script");
+            if (Directory.Exists(scriptPath))
+            {
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = new PhysicalFileProvider(scriptPath),
+                    RequestPath = "/Script"
+                });
+            }
+
+        }
+    }
 }
