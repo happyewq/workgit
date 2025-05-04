@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
+using Npgsql;
 
 namespace ochweb.Controllers
 {
@@ -21,24 +22,24 @@ namespace ochweb.Controllers
         [HttpPost]
         public ActionResult UserLogin(string UserID, string Password)
         {
-
             LoginView Result = new LoginView();
 
             try
             {
-                string connstring = DBHelper.GetConnectionString();
-                using (SqlConnection conn = new SqlConnection(connstring))
+                string connstring = DBHelper.GetConnectionString(); // 從 appsettings.json 抓 PostgreSQL 連線字串
+
+                using (var conn = new NpgsqlConnection(connstring))
                 {
                     conn.Open();
 
-                    string sql = "SELECT * FROM OCHUSER WHERE UserID = @UserID AND Password = @Password";
+                    string sql = "SELECT * FROM \"OCHUSER\".\"ochuser\" WHERE \"UserID\" = @UserID AND \"Password\" = @Password";
 
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    using (var cmd = new NpgsqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@UserID", UserID);
                         cmd.Parameters.AddWithValue("@Password", Password);
 
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        using (var reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
                             {
