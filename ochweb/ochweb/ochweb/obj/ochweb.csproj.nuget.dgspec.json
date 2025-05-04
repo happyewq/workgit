@@ -1,25 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\mypersonwork\\ochweb\\ochweb\\ochweb\\ochweb.csproj": {}
+    "C:\\Users\\lll\\OneDrive\\桌面\\workgit\\ochweb\\ochweb\\ochweb\\ochweb.csproj": {}
   },
   "projects": {
-    "D:\\mypersonwork\\ochweb\\ochweb\\ochweb\\ochweb.csproj": {
+    "C:\\Users\\lll\\OneDrive\\桌面\\workgit\\ochweb\\ochweb\\ochweb\\ochweb.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\mypersonwork\\ochweb\\ochweb\\ochweb\\ochweb.csproj",
+        "projectUniqueName": "C:\\Users\\lll\\OneDrive\\桌面\\workgit\\ochweb\\ochweb\\ochweb\\ochweb.csproj",
         "projectName": "ochweb",
-        "projectPath": "D:\\mypersonwork\\ochweb\\ochweb\\ochweb\\ochweb.csproj",
-        "packagesPath": "C:\\Users\\jason\\.nuget\\packages\\",
-        "outputPath": "D:\\mypersonwork\\ochweb\\ochweb\\ochweb\\obj\\",
+        "projectPath": "C:\\Users\\lll\\OneDrive\\桌面\\workgit\\ochweb\\ochweb\\ochweb\\ochweb.csproj",
+        "packagesPath": "C:\\Users\\lll\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\lll\\OneDrive\\桌面\\workgit\\ochweb\\ochweb\\ochweb\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\jason\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\lll\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -27,7 +22,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -40,6 +34,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -78,7 +77,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204\\RuntimeIdentifierGraph.json"
         }
       }
     }

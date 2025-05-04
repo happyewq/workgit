@@ -29,8 +29,14 @@ $.extend(login.prototype,
                             userNMC: response.userNMC
                         };
                         localStorage.setItem('userNMC', response.userNMC);
-
-                        alert("登入成功！歡迎 " + response.userNMC);
+                        Swal.fire({
+                            icon: 'success',
+                            title: '登入成功！',
+                            text: '歡迎 ' + response.userNMC,
+                            confirmButtonText: '進入系統'
+                        }).then(() => {
+                            window.location.href = "/OchC010/Index";
+                        });
 
                         // 跳轉頁面
                         window.location.href = "/OchC010/Index";

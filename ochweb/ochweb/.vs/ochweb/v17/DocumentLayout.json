@@ -1,0 +1,353 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\views\\login\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\views\\login\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\script\\login.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\script\\login.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\controllers\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\controllers\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\controllers\\ochc010controller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\controllers\\ochc010controller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\views\\shared\\_loginlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\views\\shared\\_loginlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\models\\ochc010view.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\models\\ochc010view.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\models\\loginview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\models\\loginview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\views\\ochc010\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\views\\ochc010\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\script\\menu.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\script\\menu.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\controllers\\menucontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\controllers\\menucontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\views\\home\\privacy.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\views\\home\\privacy.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\views\\shared\\_validationscriptspartial.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\views\\shared\\_validationscriptspartial.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\views\\_viewimports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\views\\_viewimports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\helper\\dbhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\helper\\dbhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|c:\\users\\lll\\onedrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\wwwroot\\js\\site.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{4C45425E-F10C-4258-8779-E4FC88E9AA55}|ochweb\\ochweb.csproj|solutionrelative:ochweb\\wwwroot\\js\\site.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 9,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\appsettings.json",
+              "RelativeDocumentMoniker": "ochweb\\appsettings.json",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\appsettings.json",
+              "RelativeToolTip": "ochweb\\appsettings.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAACBAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-04-30T14:59:30.566Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "OchC010Controller.cs",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Controllers\\OchC010Controller.cs",
+              "RelativeDocumentMoniker": "ochweb\\Controllers\\OchC010Controller.cs",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Controllers\\OchC010Controller.cs",
+              "RelativeToolTip": "ochweb\\Controllers\\OchC010Controller.cs",
+              "ViewState": "AQIAAAIAAAAAAAAAAIAwwBQAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-30T14:57:27.463Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "LoginView.cs",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Models\\LoginView.cs",
+              "RelativeDocumentMoniker": "ochweb\\Models\\LoginView.cs",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Models\\LoginView.cs",
+              "RelativeToolTip": "ochweb\\Models\\LoginView.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAXAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-30T14:57:27.711Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "login.js",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Script\\login.js",
+              "RelativeDocumentMoniker": "ochweb\\Script\\login.js",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Script\\login.js",
+              "RelativeToolTip": "ochweb\\Script\\login.js",
+              "ViewState": "AQIAAA0AAAAAAAAAAAAAwBgAAAA3AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-04-30T14:57:27.716Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "LoginController.cs",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Controllers\\LoginController.cs",
+              "RelativeDocumentMoniker": "ochweb\\Controllers\\LoginController.cs",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Controllers\\LoginController.cs",
+              "RelativeToolTip": "ochweb\\Controllers\\LoginController.cs",
+              "ViewState": "AQIAAC8AAAAAAAAAAIAwwDoAAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-30T14:57:27.72Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "_ViewImports.cshtml",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\_ViewImports.cshtml",
+              "RelativeDocumentMoniker": "ochweb\\Views\\_ViewImports.cshtml",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\_ViewImports.cshtml",
+              "RelativeToolTip": "ochweb\\Views\\_ViewImports.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-30T14:57:27.724Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\Login\\Index.cshtml",
+              "RelativeDocumentMoniker": "ochweb\\Views\\Login\\Index.cshtml",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\Login\\Index.cshtml",
+              "RelativeToolTip": "ochweb\\Views\\Login\\Index.cshtml",
+              "ViewState": "AQIAABIAAAAAAAAAAAAAACIAAAASAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-30T14:57:27.727Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "_LoginLayout.cshtml",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\Shared\\_LoginLayout.cshtml",
+              "RelativeDocumentMoniker": "ochweb\\Views\\Shared\\_LoginLayout.cshtml",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\Shared\\_LoginLayout.cshtml",
+              "RelativeToolTip": "ochweb\\Views\\Shared\\_LoginLayout.cshtml",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAAA4AAAAaAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-30T14:57:27.731Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "ochweb\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "ochweb\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AQIAAEQAAAAAAAAAAAAAAFYAAAAaAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-30T14:57:27.735Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "OchC010View.cs",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Models\\OchC010View.cs",
+              "RelativeDocumentMoniker": "ochweb\\Models\\OchC010View.cs",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Models\\OchC010View.cs",
+              "RelativeToolTip": "ochweb\\Models\\OchC010View.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAbAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-30T14:57:27.739Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\OchC010\\Index.cshtml",
+              "RelativeDocumentMoniker": "ochweb\\Views\\OchC010\\Index.cshtml",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\OchC010\\Index.cshtml",
+              "RelativeToolTip": "ochweb\\Views\\OchC010\\Index.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAcAAAAdAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-30T14:57:27.743Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "ErrorViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Models\\ErrorViewModel.cs",
+              "RelativeDocumentMoniker": "ochweb\\Models\\ErrorViewModel.cs",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Models\\ErrorViewModel.cs",
+              "RelativeToolTip": "ochweb\\Models\\ErrorViewModel.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-30T14:57:27.746Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "_ViewStart.cshtml",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\_ViewStart.cshtml",
+              "RelativeDocumentMoniker": "ochweb\\Views\\_ViewStart.cshtml",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\_ViewStart.cshtml",
+              "RelativeToolTip": "ochweb\\Views\\_ViewStart.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-30T14:57:27.75Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "Privacy.cshtml",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\Home\\Privacy.cshtml",
+              "RelativeDocumentMoniker": "ochweb\\Views\\Home\\Privacy.cshtml",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\Home\\Privacy.cshtml",
+              "RelativeToolTip": "ochweb\\Views\\Home\\Privacy.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-30T14:57:27.756Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "MenuController.cs",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Controllers\\MenuController.cs",
+              "RelativeDocumentMoniker": "ochweb\\Controllers\\MenuController.cs",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Controllers\\MenuController.cs",
+              "RelativeToolTip": "ochweb\\Controllers\\MenuController.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-30T14:57:27.759Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "menu.js",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Script\\menu.js",
+              "RelativeDocumentMoniker": "ochweb\\Script\\menu.js",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Script\\menu.js",
+              "RelativeToolTip": "ochweb\\Script\\menu.js",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-04-30T14:57:27.762Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "DBHelper.cs",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Helper\\DBHelper.cs",
+              "RelativeDocumentMoniker": "ochweb\\Helper\\DBHelper.cs",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Helper\\DBHelper.cs",
+              "RelativeToolTip": "ochweb\\Helper\\DBHelper.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAAqAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-30T14:57:27.764Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "ochweb\\Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "ochweb\\Views\\Home\\Index.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAABGAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-30T14:57:27.767Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "_ValidationScriptsPartial.cshtml",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "RelativeDocumentMoniker": "ochweb\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "RelativeToolTip": "ochweb\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-30T14:57:27.77Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "site.js",
+              "DocumentMoniker": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\wwwroot\\js\\site.js",
+              "RelativeDocumentMoniker": "ochweb\\wwwroot\\js\\site.js",
+              "ToolTip": "C:\\Users\\lll\\OneDrive\\\u684C\u9762\\workgit\\ochweb\\ochweb\\ochweb\\wwwroot\\js\\site.js",
+              "RelativeToolTip": "ochweb\\wwwroot\\js\\site.js",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-04-30T14:57:27.773Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
