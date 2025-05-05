@@ -1,0 +1,452 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增福音紀錄</title>
+    <style>
+           /* 背景漸變和動態效果 */
+    body {
+        font-family: 'Arial', sans-serif;
+        background: linear-gradient(45deg, #6a11cb, #2575fc, #ff007f);
+        background-size: 400% 400%;
+        animation: gradientAnimation 15s ease infinite;
+        margin: 0;
+        padding: 0;
+        color: #fff;
+    }
+
+
+    /* 按鈕漸變顏色和動畫 */
+    button {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.3rem;
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    button:hover {
+        background: linear-gradient(135deg, #2575fc, #6a11cb);
+        transform: scale(1.05);
+    }
+
+    /* 輸入框焦點效果 */
+    input:focus {
+        outline: none;
+        border: 2px solid #ff007f;
+        box-shadow: 0 0 5px rgba(255, 0, 127, 0.5);
+    }
+
+    /* 盒子陰影效果 */
+    .container {
+        max-width: 600px;
+        margin: 50px auto;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* 彈窗動畫 */
+    #popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+        animation: fadeIn 0.5s ease-out;
+    }
+        h1 {
+            text-align: center;
+            font-size: 1.7rem;
+            color: #333;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .input-container input {
+            width: 150px;
+            padding: 15px;
+            font-size: 2.0rem;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-sizing: border-box;
+            text-align: center;
+            margin: 0 15px; /* 增加左右間距，防止按鈕與輸入框重疊 */
+        }
+        
+        .input-container button {
+            width: 80px;
+            height: 80px;
+            font-size: 40px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+            -webkit-touch-callout: none; /* 禁用點擊放大效果 */
+        }
+
+    .input-container button:hover {
+        background-color: #0056b3;
+        transform: scale(1.1);
+    }
+        button {
+            -webkit-touch-callout: none; /* 禁用點擊放大效果 */
+            width: 100%;
+            padding: 15px;
+            font-size: 1.3rem;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+        }
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button:focus, input:focus {
+            outline: none;
+        }
+        /* 彈窗背景 */
+        #popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+        }
+        /* 彈窗內容 */
+        #popup .popup-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+        }
+        #popup .popup-box p {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #popup .popup-box button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #popup .popup-box button:hover {
+            background-color: #0056b3;
+        }
+        /* 遮罩層 */
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+        .message-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            color: white;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;  /* 垂直排列 label 和 input */
+            align-items: center;  /* 使它們居中 */
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        input {
+            width: 80%; /* 可以調整為更適合的寬度 */
+            max-width: 400px; /* 限制最大寬度 */
+            padding: 12px;
+            font-size: 1.2rem;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        /* 防止點擊時放大縮小的動畫 */
+        button:active {
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>新增福音紀錄</h1>
+
+        <div class="form-group">
+            <input type="text" id="name" placeholder="請輸入名稱">
+        </div>
+
+        <div class="form-group">
+            <label >次數</label>
+            <div class="input-container">
+                <button id="people-dec">-</button>
+                <input id="people" value="0">
+                <button id="people-inc">+</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label >人數</label>
+            <div class="input-container">
+                <button id="times-dec">-</button>
+                <input id="times" value="0">
+                <button id="times-inc">+</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label >對話</label>
+            <div class="input-container">
+                <button id="talk-dec">-</button>
+                <input id="talk" value="0">
+                <button id="talk-inc">+</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label >Line</label>
+            <div class="input-container">
+                <button id="line-dec">-</button>
+                <input id="line" value="0">
+                <button id="line-inc">+</button>
+            </div>
+        </div>
+        <!-- 日期選擇器 -->
+        <div class="form-group">
+            <label for="date">日期</label>
+            <input type="datetime-local" id="date" name="date">
+        </div>
+        <div class="button-container">
+            <button id="submitBtn">新增</button>
+            <div class="message" id="message"></div>
+                <button onclick="ToSearch()">回到查詢頁面</button>
+        </div>
+    </div>
+
+    <!-- 彈窗 -->
+    <div id="popup">
+        <div class="popup-box">
+            <p id="popup-message">訊息內容</p>
+            <button id="popup-close">確定</button>
+        </div>
+    </div>
+
+    <!-- 遮罩層 -->
+    <div id="overlay">
+        <div class="message-box">新增中...</div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const day = today.getDate().toString().padStart(2, '0');
+            const hours = today.getHours().toString().padStart(2, '0');
+            const minutes = today.getMinutes().toString().padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+            
+            document.getElementById('date').value = formattedDate;
+        };
+
+        function ToSearch() {
+            window.location.href = '/OchC010/Index';
+        }
+        // 顯示遮罩層
+        function showOverlay(message) {
+            const overlay = document.getElementById("overlay");
+            overlay.style.display = "block";
+            overlay.querySelector(".message-box").textContent = message || "新增中...";
+        }
+
+        // 隱藏遮罩層
+        function hideOverlay() {
+            const overlay = document.getElementById("overlay");
+            overlay.style.display = "none";
+        }
+
+        // 顯示彈窗
+        function showPopup(message) {
+            const popup = document.getElementById("popup");
+            const messageBox = document.getElementById("popup-message");
+            messageBox.textContent = message;
+            popup.style.display = "block";
+
+            // 點擊確定按鈕後關閉彈窗
+            document.getElementById("popup-close").onclick = () => {
+                popup.style.display = "none";
+                if(message != "請填寫所有欄位！"){
+                    clearFields(); // 清空輸入框
+                    window.location.href = 'Index.html'; // 跳轉回 index 頁面
+                }
+            };
+        }
+
+        // 改變輸入框的數值
+        function changeValue(id, delta) {
+            const input = document.getElementById(id);
+            let value = parseInt(input.value) || 0;
+            value += delta;
+            input.value = value < 0 ? 0 : value; // 防止數值為負數
+        }
+
+        // 發送資料到 Webhook
+        async function sendToWebhook(payload) {
+            const webhookUrl = "https://hook.eu2.make.com/7wbapny15so5m2flnks6n5rp4puosab5"; // 替換為您的 Webhook URL
+            const response = await fetch(webhookUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                throw new Error("資料發送失敗");
+            }
+        }
+
+        // 新增資料
+        async function insertData() {
+            const name = document.getElementById("name").value.trim();
+            const people = document.getElementById("people").value.trim();
+            const times = document.getElementById("times").value.trim();
+            const talk = document.getElementById("talk").value.trim();
+            const line = document.getElementById("line").value.trim();
+            const date = document.getElementById("date").value.trim(); // 獲取日期
+
+            // 驗證輸入
+            if (!name || !people || !times || !talk || !line|| !date) {
+                showPopup("請填寫所有欄位！");
+                return;
+            }
+
+            // 顯示遮罩層
+            showOverlay("新增中...");
+
+            const payload = {
+                data: `新增/${name}/${people}/${times}/${talk}/${line}/${date.replace(/-/g, '/').replace('T',' ')}`,
+                status: "active", // 預設為 active
+            };
+
+            try {
+                await sendToWebhook(payload);
+                showPopup("資料新增成功！");
+            } catch (error) {
+                console.error("Error inserting data:", error);
+                showPopup("資料新增失敗，請檢查錯誤日誌。");
+            } finally {
+                hideOverlay(); // 隱藏遮罩層
+            }
+        }
+
+        // 清空所有輸入框
+        function clearFields() {
+            document.getElementById("name").value = "";
+            document.getElementById("people").value = 0;
+            document.getElementById("times").value = 0;
+            document.getElementById("talk").value = 0;
+            document.getElementById("line").value = 0;
+        }
+
+        // 綁定新增按鈕的事件
+        document.getElementById("submitBtn").addEventListener("click", insertData);
+
+        // 綁定增減按鈕事件
+        document.getElementById("people-inc").addEventListener("click", function () {
+            changeValue("people", 1);
+        });
+        document.getElementById("people-dec").addEventListener("click", function () {
+            changeValue("people", -1);
+        });
+
+        document.getElementById("times-inc").addEventListener("click", function () {
+            changeValue("times", 1);
+        });
+        document.getElementById("times-dec").addEventListener("click", function () {
+            changeValue("times", -1);
+        });
+
+        document.getElementById("talk-inc").addEventListener("click", function () {
+            changeValue("talk", 1);
+        });
+        document.getElementById("talk-dec").addEventListener("click", function () {
+            changeValue("talk", -1);
+        });
+
+        document.getElementById("line-inc").addEventListener("click", function () {
+            changeValue("line", 1);
+        });
+        document.getElementById("line-dec").addEventListener("click", function () {
+            changeValue("line", -1);
+        });
+      // 禁止雙擊縮放
+      document.addEventListener("dblclick", function(e) {
+         e.preventDefault(); // 禁止雙擊事件觸發縮放
+      }, false);
+
+    </script>
+</body>

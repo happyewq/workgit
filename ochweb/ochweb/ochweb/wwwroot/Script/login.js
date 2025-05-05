@@ -12,6 +12,14 @@ $.extend(login.prototype,
                 alert("請輸入帳號和密碼！");
                 return;
             }
+            // 顯示 loading 畫面
+            Swal.fire({
+                title: '登入中...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
 
             $.ajax({
                 url: '/Login/UserLogin',
@@ -38,8 +46,6 @@ $.extend(login.prototype,
                             window.location.href = "/OchC010/Index";
                         });
 
-                        // 跳轉頁面
-                        window.location.href = "/OchC010/Index";
                     } else {
                         // 登入失敗，顯示錯誤訊息
                         alert(response.errorMessage || "登入失敗！");
@@ -51,6 +57,7 @@ $.extend(login.prototype,
                 }
             });
         }
+
     });
 
 $(function () {

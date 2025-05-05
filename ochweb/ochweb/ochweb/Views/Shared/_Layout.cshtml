@@ -75,11 +75,12 @@
     <!-- 側邊欄 -->
     <div class="sidebar">
         <h4 class="p-3 mb-0 border-bottom">och管理系統</h4>
-        <a asp-area="" asp-controller="Login" asp-action="Index">首頁</a>
-        <a asp-area="" asp-controller="Dashboard" asp-action="Index">儀表板</a>
-        <a asp-area="" asp-controller="Users" asp-action="Index">用戶管理</a>
+        <a asp-area="" asp-controller="OchQ010" asp-action="Index">首頁</a>
+        <a asp-area="" asp-controller="OchC010" asp-action="Index">福音紀錄管理</a>
+        <a asp-area="" asp-controller="OchM040" asp-action="Index">用戶管理</a>
+@*        <a asp-area="" asp-controller="Dashboard" asp-action="Index">儀表板</a>
         <a asp-area="" asp-controller="Settings" asp-action="Index">設定</a>
-        <a asp-area="" asp-controller="Home" asp-action="Privacy">隱私政策</a>
+        <a asp-area="" asp-controller="Home" asp-action="Privacy">隱私政策</a>*@
     </div>
 
     <!-- 上方欄 (Topbar) -->
@@ -97,12 +98,12 @@
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
-
+@*
         <footer class="border-top footer text-muted mt-4">
             <div class="container">
                 &copy; 2025 - och管理系統 - <a asp-area="" asp-controller="Home" asp-action="Privacy">隱私權政策</a>
             </div>
-        </footer>
+        </footer>*@
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

@@ -1,0 +1,29 @@
+﻿@model ochweb.Models.OchM040View
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts {
+    <script src="/Script/ochm040.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+}
+
+
+<div class="container mt-4">
+    <h3>新增使用者</h3>
+    <div class="mb-3">
+        <label asp-for="UserID" class="form-label"></label>
+        <input asp-for="UserID" id="UserID" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" id="Password" type="password" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="UserNMC" class="form-label"></label>
+        <input asp-for="UserNMC" id="UserNMC" class="form-control" />
+    </div>
+    <button type="button" class="btn btn-success" onclick="ochm040.SaveUser()">儲存</button>
+    <a asp-action="Index" class="btn btn-secondary">返回列表</a>
+</div>
