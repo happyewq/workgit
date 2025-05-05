@@ -1,540 +1,547 @@
-﻿
-
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>查詢福音紀錄</title>
-        <!-- 引入 jQuery -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <!-- 引入 BlockUI 插件 -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
-
-        <style>
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background-color: #eef3f9;
-                margin: 0;
-                padding: 0;
-            }
-
-            .container {
-                max-width: 900px;
-                margin: 50px auto;
-                background-color: #ffffff;
-                border-radius: 12px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-                padding: 40px;
-            }
-
-            h1 {
-                text-align: center;
-                color: #333;
-                font-size: 2rem;
-                margin-bottom: 20px;
-            }
-
-            .input-container {
-                text-align: center;
-                margin-bottom: 25px;
-            }
-
-            input[type="text"], input[type="date"] {
-                width: 80%;
-                padding: 18px;
-                font-size: 1.2rem; /* Increase font size */
-                border: 1px solid #ccc;
-                border-radius: 8px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                transition: border-color 0.2s, box-shadow 0.2s;
-                margin-top: 10px;
-            }
-
-                input[type="text"]:focus, input[type="date"]:focus {
-                    border-color: #007BFF;
-                    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
-                    outline: none;
-                }
-
-            .data-display {
-                margin-top: 25px;
-                padding: 20px;
-                background-color: #f7faff;
-                border: 1px solid #ddd;
-                border-radius: 12px;
-                max-height: 400px; /* Limit the height of the data container */
-                overflow-y: auto; /* Allow vertical scrolling */
-            }
-
-            /* Adjust table size - make it larger */
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-                table-layout: auto; /* Let the table expand to fit content */
-                font-size: 1rem; /* Increase font size */
-            }
-
-            th, td {
-                padding: 12px; /* Increase padding for larger cells */
-                text-align: center;
-                border: 1px solid #ddd;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            th {
-                background-color: #007BFF;
-                color: white;
-                font-weight: 600;
-            }
-
-            tr:nth-child(even) {
-                background-color: #f9f9f9;
-            }
-
-            tr:hover {
-                background-color: #e3f2fd;
-            }
-
-            .highlight {
-                font-weight: bold;
-                padding: 5px;
-                border-radius: 5px;
-            }
-
-            .button-container {
-                text-align: center;
-                margin-top: 20px;
-            }
-
-            /* Smaller button size */
-            button {
-                padding: 8px 16px; /* Smaller padding */
-                font-size: 0.9rem; /* Smaller font size */
-                color: #fff;
-                background: linear-gradient(to right, #007BFF, #0056b3);
-                border: black;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: background 0.3s, transform 0.2s;
-            }
-
-                button:hover {
-                    background: linear-gradient(to right, #0056b3, #003f7f);
-                    transform: translateY(-2px);
-                }
-
-            a {
-                text-decoration: none;
-            }
-
-            .total-row {
-                margin-top: 20px;
-                text-align: right;
-                font-weight: bold;
-                background-color: #f1f8ff;
-                padding: 10px;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-            }
-
-            /* Adjust date picker to be larger */
-            input[type="date"] {
-                width: 40%; /* Increase date picker width */
-                padding: 14px; /* Increase padding */
-                text-align: center;
-                font-size: 1.2rem; /* Larger font */
-                border: 1px solid #ccc;
-                border-radius: 8px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                transition: border-color 0.2s, box-shadow 0.2s;
-                margin-top: 10px;
-            }
-
-                input[type="date"]:focus {
-                    border-color: #007BFF;
-                    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
-                    outline: none;
-                }
-
-            .deleting-message {
-                background-color: rgba(255, 165, 0, 0.8); /* 背景顏色為橙色，透明度80% */
-                color: white;
-                padding: 15px;
-                font-size: 1.2rem;
-                text-align: center;
-                border-radius: 10px;
-                margin-bottom: 20px;
-                font-weight: bold;
-            }
-        </style>
-    </head>
-    <body>
-
-        <div class="container">
-
-            <h1>查詢資料</h1>
-
-            <div class="input-container">
-                <input type="text" id="nameInput" placeholder="請輸入姓名">
-                <input type="date" id="dateInput" placeholder="選擇日期">~
-                <input type="date" id="dateInput1" placeholder="選擇日期">
-            </div>
-
-            <div class="button-container">
-                <button id="fetchBtn">查詢</button>
-            </div>
-            <div class="button-container">
-                <button onclick="ToInsert()">新增資料</button>
-            </div>
-            <div class="data-display" id="dataDisplay">
-
-                <!-- Data will be displayed as a table -->
-            </div>
-
-            <div id="totalRow" class="total-row">
-                <!-- Total will be displayed here -->
-            </div>
-            <br>
-            <div style="text-align: center;">
-                <button onclick="copyToClipboard()" style="text-align: center;  font-size: 1rem; background-color: #007BFF; color: white; border-radius: 8px; cursor: pointer; transition: background 0.3s, transform 0.2s;">
-                    複製內容
-                </button>
-            </div>
-            <div class="data-display" id="nameDisplay">
-
-                <!-- 所有人名將在這裡顯示 -->
-            </div>
-            <div class="data-display" style="text-align: center;" id="individualCountDisplay">
-                <!-- 每個人的出現次數將在這裡顯示 -->
-            </div>
-        </div>
-
-        <script>
-            const baseUrl = "https://ap13.ragic.com/OCHDB/ragicsales-order-management/1";
-            const apiKey = "dkRKQnBSWCtMZjdja0pnYW5DUFBXZjZMbXNOR3NwYkFkSmI2UStQR2ZEWStxRU5KQ1FHOEQybGFERWFLWUpOVQ=";
-        function ToInsert(){
-            window.location.href = '/OchC010/Insert';
-        }
-            // 設定今日日期
-            function setTodaysDate() {
-                const today = new Date();
-                const yyyy = today.getFullYear();
-                const mm = (today.getMonth() + 1).toString().padStart(2, '0');
-                const dd = today.getDate().toString().padStart(2, '0');
-                const formattedDate = `${yyyy}-${mm}-${dd}`;
-
-                document.getElementById("dateInput").value = formattedDate;
-                document.getElementById("dateInput1").value = formattedDate;
-            }
-            window.onload = setTodaysDate;
-
-            // 顯示查詢結果的表格
-            function displayTable(data) {
-                let totalPeople = 0;
-                let totalTimes = 0;
-                let totalTalks = 0;
-                let totalLines = 0;
-                let tableHTML = `
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>姓名</th>
-                                        <th>次數</th>
-                                        <th>人數</th>
-                                        <th>對話</th>
-                                        <th>Line</th>
-                                        <th>上傳時間</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                        `;
-
-                for (const key in data) {
-                    if (data.hasOwnProperty(key)) {
-                        const record = data[key];
-                        const rawDateTime = record.CreateDatetime || "";
-                        const displayformattedDate = rawDateTime.split(" ")[0];
-
-                        totalPeople += parseInt(record.people) || 0;
-                        totalTimes += parseInt(record.times) || 0;
-                        totalTalks += parseInt(record.talk) || 0;
-                        totalLines += parseInt(record.line) || 0;
-
-                        tableHTML += `
-                                    <tr>
-                                        <td>${record.Name}</td>
-                                        <td>${record.people}</td>
-                                        <td>${record.times}</td>
-                                        <td>${record.talk}</td>
-                                        <td>${record.line}</td>
-                                        <td class="highlight">${displayformattedDate}</td>
-                                        <td>
-                                            <button class="button-edit" onclick="redirectToEditPage('${record.Name}', '${record.people}', '${record.times}', '${record.talk}', '${record.line}', '${displayformattedDate}','${record.Name}/${record.people}/${record.times}/${record.talk}/${record.line}/${displayformattedDate}')">修改</button>
-                                            <button class="button-delete" onclick="deleteRecord('${record.Name}/${record.people}/${record.times}/${record.talk}/${record.line}/${displayformattedDate}')">刪除</button>
-                                        </td>
-                                    </tr>
-                                `;
-                    }
-                }
-
-                tableHTML += `</tbody></table>`;
-                return tableHTML;
-            }
-            let data = {};  // 定義 data 為全域變數
-            // 顯示總計
-            function displayTotal(totalPeople, totalTimes, totalTalks, totalLines) {
-                const totalRow = document.getElementById("totalRow");
-                totalRow.innerHTML = `
-                            <span>總計：次數 ${totalPeople} 人數 ${totalTimes} 對話 ${totalTalks} Line ${totalLines}</span>
-                        `;
-            }
-            async function deleteRecord(name) {
-                const confirmDelete = confirm("確定要刪除這筆資料嗎？");
-
-                if (confirmDelete) {
-                    // 使用 BlockUI 顯示刪除中訊息
-                    $.blockUI({
-                        message: '<h1>資料刪除中...</h1>',  // 顯示的訊息
-                        css: {
-                            border: 'none',
-                            padding: '15px',
-                            backgroundColor: '#f0ad4e',
-                            color: '#fff',
-                            fontSize: '20px',
-                            borderRadius: '10px',
-                        }
-                    });
-
-                    try {
-                        // 構建要發送到 webhook 的字串，格式：刪除/永紳/5/8/0/0
-                        const payload = {
-                            data: `刪除/${name}`,
-                            status: "active", // 預設為 active
-                        };
-
-                        // 發送資料到 Webhook
-                        await sendToWebhook(payload);
-
-                        // 刪除成功，隱藏 BlockUI 並顯示成功提示
-                        $.unblockUI();  // 隱藏 BlockUI
-                        alert("資料刪除成功");
-                        fetchData();  // 重新載入資料
-                    } catch (error) {
-                        console.error("Webhook 發送失敗:", error);
-                        $.unblockUI();  // 隱藏 BlockUI
-                        alert("刪除失敗，請稍後再試。");
-                    }
-                }
-            }
-
-            function redirectToEditPage(name, people, times, talk, line, date, deletestring) {
-                // 將資料編碼以防止特殊字元影響 URL
-                deletestring = `刪除/${deletestring}`;
-
-                // 使用 encodeURIComponent 確保日期被正確編碼
-                const encodedParams = new URLSearchParams({
-                    name: name,
-                    people: people,
-                    times: times,
-                    talk: talk,
-                    line: line,
-                    date: date, // 編碼日期
-                    deletestring: deletestring
-                }).toString();
-
-                // 跳轉到修改頁面，並帶上資料
-                window.location.href = `Edit.html?${encodedParams}`;
-            }
-
-            // 發送資料到 Webhook
-            async function sendToWebhook(payload) {
-                const webhookUrl = "https://hook.eu2.make.com/7wbapny15so5m2flnks6n5rp4puosab5"; // 替換為您的 Webhook URL
-                const response = await fetch(webhookUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(payload),
-                });
-
-                if (!response.ok) {
-                    throw new Error("資料發送失敗");
-                }
-            }
-
-            async function fetchData() {
-                const name = document.getElementById("nameInput").value.trim();
-                const date = document.getElementById("dateInput").value.trim();
-                const date1 = document.getElementById("dateInput1").value.trim();
-                let searchdata = "";
-
-                if (name) {
-                    searchdata = `&where=1000001,like,${encodeURIComponent(name)}`;
-                }
-
-                if (date === date1) {
-                    const formattedStartDate = date.split("-").join("/");
-                    searchdata += `&where=1000007,like,${encodeURIComponent(formattedStartDate)}`;
-                } else {
-                    const formattedStartDate = date.split("-").join("/") + " 00:00";
-                    const formattedEndDate = date1.split("-").join("/") + " 23:59";
-                    searchdata += `&where=1000007,gt,${formattedStartDate}`;
-                    searchdata += `&where=1000007,lt,${formattedEndDate}`;
-                }
-
-                const apiUrl = `${baseUrl}?V=1&APIKey=${apiKey}${searchdata}&api`;
-                const displayDiv = document.getElementById("dataDisplay");
-                displayDiv.innerHTML = "";
-                const totalRow = document.getElementById("totalRow");
-                totalRow.innerHTML = "";
-
-                try {
-                    const response = await fetch(apiUrl);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-
-                    if (Object.keys(data).length === 0) {
-                        displayDiv.innerHTML = "<p>查無資料。</p>";
-                        return;
-                    }
-
-                    const tableHTML = displayTable(data);
-                    displayDiv.innerHTML = tableHTML;
-
-                    // 計算總計
-                    let totalPeople = 0;
-                    let totalTimes = 0;
-                    let totalTalks = 0;
-                    let totalLines = 0;
-                    const namesSet = new Set(); // 使用 Set 來存儲唯一姓名
-                    const namesCount = {}; // 用來統計每個人的出現次數
-
-                    for (const key in data) {
-                        if (data.hasOwnProperty(key)) {
-                            const record = data[key];
-                            totalPeople += parseInt(record.people) || 0;
-                            totalTimes += parseInt(record.times) || 0;
-                            totalTalks += parseInt(record.talk) || 0;
-                            totalLines += parseInt(record.line) || 0;
-
-                            // 提取名稱並分割每兩個字為一個名字，用來計算參與人數與出現次數
-                            if (record.Name) {
-                                const nameParts = record.Name.trim().match(/.{1,2}/g); // 每兩個字分開
-                                if (nameParts) {
-                                    nameParts.forEach(part => {
-                                        namesSet.add(part); // 將每兩個字加入 Set 中，保證唯一性
-                                        if (!namesCount[part]) {
-                                            namesCount[part] = 0;
-                                        }
-                                        namesCount[part] += 1; // 計算每個人出現的次數
-                                    });
-                                }
-                            }
-                        }
-                    }
-
-                    displayTotal(totalPeople, totalTimes, totalTalks, totalLines);
-                    const today = new Date();
-                    const formattedDate = formatDate(today); // 格式化日期
-                    const weekdayName = getWeekdayName(today); // 取得星期幾
-
-                    // 顯示名稱和參與人數（顯示原始姓名）
-                    const nameDisplay = document.getElementById("nameDisplay");
-                    nameDisplay.innerHTML = `
-                                <div style="text-align: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; color: red;">
-                                    ${formattedDate} 週${weekdayName} 福音特攻隊統計<br>
-                                </div>
-
-                                <div style="text-align: center; font-size: 1.1rem;">
-                                    ${Object.values(data).map(record => `${record.Name} ${record.people}/${record.times}/${record.talk}/${record.line}`).join("<br>")}
-                                </div><br>
-                                <div style="text-align: center; font-weight: bold; font-size: 1rem; margin-bottom: 10px; color: red;">
-                                    <span>總計： ${totalPeople}/${totalTimes}/${totalTalks}/${totalLines}</span>
-                                </div>
-                                <div style="text-align: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; color: green;">
-                                    參與人數: ${namesSet.size}
-                                </div>
-                            `;
-
-                    // 顯示每個人的出現次數並排序（從大到小）
-                    const individualCountDisplay = document.getElementById("individualCountDisplay");
-                    const sortedNamesCount = Object.entries(namesCount)
-                        .sort(([, countA], [, countB]) => countB - countA); // 按次數從大到小排序
-
-                    const namesCountHTML = sortedNamesCount
-                        .map(([name, count]) => `<div>${name}: ${count} 次</div>`)
-                        .join("");
-
-                    individualCountDisplay.innerHTML = `
-                                <h3 style="text-align: center; margin-bottom: 10px; color: #007BFF;">每個人的出現次數 (按次數排序)</h3>
-                                ${namesCountHTML}
-                            `;
-
-                } catch (error) {
-                    console.error("Error fetching data:", error);
-                    alert("資料查詢失敗，請檢查錯誤日誌。");
-                }
-            }
-
-
-            // 複製文本的功能
-            function copyToClipboard() {
-                const text = document.getElementById("nameDisplay").innerText;  // 取得區塊內的純文字
-                const textarea = document.createElement("textarea");  // 創建一個 textarea 元素來放置文字
-                textarea.value = text;  // 設置 textarea 的值為要複製的文字
-                document.body.appendChild(textarea);  // 把 textarea 添加到頁面中（不顯示）
-                textarea.select();  // 選中 textarea 的內容
-                document.execCommand("copy");  // 執行複製操作
-                document.body.removeChild(textarea);  // 複製完後移除 textarea
-
-                // 創建提示訊息
-                const copyMessage = document.createElement("div");
-                copyMessage.innerText = "內容已複製！";
-                copyMessage.style.position = "fixed";
-                copyMessage.style.top = "20px";
-                copyMessage.style.left = "50%";
-                copyMessage.style.transform = "translateX(-50%)";
-                copyMessage.style.padding = "10px 20px";
-                copyMessage.style.backgroundColor = "#28a745";  // 綠色背景
-                copyMessage.style.color = "white";
-                copyMessage.style.borderRadius = "5px";
-                copyMessage.style.fontSize = "1rem";
-                copyMessage.style.zIndex = "1000";
-                copyMessage.style.display = "inline-block";
-                document.body.appendChild(copyMessage);
-
-                // 一秒後自動隱藏提示訊息
-                setTimeout(() => {
-                    copyMessage.style.display = "none";
-                }, 1000);  // 一秒後消失
-            }
-            // 取得星期幾的名稱
-            function getWeekdayName(date) {
-                const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
-                return weekdays[date.getDay()];
-            }
-
-            // 格式化日期為 "月/日" 的形式
-            function formatDate(date) {
-                const month = date.getMonth() + 1;  // 月份是從 0 開始的，所以要加 1
-                const day = date.getDate();
-                return `${month}/${day}`;
-            }
-
-            window.onload = () => {
-                setTodaysDate();  // Set today's date in the date input fields
-                fetchData();      // Automatically fetch data when the page loads
-            };
-            document.getElementById("fetchBtn").addEventListener("click", fetchData);
-        </script>
-    </body>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>查詢福音紀錄</title>
+	<!-- 引入 jQuery -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!-- 引入 BlockUI 插件 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
+
+	<style>
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background-color: #eef3f9;
+			margin: 0;
+			padding: 0;
+		}
+
+		.container {
+			max-width: 900px;
+			margin: 50px auto;
+			background-color: #ffffff;
+			border-radius: 12px;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+			padding: 40px;
+		}
+
+		h1 {
+			text-align: center;
+			color: #333;
+			font-size: 2rem;
+			margin-bottom: 20px;
+		}
+
+		.input-container {
+			text-align: center;
+			margin-bottom: 25px;
+		}
+
+		input[type="text"], input[type="date"] {
+			width: 80%;
+			padding: 18px;
+			font-size: 1.2rem; /* Increase font size */
+			border: 1px solid #ccc;
+			border-radius: 8px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			transition: border-color 0.2s, box-shadow 0.2s;
+			margin-top: 10px;
+		}
+
+			input[type="text"]:focus, input[type="date"]:focus {
+				border-color: #007BFF;
+				box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+				outline: none;
+			}
+
+		.data-display {
+			margin-top: 25px;
+			padding: 20px;
+			background-color: #f7faff;
+			border: 1px solid #ddd;
+			border-radius: 12px;
+			max-height: 400px; /* Limit the height of the data container */
+			overflow-y: auto; /* Allow vertical scrolling */
+		}
+
+		/* Adjust table size - make it larger */
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 10px;
+			table-layout: auto; /* Let the table expand to fit content */
+			font-size: 1rem; /* Increase font size */
+		}
+
+		th, td {
+			padding: 12px; /* Increase padding for larger cells */
+			text-align: center;
+			border: 1px solid #ddd;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		th {
+			background-color: #007BFF;
+			color: white;
+			font-weight: 600;
+		}
+
+		tr:nth-child(even) {
+			background-color: #f9f9f9;
+		}
+
+		tr:hover {
+			background-color: #e3f2fd;
+		}
+
+		.highlight {
+			font-weight: bold;
+			padding: 5px;
+			border-radius: 5px;
+		}
+
+		.button-container {
+			text-align: center;
+			margin-top: 20px;
+		}
+
+		/* Smaller button size */
+		button {
+			padding: 8px 16px; /* Smaller padding */
+			font-size: 0.9rem; /* Smaller font size */
+			color: #fff;
+			background: linear-gradient(to right, #007BFF, #0056b3);
+			border: black;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: background 0.3s, transform 0.2s;
+		}
+
+			button:hover {
+				background: linear-gradient(to right, #0056b3, #003f7f);
+				transform: translateY(-2px);
+			}
+
+		a {
+			text-decoration: none;
+		}
+
+		.total-row {
+			margin-top: 20px;
+			text-align: right;
+			font-weight: bold;
+			background-color: #f1f8ff;
+			padding: 10px;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+		}
+
+		/* Adjust date picker to be larger */
+		input[type="date"] {
+			width: 40%; /* Increase date picker width */
+			padding: 14px; /* Increase padding */
+			text-align: center;
+			font-size: 1.2rem; /* Larger font */
+			border: 1px solid #ccc;
+			border-radius: 8px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			transition: border-color 0.2s, box-shadow 0.2s;
+			margin-top: 10px;
+		}
+
+			input[type="date"]:focus {
+				border-color: #007BFF;
+				box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+				outline: none;
+			}
+
+		.deleting-message {
+			background-color: rgba(255, 165, 0, 0.8); /* 背景顏色為橙色，透明度80% */
+			color: white;
+			padding: 15px;
+			font-size: 1.2rem;
+			text-align: center;
+			border-radius: 10px;
+			margin-bottom: 20px;
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+
+	<div class="container">
+
+		<h1>查詢資料</h1>
+
+		<div class="input-container">
+			<input type="text" id="nameInput" placeholder="請輸入姓名">
+			<input type="date" id="dateInput" placeholder="選擇日期">~
+			<input type="date" id="dateInput1" placeholder="選擇日期">
+		</div>
+
+		<div class="button-container">
+			<button id="fetchBtn">查詢</button>
+		</div>
+		<div class="button-container">
+			<button onclick="ToInsert()">新增資料</button>
+		</div>
+		<div class="data-display" id="dataDisplay">
+
+			<!-- Data will be displayed as a table -->
+		</div>
+
+		<div id="totalRow" class="total-row">
+			<!-- Total will be displayed here -->
+		</div>
+		<br>
+		<div style="text-align: center;">
+			<button onclick="copyToClipboard()" style="text-align: center;  font-size: 1rem; background-color: #007BFF; color: white; border-radius: 8px; cursor: pointer; transition: background 0.3s, transform 0.2s;">
+				複製內容
+			</button>
+		</div>
+		<div class="data-display" id="nameDisplay">
+
+			<!-- 所有人名將在這裡顯示 -->
+		</div>
+		<div class="data-display" style="text-align: center;" id="individualCountDisplay">
+			<!-- 每個人的出現次數將在這裡顯示 -->
+		</div>
+	</div>
+
+	<script>
+		const baseUrl = "https://ap13.ragic.com/OCHDB/ragicsales-order-management/1";
+		const apiKey = "dkRKQnBSWCtMZjdja0pnYW5DUFBXZjZMbXNOR3NwYkFkSmI2UStQR2ZEWStxRU5KQ1FHOEQybGFERWFLWUpOVQ=";
+		function ToInsert() {
+			window.location.href = '/OchC010/Insert';
+		}
+		// 設定今日日期
+		function setTodaysDate() {
+			const today = new Date();
+			const yyyy = today.getFullYear();
+			const mm = (today.getMonth() + 1).toString().padStart(2, '0');
+			const dd = today.getDate().toString().padStart(2, '0');
+			const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+			document.getElementById("dateInput").value = formattedDate;
+			document.getElementById("dateInput1").value = formattedDate;
+		}
+		window.onload = setTodaysDate;
+
+		// 顯示查詢結果的表格
+		function displayTable(data) {
+			let totalPeople = 0;
+			let totalTimes = 0;
+			let totalTalks = 0;
+			let totalLines = 0;
+			let tableHTML = `
+									<table>
+										<thead>
+											<tr>
+												<th>姓名</th>
+												<th>次數</th>
+												<th>人數</th>
+												<th>對話</th>
+												<th>Line</th>
+												<th>上傳時間</th>
+												<th>操作</th>
+											</tr>
+										</thead>
+										<tbody>
+								`;
+
+			for (const key in data) {
+				if (data.hasOwnProperty(key)) {
+					const record = data[key];
+					const rawDateTime = record.CreateDatetime || "";
+					const displayformattedDate = rawDateTime.split(" ")[0];
+
+					totalPeople += parseInt(record.people) || 0;
+					totalTimes += parseInt(record.times) || 0;
+					totalTalks += parseInt(record.talk) || 0;
+					totalLines += parseInt(record.line) || 0;
+
+					tableHTML += `
+											<tr>
+												<td>${record.Name}</td>
+												<td>${record.people}</td>
+												<td>${record.times}</td>
+												<td>${record.talk}</td>
+												<td>${record.line}</td>
+												<td class="highlight">${displayformattedDate}</td>
+												<td>
+													<button class="button-edit" onclick="redirectToEditPage('${record.Name}', '${record.people}', '${record.times}', '${record.talk}', '${record.line}', '${displayformattedDate}','${record.Name}/${record.people}/${record.times}/${record.talk}/${record.line}/${displayformattedDate}')">修改</button>
+													<button class="button-delete" onclick="deleteRecord('${record.Name}/${record.people}/${record.times}/${record.talk}/${record.line}/${displayformattedDate}')">刪除</button>
+												</td>
+											</tr>
+										`;
+				}
+			}
+
+			tableHTML += `</tbody></table>`;
+			return tableHTML;
+		}
+		let data = {};  // 定義 data 為全域變數
+		// 顯示總計
+		function displayTotal(totalPeople, totalTimes, totalTalks, totalLines) {
+			const totalRow = document.getElementById("totalRow");
+			totalRow.innerHTML = `
+									<span>總計：次數 ${totalPeople} 人數 ${totalTimes} 對話 ${totalTalks} Line ${totalLines}</span>
+								`;
+		}
+		async function deleteRecord(name) {
+			const confirmDelete = confirm("確定要刪除這筆資料嗎？");
+
+			if (confirmDelete) {
+				// 使用 BlockUI 顯示刪除中訊息
+				$.blockUI({
+					message: '<h1>資料刪除中...</h1>',  // 顯示的訊息
+					css: {
+						border: 'none',
+						padding: '15px',
+						backgroundColor: '#f0ad4e',
+						color: '#fff',
+						fontSize: '20px',
+						borderRadius: '10px',
+					}
+				});
+
+				try {
+					// 構建要發送到 webhook 的字串，格式：刪除/永紳/5/8/0/0
+					const payload = {
+						data: `刪除/${name}`,
+						status: "active", // 預設為 active
+					};
+
+					// 發送資料到 Webhook
+					await sendToWebhook(payload);
+
+					// 刪除成功，隱藏 BlockUI 並顯示成功提示
+					$.unblockUI();  // 隱藏 BlockUI
+					alert("資料刪除成功");
+					fetchData();  // 重新載入資料
+				} catch (error) {
+					console.error("Webhook 發送失敗:", error);
+					$.unblockUI();  // 隱藏 BlockUI
+					alert("刪除失敗，請稍後再試。");
+				}
+			}
+		}
+
+		function redirectToEditPage(name, people, times, talk, line, date, deletestring) {
+			// 建立一個隱藏 form
+			const form = document.createElement('form');
+			form.method = 'POST';
+			form.action = '/OchC010/Edit';
+
+			const fields = {
+				Name: name,
+				People: people,
+				Times: times,
+				Talk: talk,
+				Line: line,
+				Date: date,
+				DeleteString: "刪除/" + deletestring
+			};
+
+			for (const key in fields) {
+				const input = document.createElement('input');
+				input.type = 'hidden';
+				input.name = key;
+				input.value = fields[key];
+				form.appendChild(input);
+			}
+
+			document.body.appendChild(form);
+			form.submit();
+		}
+
+		// 發送資料到 Webhook
+		async function sendToWebhook(payload) {
+			const webhookUrl = "https://hook.eu2.make.com/7wbapny15so5m2flnks6n5rp4puosab5"; // 替換為您的 Webhook URL
+			const response = await fetch(webhookUrl, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(payload),
+			});
+
+			if (!response.ok) {
+				throw new Error("資料發送失敗");
+			}
+		}
+
+		async function fetchData() {
+			const name = document.getElementById("nameInput").value.trim();
+			const date = document.getElementById("dateInput").value.trim();
+			const date1 = document.getElementById("dateInput1").value.trim();
+			let searchdata = "";
+
+			if (name) {
+				searchdata = `&where=1000001,like,${encodeURIComponent(name)}`;
+			}
+
+			if (date === date1) {
+				const formattedStartDate = date.split("-").join("/");
+				searchdata += `&where=1000007,like,${encodeURIComponent(formattedStartDate)}`;
+			} else {
+				const formattedStartDate = date.split("-").join("/") + " 00:00";
+				const formattedEndDate = date1.split("-").join("/") + " 23:59";
+				searchdata += `&where=1000007,gt,${formattedStartDate}`;
+				searchdata += `&where=1000007,lt,${formattedEndDate}`;
+			}
+
+			const apiUrl = `${baseUrl}?V=1&APIKey=${apiKey}${searchdata}&api`;
+			const displayDiv = document.getElementById("dataDisplay");
+			displayDiv.innerHTML = "";
+			const totalRow = document.getElementById("totalRow");
+			totalRow.innerHTML = "";
+
+			try {
+				const response = await fetch(apiUrl);
+				if (!response.ok) {
+					throw new Error(`HTTP error! Status: ${response.status}`);
+				}
+
+				const data = await response.json();
+
+				if (Object.keys(data).length === 0) {
+					displayDiv.innerHTML = "<p>查無資料。</p>";
+					return;
+				}
+
+				const tableHTML = displayTable(data);
+				displayDiv.innerHTML = tableHTML;
+
+				// 計算總計
+				let totalPeople = 0;
+				let totalTimes = 0;
+				let totalTalks = 0;
+				let totalLines = 0;
+				const namesSet = new Set(); // 使用 Set 來存儲唯一姓名
+				const namesCount = {}; // 用來統計每個人的出現次數
+
+				for (const key in data) {
+					if (data.hasOwnProperty(key)) {
+						const record = data[key];
+						totalPeople += parseInt(record.people) || 0;
+						totalTimes += parseInt(record.times) || 0;
+						totalTalks += parseInt(record.talk) || 0;
+						totalLines += parseInt(record.line) || 0;
+
+						// 提取名稱並分割每兩個字為一個名字，用來計算參與人數與出現次數
+						if (record.Name) {
+							const nameParts = record.Name.trim().match(/.{1,2}/g); // 每兩個字分開
+							if (nameParts) {
+								nameParts.forEach(part => {
+									namesSet.add(part); // 將每兩個字加入 Set 中，保證唯一性
+									if (!namesCount[part]) {
+										namesCount[part] = 0;
+									}
+									namesCount[part] += 1; // 計算每個人出現的次數
+								});
+							}
+						}
+					}
+				}
+
+				displayTotal(totalPeople, totalTimes, totalTalks, totalLines);
+				const today = new Date();
+				const formattedDate = formatDate(today); // 格式化日期
+				const weekdayName = getWeekdayName(today); // 取得星期幾
+
+				// 顯示名稱和參與人數（顯示原始姓名）
+				const nameDisplay = document.getElementById("nameDisplay");
+				nameDisplay.innerHTML = `
+										<div style="text-align: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; color: red;">
+											${formattedDate} 週${weekdayName} 福音特攻隊統計<br>
+										</div>
+
+										<div style="text-align: center; font-size: 1.1rem;">
+											${Object.values(data).map(record => `${record.Name} ${record.people}/${record.times}/${record.talk}/${record.line}`).join("<br>")}
+										</div><br>
+										<div style="text-align: center; font-weight: bold; font-size: 1rem; margin-bottom: 10px; color: red;">
+											<span>總計： ${totalPeople}/${totalTimes}/${totalTalks}/${totalLines}</span>
+										</div>
+										<div style="text-align: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; color: green;">
+											參與人數: ${namesSet.size}
+										</div>
+									`;
+
+				// 顯示每個人的出現次數並排序（從大到小）
+				const individualCountDisplay = document.getElementById("individualCountDisplay");
+				const sortedNamesCount = Object.entries(namesCount)
+					.sort(([, countA], [, countB]) => countB - countA); // 按次數從大到小排序
+
+				const namesCountHTML = sortedNamesCount
+					.map(([name, count]) => `<div>${name}: ${count} 次</div>`)
+					.join("");
+
+				individualCountDisplay.innerHTML = `
+										<h3 style="text-align: center; margin-bottom: 10px; color: #007BFF;">每個人的出現次數 (按次數排序)</h3>
+										${namesCountHTML}
+									`;
+
+			} catch (error) {
+				console.error("Error fetching data:", error);
+				alert("資料查詢失敗，請檢查錯誤日誌。");
+			}
+		}
+
+
+		// 複製文本的功能
+		function copyToClipboard() {
+			const text = document.getElementById("nameDisplay").innerText;  // 取得區塊內的純文字
+			const textarea = document.createElement("textarea");  // 創建一個 textarea 元素來放置文字
+			textarea.value = text;  // 設置 textarea 的值為要複製的文字
+			document.body.appendChild(textarea);  // 把 textarea 添加到頁面中（不顯示）
+			textarea.select();  // 選中 textarea 的內容
+			document.execCommand("copy");  // 執行複製操作
+			document.body.removeChild(textarea);  // 複製完後移除 textarea
+
+			// 創建提示訊息
+			const copyMessage = document.createElement("div");
+			copyMessage.innerText = "內容已複製！";
+			copyMessage.style.position = "fixed";
+			copyMessage.style.top = "20px";
+			copyMessage.style.left = "50%";
+			copyMessage.style.transform = "translateX(-50%)";
+			copyMessage.style.padding = "10px 20px";
+			copyMessage.style.backgroundColor = "#28a745";  // 綠色背景
+			copyMessage.style.color = "white";
+			copyMessage.style.borderRadius = "5px";
+			copyMessage.style.fontSize = "1rem";
+			copyMessage.style.zIndex = "1000";
+			copyMessage.style.display = "inline-block";
+			document.body.appendChild(copyMessage);
+
+			// 一秒後自動隱藏提示訊息
+			setTimeout(() => {
+				copyMessage.style.display = "none";
+			}, 1000);  // 一秒後消失
+		}
+		// 取得星期幾的名稱
+		function getWeekdayName(date) {
+			const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+			return weekdays[date.getDay()];
+		}
+
+		// 格式化日期為 "月/日" 的形式
+		function formatDate(date) {
+			const month = date.getMonth() + 1;  // 月份是從 0 開始的，所以要加 1
+			const day = date.getDate();
+			return `${month}/${day}`;
+		}
+
+		window.onload = () => {
+			setTodaysDate();  // Set today's date in the date input fields
+			fetchData();      // Automatically fetch data when the page loads
+		};
+		document.getElementById("fetchBtn").addEventListener("click", fetchData);
+	</script>
+</body>

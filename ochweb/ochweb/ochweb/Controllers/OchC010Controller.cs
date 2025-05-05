@@ -22,5 +22,9 @@ namespace ochweb.Controllers
             OchC010View NewOchC010 = new OchC010View();
             return View("Insert", NewOchC010);
         }
+        public ActionResult Edit(OchC010View NewOchC010)
+        {
+            return View("Edit", NewOchC010);
+        }
     }
 }

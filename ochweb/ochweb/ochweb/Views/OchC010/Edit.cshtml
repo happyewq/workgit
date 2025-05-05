@@ -1,0 +1,209 @@
+﻿@model ochweb.Models.OchC010View
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- 使用者管理頁面：免費版（DataTables + Bootstrap Modal + SweetAlert2） -->
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>修改資料</title>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- 引入 jQuery -->
+	<script src="https://malsup.github.io/jquery.blockUI.js"></script> <!-- 引入 BlockUI -->
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: Arial, sans-serif;
+			background: linear-gradient(to right, #74ebd5, #acb6e5);
+			color: #333;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			min-height: 100vh;
+		}
+
+		h1 {
+			text-align: center;
+			color: #444;
+			font-size: 28px;
+			margin-bottom: 20px;
+		}
+
+		form {
+			background: #fff;
+			padding: 20px 30px;
+			border-radius: 10px;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+			width: 90%; /* 使用百分比寬度 */
+			max-width: 500px;
+		}
+
+		label {
+			font-weight: bold;
+			display: block;
+			text-align: center; /* 置中 */
+			font-size: 16px;
+			margin-bottom: 8px;
+			color: #555;
+		}
+
+		input[type="text"],
+		input[type="date"] {
+			width: 100%;
+			padding: 12px;
+			margin-bottom: 15px;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			font-size: 16px;
+			text-align: center; /* 輸入文字置中 */
+		}
+
+		button {
+			width: 100%;
+			padding: 12px;
+			background: #74c0fc;
+			border: none;
+			border-radius: 5px;
+			font-size: 16px;
+			font-weight: bold;
+			color: #fff;
+			cursor: pointer;
+			transition: background 0.3s ease;
+		}
+
+			button:hover {
+				background: #4dabf7;
+			}
+
+			button:active {
+				background: #228be6;
+			}
+
+	</style>
+</head>
+<body>
+	<form id="editForm">
+		<h1>修改資料</h1>
+
+		<label for="name">姓名</label>
+		<input type="text" id="name" name="name">
+
+		<label for="people">次數</label>
+		<input type="text" id="people" name="people">
+
+		<label for="times">人數</label>
+		<input type="text" id="times" name="times">
+
+		<label for="talk">對話</label>
+		<input type="text" id="talk" name="talk">
+
+		<label for="line">Line</label>
+		<input type="text" id="line" name="line">
+
+		<label for="date">時間</label>
+		<input type="date" id="date" name="date">
+
+		<input type="hidden" id="deletestring" name="deletestring">
+
+		<button type="submit">提交修改</button>
+	</form>
+
+	<script>
+		// 取得 URL 中的查詢參數
+		const params = new URLSearchParams(window.location.search);
+
+		// 將參數值填充到表單中
+		document.getElementById('name').value = params.get('name') || '';
+		document.getElementById('people').value = params.get('people') || '';
+		document.getElementById('times').value = params.get('times') || '';
+		document.getElementById('talk').value = params.get('talk') || '';
+		document.getElementById('line').value = params.get('line') || '';
+
+		// 將日期參數格式轉換為符合 <input type="date"> 的格式
+		const dateParam = params.get('date');
+		if (dateParam) {
+			// 假設 dateParam 格式是 YYYY/MM/DD
+			const dateParts = dateParam.split('/'); // 拆分日期
+			if (dateParts.length === 3) {
+				const formattedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`; // 轉換為 YYYY-MM-DD
+				document.getElementById('date').value = formattedDate;
+			}
+		}
+
+
+		document.getElementById('deletestring').value = params.get('deletestring') || '';
+
+		// 提交表單時處理修改邏輯
+		document.getElementById('editForm').addEventListener('submit', async function (e) {
+			e.preventDefault(); // 阻止預設提交行為
+
+			// 取得表單中的所有值
+			const updatedData = {
+				name: document.getElementById('name').value,
+				people: document.getElementById('people').value,
+				times: document.getElementById('times').value,
+				talk: document.getElementById('talk').value,
+				line: document.getElementById('line').value,
+				date: document.getElementById('date').value,
+				deletestring: document.getElementById('deletestring').value,
+			};
+
+			// 確認是否修改
+			const confirmEdit = confirm("確定要修改這筆資料嗎？");
+			if (!confirmEdit) {
+				return;
+			}
+
+			// 使用 BlockUI 顯示 "修改中" 訊息
+			$.blockUI({
+				message: '<h1>資料修改中...</h1>',
+				css: {
+					border: 'none',
+					padding: '15px',
+					backgroundColor: '#f0ad4e',
+					color: '#fff',
+					fontSize: '20px',
+					borderRadius: '10px',
+				}
+			});
+
+			try {
+				// 發送資料到 Webhook
+				const webhookUrl = "https://hook.eu2.make.com/7wbapny15so5m2flnks6n5rp4puosab5"; // 替換為您的 Webhook URL
+				const payload = {
+					data: `修改/${updatedData.name}/${updatedData.people}/${updatedData.times}/${updatedData.talk}/${updatedData.line}/${updatedData.date.replace(/-/g, '/')}`,
+					deletestring: updatedData.deletestring,
+					status: "active", // 固定值
+				};
+
+				const response = await fetch(webhookUrl, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(payload),
+				});
+
+				if (!response.ok) {
+					throw new Error("Webhook 發送失敗");
+				}
+
+				// 修改成功
+				$.unblockUI(); // 隱藏 BlockUI
+				alert("資料修改成功");
+				// 跳轉回 Index 頁面
+				window.location.href = 'Index.html'; // 修改為你的 Index 頁面 URL
+			} catch (error) {
+				console.error("Webhook 發送失敗:", error);
+				$.unblockUI(); // 隱藏 BlockUI
+				alert("修改失敗，請稍後再試。");
+			}
+		});
+
+	</script>
+</body>
