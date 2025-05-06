@@ -6,11 +6,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>查詢福音紀錄</title>
-	<!-- 引入 jQuery -->
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<!-- 引入 BlockUI 插件 -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
 
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- 引入 jQuery -->
+	<script src="https://malsup.github.io/jquery.blockUI.js"></script> <!-- 引入 BlockUI -->
 	<style>
 		body {
 			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -239,20 +237,20 @@
 			let totalTalks = 0;
 			let totalLines = 0;
 			let tableHTML = `
-									<table>
-										<thead>
-											<tr>
-												<th>姓名</th>
-												<th>次數</th>
-												<th>人數</th>
-												<th>對話</th>
-												<th>Line</th>
-												<th>上傳時間</th>
-												<th>操作</th>
-											</tr>
-										</thead>
-										<tbody>
-								`;
+											<table>
+												<thead>
+													<tr>
+														<th>姓名</th>
+														<th>次數</th>
+														<th>人數</th>
+														<th>對話</th>
+														<th>Line</th>
+														<th>上傳時間</th>
+														<th>操作</th>
+													</tr>
+												</thead>
+												<tbody>
+										`;
 
 			for (const key in data) {
 				if (data.hasOwnProperty(key)) {
@@ -266,19 +264,19 @@
 					totalLines += parseInt(record.line) || 0;
 
 					tableHTML += `
-											<tr>
-												<td>${record.Name}</td>
-												<td>${record.people}</td>
-												<td>${record.times}</td>
-												<td>${record.talk}</td>
-												<td>${record.line}</td>
-												<td class="highlight">${displayformattedDate}</td>
-												<td>
-													<button class="button-edit" onclick="redirectToEditPage('${record.Name}', '${record.people}', '${record.times}', '${record.talk}', '${record.line}', '${displayformattedDate}','${record.Name}/${record.people}/${record.times}/${record.talk}/${record.line}/${displayformattedDate}')">修改</button>
-													<button class="button-delete" onclick="deleteRecord('${record.Name}/${record.people}/${record.times}/${record.talk}/${record.line}/${displayformattedDate}')">刪除</button>
-												</td>
-											</tr>
-										`;
+													<tr>
+														<td>${record.Name}</td>
+														<td>${record.people}</td>
+														<td>${record.times}</td>
+														<td>${record.talk}</td>
+														<td>${record.line}</td>
+														<td class="highlight">${displayformattedDate}</td>
+														<td>
+															<button class="button-edit" onclick="redirectToEditPage('${record.Name}', '${record.people}', '${record.times}', '${record.talk}', '${record.line}', '${displayformattedDate}','${record.Name}/${record.people}/${record.times}/${record.talk}/${record.line}/${displayformattedDate}')">修改</button>
+															<button class="button-delete" onclick="deleteRecord('${record.Name}/${record.people}/${record.times}/${record.talk}/${record.line}/${displayformattedDate}')">刪除</button>
+														</td>
+													</tr>
+												`;
 				}
 			}
 
@@ -290,25 +288,23 @@
 		function displayTotal(totalPeople, totalTimes, totalTalks, totalLines) {
 			const totalRow = document.getElementById("totalRow");
 			totalRow.innerHTML = `
-									<span>總計：次數 ${totalPeople} 人數 ${totalTimes} 對話 ${totalTalks} Line ${totalLines}</span>
-								`;
+											<span>總計：次數 ${totalPeople} 人數 ${totalTimes} 對話 ${totalTalks} Line ${totalLines}</span>
+										`;
 		}
 		async function deleteRecord(name) {
 			const confirmDelete = confirm("確定要刪除這筆資料嗎？");
 
 			if (confirmDelete) {
 				// 使用 BlockUI 顯示刪除中訊息
-				$.blockUI({
-					message: '<h1>資料刪除中...</h1>',  // 顯示的訊息
-					css: {
-						border: 'none',
-						padding: '15px',
-						backgroundColor: '#f0ad4e',
-						color: '#fff',
-						fontSize: '20px',
-						borderRadius: '10px',
+
+				Swal.fire({
+					title: '<h1>資料刪除中...</h1>',
+					allowOutsideClick: false,
+					didOpen: () => {
+						Swal.showLoading();
 					}
 				});
+
 
 				try {
 					// 構建要發送到 webhook 的字串，格式：刪除/永紳/5/8/0/0
@@ -321,13 +317,22 @@
 					await sendToWebhook(payload);
 
 					// 刪除成功，隱藏 BlockUI 並顯示成功提示
-					$.unblockUI();  // 隱藏 BlockUI
-					alert("資料刪除成功");
-					fetchData();  // 重新載入資料
+
+					Swal.fire({
+						icon: 'success',
+						title: '資料刪除成功！',
+						confirmButtonText: '確定'
+					}).then(() => {
+						window.location.href = "/OchC010/Index";
+					});
 				} catch (error) {
-					console.error("Webhook 發送失敗:", error);
-					$.unblockUI();  // 隱藏 BlockUI
-					alert("刪除失敗，請稍後再試。");
+					Swal.fire({
+						icon: 'error',
+						title: '刪除失敗，請稍後再試。',
+						confirmButtonText: '確定'
+					}).then(() => {
+						window.location.href = "/OchC010/Index";
+					});
 				}
 			}
 		}
@@ -458,20 +463,20 @@
 				// 顯示名稱和參與人數（顯示原始姓名）
 				const nameDisplay = document.getElementById("nameDisplay");
 				nameDisplay.innerHTML = `
-										<div style="text-align: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; color: red;">
-											${formattedDate} 週${weekdayName} 福音特攻隊統計<br>
-										</div>
+												<div style="text-align: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; color: red;">
+													${formattedDate} 週${weekdayName} 福音特攻隊統計<br>
+												</div>
 
-										<div style="text-align: center; font-size: 1.1rem;">
-											${Object.values(data).map(record => `${record.Name} ${record.people}/${record.times}/${record.talk}/${record.line}`).join("<br>")}
-										</div><br>
-										<div style="text-align: center; font-weight: bold; font-size: 1rem; margin-bottom: 10px; color: red;">
-											<span>總計： ${totalPeople}/${totalTimes}/${totalTalks}/${totalLines}</span>
-										</div>
-										<div style="text-align: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; color: green;">
-											參與人數: ${namesSet.size}
-										</div>
-									`;
+												<div style="text-align: center; font-size: 1.1rem;">
+													${Object.values(data).map(record => `${record.Name} ${record.people}/${record.times}/${record.talk}/${record.line}`).join("<br>")}
+												</div><br>
+												<div style="text-align: center; font-weight: bold; font-size: 1rem; margin-bottom: 10px; color: red;">
+													<span>總計： ${totalPeople}/${totalTimes}/${totalTalks}/${totalLines}</span>
+												</div>
+												<div style="text-align: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; color: green;">
+													參與人數: ${namesSet.size}
+												</div>
+											`;
 
 				// 顯示每個人的出現次數並排序（從大到小）
 				const individualCountDisplay = document.getElementById("individualCountDisplay");
@@ -483,9 +488,9 @@
 					.join("");
 
 				individualCountDisplay.innerHTML = `
-										<h3 style="text-align: center; margin-bottom: 10px; color: #007BFF;">每個人的出現次數 (按次數排序)</h3>
-										${namesCountHTML}
-									`;
+												<h3 style="text-align: center; margin-bottom: 10px; color: #007BFF;">每個人的出現次數 (按次數排序)</h3>
+												${namesCountHTML}
+											`;
 
 			} catch (error) {
 				console.error("Error fetching data:", error);
@@ -544,4 +549,5 @@
 		};
 		document.getElementById("fetchBtn").addEventListener("click", fetchData);
 	</script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>

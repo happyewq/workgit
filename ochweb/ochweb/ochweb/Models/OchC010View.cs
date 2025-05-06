@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ochweb.Models
@@ -20,8 +21,9 @@ namespace ochweb.Models
 
         [Display(Name = "Line")]
 		public string line { get; set; }
-        [Display(Name = "使用者帳號")]
-        public string date { get; set; }
+        [Display(Name = "時間")]
+        public DateTime date { get; set; }
+
         [Display(Name = "刪除字串")]
         public string deletestring { get; set; }
 
