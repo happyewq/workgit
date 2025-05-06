@@ -73,6 +73,25 @@
             }
         });
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var userNMC = localStorage.getItem('userNMC');
+            if (userNMC) {
+                document.getElementById('currentUser').innerText = '登入者：' + userNMC;
+            } else {
+                window.location.href = '/Login/Index';
+            }
+
+            // 登出按鈕事件
+            document.getElementById('logoutBtn').addEventListener('click', function () {
+                if (confirm('確定要登出嗎？')) {
+                    localStorage.removeItem('userNMC'); // 清除登入資料
+                    window.location.href = '/Login/Index'; // 返回登入頁
+                }
+            });
+        });
+    </script>
     <!-- 側邊欄 -->
     <div class="sidebar">
         <h4 class="p-3 mb-0 border-bottom">och管理系統</h4>
@@ -87,7 +106,12 @@
     <!-- 上方欄 (Topbar) -->
     <div class="topbar">
         <div>och管理系統</div>
-        <div id="currentUser">尚未登入</div>
+        <div>
+            <span id="currentUser" style="margin-right: 20px;">尚未登入</span>
+            <button id="logoutBtn" class="btn btn-sm px-3 py-1" style="background: linear-gradient(to right, #ff6a6a, #ff4d4d); color: white; border: none; border-radius: 20px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s ease;">
+                登出
+            </button>
+        </div>
     </div>
 
     <!-- 主內容 -->
