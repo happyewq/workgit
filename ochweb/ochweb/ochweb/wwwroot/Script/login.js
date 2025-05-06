@@ -47,8 +47,14 @@ $.extend(login.prototype,
                         });
 
                     } else {
-                        // 登入失敗，顯示錯誤訊息
-                        alert(response.errorMessage || "登入失敗！");
+                        Swal.fire({
+                            icon: 'error',
+                            title: '登入失敗！',
+                            text: "錯誤訊息：" + response.errorMessage, // 加上冒號與空格使格式一致
+                            confirmButtonText: '確定'
+                        }).then(() => {
+                            window.location.href = "/Login/Index"; // 登入頁路徑正確就可
+                        });
                     }
                 },
                 error: function (xhr, status, error) {

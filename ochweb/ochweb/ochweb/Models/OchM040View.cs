@@ -13,6 +13,11 @@ namespace ochweb.Models
 
         [Display(Name = "使用者密碼")]
         public string Password { get; set; }
+        [Display(Name = "新密碼")]
+        public string NewPassword { get; set; }
+
+        [Display(Name = "確認密碼")]
+        public string ConfirmPassword { get; set; }
         public string CreateDateTime { get; set; }
         public string ErrorMessage { get; set; }
 

@@ -1,5 +1,44 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model ochweb.Models.OchM040View
+
 @{
+    ViewBag.Title = "編輯使用者";
+
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+
+@section Scripts {
+    <script src="/Script/ochm040.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+}
+
+<div class="container mt-5">
+
+    <div class="form-group">
+        <label for="UserID">帳號</label>
+        <input type="text" class="form-control" id="UserID" value="@Model.UserID" readonly />
+    </div>
+
+    <div class="form-group mt-3">
+        <label for="UserNMC">名稱</label>
+        <input type="text" class="form-control" id="UserNMC" value="@Model.UserNMC" />
+    </div>
+
+    <div class="form-group mt-3">
+        <label for="Password">密碼</label>
+        <input type="password" class="form-control" id="Password" value="@Model.Password" readonly />
+    </div>
+    <div class="form-group mt-3">
+        <label for="NewPassword">新密碼</label>
+        <input type="text" class="form-control" id="NewPassword" value="@Model.NewPassword" />
+    </div>
+    
+    <div class="form-group mt-3">
+        <label for="ConfirmPassword">確認密碼</label>
+        <input type="text" class="form-control" id="ConfirmPassword" value="@Model.ConfirmPassword" />
+    </div>
+
+    <button class="btn btn-success mt-4" onclick="ochm040.saveEdit()">儲存修改</button>
+    <a href="@Url.Action("Index")" class="btn btn-secondary mt-4">取消</a>
+</div>

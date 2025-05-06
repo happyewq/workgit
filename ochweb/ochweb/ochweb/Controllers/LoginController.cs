@@ -48,7 +48,7 @@ namespace ochweb.Controllers
                             }
                             else
                             {
-                                Result.ErrorMessage = "登入失敗";
+                                Result.ErrorMessage = "帳號密碼錯誤";
                             }
                         }
                     }

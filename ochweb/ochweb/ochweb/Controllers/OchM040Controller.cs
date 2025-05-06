@@ -5,6 +5,8 @@ using ochweb.Helpers;
 using ochweb.Models;
 using System;
 using System.Collections.Generic;
+using Dapper;
+using System.Data;
 
 namespace ochweb.Controllers
 {
@@ -86,6 +88,25 @@ namespace ochweb.Controllers
             return Json(result);
         }
 
+
+        [HttpPost]
+        public ActionResult Edit(string id)
+        {
+            string connstring = DBHelper.GetConnectionString();
+            OchM040View user = null;
+
+            using (var conn = new NpgsqlConnection(connstring))
+            {
+                string sql = @"SELECT * FROM ""OCHUSER"".""ochuser"" WHERE ""UserID"" = @UserID";
+                user = conn.QueryFirstOrDefault<OchM040View>(sql, new { UserID = id });
+            }
+
+            if (user == null)
+                return NotFound();
+
+            return View("Edit", user);
+        }
+
         [HttpPost]
         public JsonResult DeleteUser(string userID)
         {
@@ -117,6 +138,44 @@ namespace ochweb.Controllers
             catch (Exception ex)
             {
                 result.ErrorMessage = "刪除失敗：" + ex.Message;
+            }
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        public JsonResult SaveData(OchM040View user)
+        {
+            var result = new OchM040View();
+
+            try
+            {
+                string connstring = DBHelper.GetConnectionString();
+
+                using (var conn = new NpgsqlConnection(connstring))
+                {
+                    conn.Open();
+
+                    string sql = @"
+                UPDATE ""OCHUSER"".""ochuser"" 
+                SET ""UserNMC"" = @UserNMC, ""Password"" = @Password
+                WHERE ""UserID"" = @UserID";
+
+                    using (var cmd = new NpgsqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@UserNMC", user.UserNMC);
+                        cmd.Parameters.AddWithValue("@Password", user.NewPassword);
+                        cmd.Parameters.AddWithValue("@UserID", user.UserID);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                result.UserID = user.UserID;
+                result.UserNMC = user.UserNMC;
+            }
+            catch (Exception ex)
+            {
+                result.ErrorMessage = "更新失敗：" + ex.Message;
             }
 
             return Json(result);

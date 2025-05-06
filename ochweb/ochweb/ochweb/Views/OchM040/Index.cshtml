@@ -31,7 +31,8 @@
                     <td>@user.UserID</td>
                     <td>@user.UserNMC</td>
                     <td>
-                        <button class="btn btn-sm btn-warning" onclick="ochm040.showEditModal('@user.UserID')">編輯</button>
+                        <button class="btn btn-sm btn-warning" data-userid="@user.UserID" onclick="ochm040.onEditClick(event)">編輯</button>
+
                         <button class="btn btn-sm btn-danger" data-userid="@user.UserID" onclick="ochm040.DeleteUser(event)">刪除</button>
 
                     </td>

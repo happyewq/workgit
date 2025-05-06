@@ -32,6 +32,38 @@ $.extend(ochm040.prototype,
             window.location.href = '/OchM040/AddUser';
         },
 
+        onEditClick: function (e) {
+            const userID = e.currentTarget.getAttribute("data-userid");
+            if (!userID) return;
+
+            // 建立視窗名稱與目標 URL
+            const windowName = "EditUserWindow_" + userID;
+            const url = "/OchM040/Edit";
+
+            // 建立一個新的視窗
+            const popup = window.open('', windowName, 'width=800,height=600');
+
+            // 建立隱藏表單
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = url;
+            form.target = windowName;
+
+            // 加上 userID 參數
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "id";  // 對應後端參數
+            input.value = userID;
+            form.appendChild(input);
+
+            // 加到 body 並送出
+            document.body.appendChild(form);
+            form.submit();
+
+            // 清除表單 DOM
+            document.body.removeChild(form);
+        },
+
         DeleteUser: function (e) {
             const userID = e.currentTarget.getAttribute("data-userid");
 
@@ -49,6 +81,45 @@ $.extend(ochm040.prototype,
                             Swal.fire('錯誤', res.errorMessage, 'error');
                         }
                     });
+                }
+            });
+        },
+        saveEdit: function () {
+            const userID = document.getElementById("UserID").value;
+            const userNMC = document.getElementById("UserNMC").value;
+            const password = document.getElementById("Password").value;
+            const confirmPassword = document.getElementById("ConfirmPassword").value;
+            const NewPassword = document.getElementById("NewPassword").value;
+            
+
+            if (NewPassword !== confirmPassword) {
+                Swal.fire('錯誤', '新密碼與確認密碼不一致', 'error');
+                return;
+            }
+
+            const payload = {
+                UserID: userID,
+                UserNMC: userNMC,
+                Password: password,
+                ConfirmPassword: confirmPassword,
+                NewPassword: NewPassword
+            };
+
+            $.ajax({
+                url: '/OchM040/SaveData',
+                type: 'POST',
+                data: payload,
+                success: function (res) {
+                    if (!res.errorMessage) {
+                        Swal.fire('成功', '修改完成', 'success').then(() => {
+                            window.location.href = '/OchM040/Index';
+                        });
+                    } else {
+                        Swal.fire('錯誤', res.errorMessage, 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('錯誤', '伺服器錯誤，請稍後再試', 'error');
                 }
             });
         },
