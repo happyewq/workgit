@@ -68,7 +68,8 @@
             if (userNMC) {
                 document.getElementById('currentUser').innerText = '登入者：' + userNMC;
             } else {
-                document.getElementById('currentUser').innerText = '尚未登入';
+                // 沒有登入資料，跳轉到登入頁面
+                window.location.href = '/Login/Index';  // ← 根據你的專案調整路徑
             }
         });
     </script>
