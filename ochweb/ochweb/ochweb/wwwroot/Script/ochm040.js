@@ -36,32 +36,19 @@ $.extend(ochm040.prototype,
             const userID = e.currentTarget.getAttribute("data-userid");
             if (!userID) return;
 
-            // 建立視窗名稱與目標 URL
-            const windowName = "EditUserWindow_" + userID;
-            const url = "/OchM040/Edit";
-
-            // 建立一個新的視窗
-            const popup = window.open('', windowName, 'width=800,height=600');
-
-            // 建立隱藏表單
+            // 建立隱藏 form
             const form = document.createElement("form");
             form.method = "POST";
-            form.action = url;
-            form.target = windowName;
+            form.action = "/OchM040/Edit";
 
-            // 加上 userID 參數
             const input = document.createElement("input");
             input.type = "hidden";
-            input.name = "id";  // 對應後端參數
+            input.name = "id"; // 對應後端 Edit 的參數
             input.value = userID;
-            form.appendChild(input);
 
-            // 加到 body 並送出
+            form.appendChild(input);
             document.body.appendChild(form);
             form.submit();
-
-            // 清除表單 DOM
-            document.body.removeChild(form);
         },
 
         DeleteUser: function (e) {
