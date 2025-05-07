@@ -26,9 +26,18 @@
     </div>
 
     <div class="form-group mt-3">
+        <label asp-for="Permission" class="form-label"></label>
+        <select asp-for="Permission" class="form-select">
+            <option value="User">User</option>
+            <option value="Admin">Admin</option>
+        </select>
+    </div>
+
+    <div class="form-group mt-3">
         <label for="Password">密碼</label>
         <input type="password" class="form-control" id="Password" value="@Model.Password" readonly />
     </div>
+
     <div class="form-group mt-3">
         <label for="NewPassword">新密碼</label>
         <input type="text" class="form-control" id="NewPassword" value="@Model.NewPassword" />

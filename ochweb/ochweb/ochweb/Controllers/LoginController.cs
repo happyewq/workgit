@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 using Npgsql;
+using Microsoft.AspNetCore.Http;
 
 namespace ochweb.Controllers
 {
@@ -26,7 +27,7 @@ namespace ochweb.Controllers
 
             try
             {
-                string connstring = DBHelper.GetConnectionString(); // 從 appsettings.json 抓 PostgreSQL 連線字串
+                string connstring = DBHelper.GetConnectionString();
 
                 using (var conn = new NpgsqlConnection(connstring))
                 {
@@ -43,8 +44,15 @@ namespace ochweb.Controllers
                         {
                             if (reader.Read())
                             {
+                                // 設定回傳資料
                                 Result.UserNMC = reader["UserNMC"].ToString();
                                 Result.UserID = reader["UserID"].ToString();
+                                Result.Permission = reader["Permission"].ToString();
+
+                                // ✅ 寫入 Session
+                                HttpContext.Session.SetString("UserNMC", Result.UserNMC);
+                                HttpContext.Session.SetString("UserID", Result.UserID);
+                                HttpContext.Session.SetString("Permission", Result.Permission);
                             }
                             else
                             {
@@ -60,6 +68,13 @@ namespace ochweb.Controllers
             }
 
             return Json(Result);
+        }
+
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear(); // 清空所有 session
+            return RedirectToAction("Index", "Login");
         }
     }
 }

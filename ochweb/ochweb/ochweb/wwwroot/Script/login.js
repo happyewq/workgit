@@ -34,16 +34,18 @@ $.extend(login.prototype,
                         // 登入成功（沒有 ErrorMessage）
                         login._member = {
                             userID: response.userID,
-                            userNMC: response.userNMC
+                            userNMC: response.userNMC,
+                            permission: response.Permission
                         };
                         localStorage.setItem('userNMC', response.userNMC);
+                        localStorage.setItem('permission', response.permission);
                         Swal.fire({
                             icon: 'success',
                             title: '登入成功！',
                             text: '歡迎 ' + response.userNMC,
-                            confirmButtonText: '進入系統'
+                            confirmButtonText: '確定'
                         }).then(() => {
-                            window.location.href = "/OchC010/Index";
+                            window.location.href = "/Home/Index";
                         });
 
                     } else {

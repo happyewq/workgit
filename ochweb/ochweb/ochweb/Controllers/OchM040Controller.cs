@@ -10,8 +10,8 @@ using System.Data;
 
 namespace ochweb.Controllers
 {
-	public class OchM040Controller : Controller
-	{
+	public class OchM040Controller : BaseController
+    {
         public IActionResult Index()
         {
             List<OchM040View> users = new List<OchM040View>();
@@ -21,7 +21,7 @@ namespace ochweb.Controllers
             using (var conn = new NpgsqlConnection(connstring))
             {
                 conn.Open();
-                string sql = "SELECT \"UserID\", \"UserNMC\", \"Password\", \"CreateDateTime\" FROM \"OCHUSER\".\"ochuser\"";
+                string sql = "SELECT * FROM \"OCHUSER\".\"ochuser\"";
 
                 using (var cmd = new NpgsqlCommand(sql, conn))
                 using (var reader = cmd.ExecuteReader())
@@ -32,6 +32,7 @@ namespace ochweb.Controllers
                         {
                             UserID = reader["UserID"].ToString(),
                             UserNMC = reader["UserNMC"].ToString(),
+                            Permission = reader["Permission"].ToString(),
                             Password = "", // 不回傳密碼
                             CreateDateTime = reader["CreateDateTime"].ToString()
                         });
@@ -48,7 +49,7 @@ namespace ochweb.Controllers
         }
 
         [HttpPost]
-        public JsonResult SaveUser(string userID, string userNMC, string password)
+        public JsonResult SaveUser(OchM040View OchM040View)
         {
             var result = new ochweb.Models.OchM040View();
 
@@ -62,21 +63,22 @@ namespace ochweb.Controllers
 
                     string sql = @"
                         INSERT INTO ""OCHUSER"".""ochuser""
-                        (""UserID"", ""UserNMC"", ""Password"", ""DCcode"", ""CancelYN"", ""CreateDateTime"")
-                        VALUES (@UserID, @UserNMC, @Password, '1', 'N', @CreateDateTime)
+                        (""UserID"", ""UserNMC"", ""Password"", ""DCcode"", ""CancelYN"", ""CreateDateTime"", ""Permission"")
+                        VALUES (@UserID, @UserNMC, @Password, '1', 'N', @CreateDateTime, @Permission)
                     ";
 
                     using (var cmd = new NpgsqlCommand(sql, conn))
                     {
-                        cmd.Parameters.AddWithValue("@UserID", userID);
-                        cmd.Parameters.AddWithValue("@UserNMC", userNMC);
-                        cmd.Parameters.AddWithValue("@Password", password);
+                        cmd.Parameters.AddWithValue("@UserID", OchM040View.UserID);
+                        cmd.Parameters.AddWithValue("@UserNMC", OchM040View.UserNMC);
+                        cmd.Parameters.AddWithValue("@Password", OchM040View.Password);
                         cmd.Parameters.AddWithValue("@CreateDateTime", DateTime.Now.ToString("yyyyMMdd"));
+                        cmd.Parameters.AddWithValue("@Permission", OchM040View.Permission);
 
                         cmd.ExecuteNonQuery();
 
-                        result.UserID = userID;
-                        result.UserNMC = userNMC;
+                        result.UserID = OchM040View.UserID;
+                        result.UserNMC = OchM040View.UserNMC;
                     }
                 }
             }
@@ -156,16 +158,39 @@ namespace ochweb.Controllers
                 {
                     conn.Open();
 
+                    // 動態組 SQL
                     string sql = @"
                 UPDATE ""OCHUSER"".""ochuser"" 
-                SET ""UserNMC"" = @UserNMC, ""Password"" = @Password
-                WHERE ""UserID"" = @UserID";
+                SET ""UserNMC"" = @UserNMC";
+
+
+                    if (!string.IsNullOrWhiteSpace(user.NewPassword))
+                    {
+                        sql += ", \"Password\" = @Password";
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(user.Permission))
+                    {
+                        sql += ", \"Permission\" = @Permission";
+                    }
+
+                    sql += " WHERE \"UserID\" = @UserID";
 
                     using (var cmd = new NpgsqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@UserNMC", user.UserNMC);
-                        cmd.Parameters.AddWithValue("@Password", user.NewPassword);
                         cmd.Parameters.AddWithValue("@UserID", user.UserID);
+
+                        if (!string.IsNullOrWhiteSpace(user.NewPassword))
+                        {
+                            cmd.Parameters.AddWithValue("@Password", user.NewPassword);
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(user.Permission))
+                        {
+                            cmd.Parameters.AddWithValue("@Permission", user.Permission);
+                        }
+
                         cmd.ExecuteNonQuery();
                     }
                 }

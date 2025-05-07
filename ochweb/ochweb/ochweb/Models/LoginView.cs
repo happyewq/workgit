@@ -16,6 +16,9 @@ namespace ochweb.Models
 		public string CreateDateTime { get; set; }
         public string ErrorMessage { get; set; }
 
+        [Display(Name = "使用者權限")]
+        public string Permission { get; set; }
+        
         public LoginView()
 		{
 		}

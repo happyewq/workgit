@@ -10,8 +10,8 @@ using System.Data.SqlClient;
 
 namespace ochweb.Controllers
 {
-	public class OchC010Controller : Controller
-	{
+	public class OchC010Controller : BaseController
+    {
 		public ActionResult Index()
 		{
 			OchC010View NewOchC010 = new OchC010View();

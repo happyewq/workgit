@@ -12,49 +12,53 @@ using System.Threading.Tasks;
 
 namespace ochweb
 {
-	public class Startup
-	{
-		public Startup(IConfiguration configuration)
-		{
-			Configuration = configuration;
-		}
-
-		public IConfiguration Configuration { get; }
-
-		// This method gets called by the runtime. Use this method to add services to the container.
-		public void ConfigureServices(IServiceCollection services)
-		{
-			services.AddControllersWithViews()
-				.AddRazorRuntimeCompilation(); // ✅ 加這行;
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
         }
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-		{
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-			}
-			else
-			{
-				app.UseExceptionHandler("/Home/Error");
-			}
-			// ✅ 初始化DBHelper
-			ochweb.Helpers.DBHelper.Init(Configuration);
+        public IConfiguration Configuration { get; }
 
-			app.UseStaticFiles();
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllersWithViews()
+                .AddRazorRuntimeCompilation(); // ✅ 加這行;
 
-			app.UseRouting();
+            services.AddSession();
+            services.AddHttpContextAccessor();
+        }
 
-			app.UseAuthorization();
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+            }
+            // ✅ 初始化DBHelper
+            ochweb.Helpers.DBHelper.Init(Configuration);
 
-			app.UseEndpoints(endpoints =>
-			{
-				endpoints.MapControllerRoute(
-					name: "default",
-					pattern: "{controller=Login}/{action=Index}/{id?}");
-			});
+            app.UseStaticFiles();
 
+            app.UseRouting();
+
+            app.UseSession();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Login}/{action=Index}/{id?}");
+            });
             // 額外開放 Script 資料夾裡面放JS
             var scriptPath = Path.Combine(env.ContentRootPath, "Script");
             if (Directory.Exists(scriptPath))

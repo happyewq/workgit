@@ -1,8 +1,118 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model ochweb.Models.OchC010View
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>我們家教會</title>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet">
+	<style>
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: 'Noto Sans TC', sans-serif;
+			background: #f5f5f5;
+			color: #333;
+			line-height: 1.6;
+		}
+
+		header {
+			background: #004080;
+			color: white;
+			text-align: center;
+			padding: 20px;
+		}
+
+			header img {
+				height: 100px;
+				border-radius: 50%;
+			}
+
+		h1 {
+			font-size: 2em;
+			margin-top: 10px;
+		}
+
+		section {
+			padding: 40px 20px;
+			max-width: 900px;
+			margin: auto;
+		}
+
+		.card {
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+			padding: 20px;
+			margin-bottom: 30px;
+		}
+
+		.title {
+			font-size: 1.5em;
+			color: #004080;
+			margin-bottom: 15px;
+			border-left: 5px solid #004080;
+			padding-left: 10px;
+		}
+
+		iframe {
+			width: 100%;
+			height: 360px;
+			border: none;
+			border-radius: 10px;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<img src="https://happyewq.github.io/workgit/ochimage/ochimage.png" alt="教會Logo">
+		<h1>我們家教會</h1>
+		<p>歡迎你來到愛與真理的家</p>
+	</header>
+
+	<section>
+		<div class="card">
+			<div class="title">📅 聚會時間</div>
+			<ul>
+				<li>主日禮拜：每週日 上午 10:30</li>
+				<li>小組聚會：每週一 晚上 8:30</li>
+				<li>小組聚會：每週二 晚上 8:30</li>
+				<li>小組聚會：每週三 晚上 8:30</li>
+				<li>小組聚會：每週四 晚上 8:00</li>
+				<li>小組聚會：每週六 晚上 8:30</li>
+				<li>禱告會：每週五 晚上 7:30</li>
+				<li>地點：台中市○○區○○路123號</li>
+			</ul>
+		</div>
+
+		<div class="card">
+			<div class="title">🙋‍♂️ 組長介紹</div>
+			<p>我們家教會共有五位溫暖的組長：</p>
+			<ul>
+				<li>許弟兄（青年小組）</li>
+				<li>洪姊妹（中年小組）</li>
+				<li>尤姊妹（青年小組）</li>
+				<li>藍姊妹（青年小組）</li>
+				<li>菜姊妹（家庭小組）</li>
+			</ul>
+		</div>
+
+		<div class="card">
+			<div class="title">🎬 教會活動影片</div>
+			<!-- 可替換為實際的影片連結 -->
+			<video controls style="width:100%; border-radius:10px;">
+				<source src="https://happyewq.github.io/workgit/ochvideo/ochvideo.mp4" type="video/mp4">
+				您的瀏覽器不支援影片播放。
+			</video>
+		</div>
+	</section>
+</body>
+</html>

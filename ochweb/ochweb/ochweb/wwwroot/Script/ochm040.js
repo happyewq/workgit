@@ -8,14 +8,20 @@ $.extend(ochm040.prototype,
             var userID = $("#UserID").val();
             var password = $("#Password").val();
             var usernmc = $("#UserNMC").val();
+            var permission = $("#Permission").val();
+            if (!permission) {
+                Swal.fire('提醒', '請選擇使用者權限！', 'warning');
+                return;
+            }
 
             $.ajax({
                 url: '/OchM040/SaveUser',
                 type: 'POST',
                 data: {
                     UserID: userID,
+                    UserNMC: usernmc,
                     Password: password,
-                    usernmc: usernmc
+                    Permission: permission
                 },
                 success: function (res) {
                     Swal.fire('成功', '新增完成', 'success').then(() => {
@@ -27,6 +33,7 @@ $.extend(ochm040.prototype,
                 }
             });
         },
+
 
         goAddPage: function () {
             window.location.href = '/OchM040/AddUser';
@@ -77,7 +84,8 @@ $.extend(ochm040.prototype,
             const password = document.getElementById("Password").value;
             const confirmPassword = document.getElementById("ConfirmPassword").value;
             const NewPassword = document.getElementById("NewPassword").value;
-            
+
+            var Permission = $("#Permission").val();
 
             if (NewPassword !== confirmPassword) {
                 Swal.fire('錯誤', '新密碼與確認密碼不一致', 'error');
@@ -89,7 +97,8 @@ $.extend(ochm040.prototype,
                 UserNMC: userNMC,
                 Password: password,
                 ConfirmPassword: confirmPassword,
-                NewPassword: NewPassword
+                NewPassword: NewPassword,
+                Permission: Permission
             };
 
             $.ajax({

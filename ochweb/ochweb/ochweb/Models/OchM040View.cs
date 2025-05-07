@@ -15,6 +15,8 @@ namespace ochweb.Models
         public string Password { get; set; }
         [Display(Name = "新密碼")]
         public string NewPassword { get; set; }
+        [Display(Name = "使用者權限")]
+        public string Permission { get; set; }
 
         [Display(Name = "確認密碼")]
         public string ConfirmPassword { get; set; }
