@@ -26,6 +26,15 @@ namespace ochweb
         {
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation(); // ✅ 加這行;
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "OCH API 文件",
+                    Version = "v1",
+                    Description = "我們教會管理系統的 API 文件"
+                });
+            });
 
             services.AddSession();
             services.AddHttpContextAccessor();
@@ -52,6 +61,13 @@ namespace ochweb
             app.UseSession();
 
             app.UseAuthorization();
+
+            app.UseSwagger(); // 加這行：產生 swagger.json
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "OCH API v1");
+                c.RoutePrefix = "swagger"; // 存取網址為 /swagger
+            });
 
             app.UseEndpoints(endpoints =>
             {

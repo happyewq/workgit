@@ -1,0 +1,13 @@
+name: Keep Render App Alive
+
+on:
+  schedule:
+    - cron: "*/10 0-14 * * *"  # 台灣時間 08:00–22:50，每 10 分鐘 ping 一次
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Ping Render App
+      run: |
+        curl -s -o /dev/null https://workgit.onrender.com || echo "Ping failed"

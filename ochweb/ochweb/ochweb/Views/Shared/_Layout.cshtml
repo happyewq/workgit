@@ -89,6 +89,10 @@
         @if (HttpContextAccessor.HttpContext.Session.GetString("Permission") == "Admin")
         {
             <a asp-area="" asp-controller="OchM040" asp-action="Index">帳號管理</a>
+        } 
+        @if (HttpContextAccessor.HttpContext.Session.GetString("Permission") == "Admin")
+        {
+            <a asp-area="" asp-controller="Pay" asp-action="Index">繳費管理</a>
         }
     </div>
 
