@@ -1,0 +1,33 @@
+﻿@model SessionDetailViewModel
+
+@{
+    ViewData["Title"] = "場次詳細";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h3>場次：@Model.SessionName (ID: @Model.SessionID)</h3>
+    <table class="table table-bordered table-striped mt-3">
+        <thead>
+            <tr>
+                <th>報名者</th>
+                <th>身分</th>
+                <th>費用</th>
+                <th>是否繳交</th>
+                <th>報名時間</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Registrants)
+            {
+                <tr>
+                    <td>@r.UserID</td>
+                    <td>@(r.UserType == "w" ? "上班族" : "學生")</td>
+                    <td>@r.FeeAmount</td>
+                    <td>@(r.PaidYN == "Y" ? "已繳交" : "未繳交")</td>
+                    <td>@r.RegisterTime</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

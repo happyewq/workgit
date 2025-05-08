@@ -26,23 +26,44 @@
             flex-direction: column;
             position: fixed;
             height: 100%;
+            transition: all 0.3s;
         }
 
-            .sidebar a {
-                color: #fff;
-                padding: 15px 20px;
-                text-decoration: none;
-                display: block;
-            }
+        .sidebar a {
+            color: #fff;
+            padding: 15px 20px;
+            text-decoration: none;
+            display: block;
+        }
 
-                .sidebar a:hover {
-                    background-color: #495057;
-                }
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar.collapsed a {
+            font-size: 0;
+            padding: 15px 10px;
+        }
+
+        .sidebar.collapsed h4 {
+            font-size: 0;
+            padding: 0;
+            overflow: hidden;
+        }
 
         .main-content {
             margin-left: 240px;
             padding: 20px;
             flex-grow: 1;
+            transition: all 0.3s;
+        }
+
+        .main-content.collapsed {
+            margin-left: 60px;
         }
 
         .topbar {
@@ -58,59 +79,48 @@
             right: 0;
             top: 0;
             z-index: 1030;
+            transition: all 0.3s;
+        }
+
+        .topbar.collapsed {
+            left: 60px;
         }
 
         .main-content > header {
-            margin-top: 80px; /* 預留 topbar 的高度 */
+            margin-top: 80px;
         }
     </style>
 </head>
 <body>
-@*    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var userNMC = localStorage.getItem('userNMC');
-            var permission = localStorage.getItem('permission');
-            if (userNMC) {
-                document.getElementById('currentUser').innerText = '登入者：' + userNMC;
-            } else {
-                // 沒有登入資料，跳轉到登入頁面
-                window.location.href = '/Login/Index';  // ← 根據你的專案調整路徑
-            }
-        });
-    </script>*@
 
-    <!-- 側邊欄 -->
     <!-- 側邊欄 -->
     <div class="sidebar">
         <h4 class="p-3 mb-0 border-bottom">och管理系統</h4>
         <a asp-area="" asp-controller="Home" asp-action="Index">首頁</a>
         <a asp-area="" asp-controller="OchC010" asp-action="Index">福音紀錄管理</a>
-
         @if (HttpContextAccessor.HttpContext.Session.GetString("Permission") == "Admin")
         {
             <a asp-area="" asp-controller="OchM040" asp-action="Index">帳號管理</a>
-        } 
-        @if (HttpContextAccessor.HttpContext.Session.GetString("Permission") == "Admin")
-        {
-            <a asp-area="" asp-controller="Pay" asp-action="Index">繳費管理</a>
+            <a asp-area="" asp-controller="OchC020" asp-action="Index">活動管理</a>
         }
     </div>
 
-    <!-- 上方欄 (Topbar) -->
+    <!-- 上方欄 -->
     <div class="topbar">
-        <div>och管理系統</div>
+        <div class="d-flex align-items-center">
+            <button id="toggleSidebar" class="btn btn-outline-secondary btn-sm me-2">☰</button>
+            <div>och管理系統</div>
+        </div>
         <div>
             <span id="currentUser" style="margin-right: 20px;">
                 登入者：@HttpContextAccessor.HttpContext.Session.GetString("UserNMC")
             </span>
-
             <form id="logoutForm" asp-action="Logout" asp-controller="Login" method="post" style="display: inline;">
                 <button type="submit" class="btn btn-sm px-3 py-1"
                         style="background: linear-gradient(to right, #ff6a6a, #ff4d4d); color: white; border: none; border-radius: 20px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s ease;">
                     登出
                 </button>
             </form>
-
         </div>
     </div>
 
@@ -119,16 +129,9 @@
         <header class="mb-4">
             <h2>@ViewData["Title"]</h2>
         </header>
-
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
-@*
-        <footer class="border-top footer text-muted mt-4">
-            <div class="container">
-                &copy; 2025 - och管理系統 - <a asp-area="" asp-controller="Home" asp-action="Privacy">隱私權政策</a>
-            </div>
-        </footer>*@
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -141,7 +144,7 @@
             const form = document.getElementById("logoutForm");
             if (form) {
                 form.addEventListener("submit", function (e) {
-                    e.preventDefault(); // 先阻止送出
+                    e.preventDefault();
                     Swal.fire({
                         title: '確定要登出嗎？',
                         icon: 'warning',
@@ -152,13 +155,23 @@
                         cancelButtonText: '取消'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            form.submit(); // 使用者確認才送出表單
+                            form.submit();
                         }
                     });
                 });
             }
+
+            const toggleBtn = document.getElementById("toggleSidebar");
+            const sidebar = document.querySelector(".sidebar");
+            const main = document.querySelector(".main-content");
+            const topbar = document.querySelector(".topbar");
+
+            toggleBtn.addEventListener("click", function () {
+                sidebar.classList.toggle("collapsed");
+                main.classList.toggle("collapsed");
+                topbar.classList.toggle("collapsed");
+            });
         });
     </script>
-
 </body>
 </html>

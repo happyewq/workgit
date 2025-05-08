@@ -1,0 +1,34 @@
+﻿@model OchC020View
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = ViewContext.View.Path.Contains("Create") ? "新增場次" : "編輯場次";
+}
+
+<div class="container mt-5">
+    <h2>@ViewData["Title"]</h2>
+    <form asp-action="SaveData" asp-controller="OchC020" method="post">
+        <input type="hidden" name="SessionID" value="@Model?.SessionID" />
+        <div class="mb-3">
+            <label class="form-label">場次名稱</label>
+            <input type="text" name="SessionName" class="form-control" value="@Model?.SessionName" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">內容</label>
+            <textarea name="SessionContent" class="form-control">@Model?.SessionContent</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">地點</label>
+            <input type="text" name="SessionLocation" class="form-control" value="@Model?.SessionLocation" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">開始時間</label>
+            <input type="datetime-local" name="StartTime" class="form-control" value="@Model?.StartTime" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">結束時間</label>
+            <input type="datetime-local" name="EndTime" class="form-control" value="@Model?.EndTime" />
+        </div>
+        <button type="submit" class="btn btn-primary">儲存</button>
+        <a href="/OchC020/Index" class="btn btn-secondary">返回</a>
+    </form>
+</div>
