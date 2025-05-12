@@ -4,58 +4,69 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<!-- 外部樣式與腳本 -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- 主要內容 -->
 <div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>場次管理</h2>
-        <a href="/OchC020/Create" class="btn btn-success">＋ 新增場次</a>
+    <div class="card shadow-lg p-4 rounded-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-primary fw-bold">📅 場次管理</h2>
+            <a href="/OchC020/Create" class="btn btn-success btn-lg px-4 rounded-pill shadow-sm">＋ 新增場次</a>
+        </div>
+
+        <div class="table-responsive">
+            <table id="sessionTable" class="table table-bordered table-hover align-middle text-center rounded">
+                <thead class="table-primary">
+                    <tr>
+                        <th>場次ID</th>
+                        <th>場次名稱</th>
+                        <th>內容</th>
+                        <th>地點</th>
+                        <th>開始時間</th>
+                        <th>結束時間</th>
+                        <th>建立時間</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model)
+                    {
+                        <tr>
+                            <td>@s.SessionID</td>
+                            <td>@s.SessionName</td>
+                            <td>@s.SessionContent</td>
+                            <td>@s.SessionLocation</td>
+                            <td>@s.StartTime</td>
+                            <td>@s.EndTime</td>
+                            <td>@s.CreateDateTime</td>
+                            <td>
+                                <a href="/OchC020/Details/@s.SessionID" class="btn btn-info btn-sm me-1">詳細</a>
+                                <a href="/OchC020/Edit/@s.SessionID" class="btn btn-warning btn-sm me-1">編輯</a>
+                                <button class="btn btn-danger btn-sm" onclick="deleteSession(@s.SessionID)">刪除</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-    <table id="sessionTable" class="display table table-bordered">
-        <thead>
-            <tr>
-                <th>場次ID</th>
-                <th>場次名稱</th>
-                <th>內容</th>
-                <th>地點</th>
-                <th>開始時間</th>
-                <th>結束時間</th>
-                <th>建立時間</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var s in Model)
-            {
-                <tr>
-                    <td>@s.SessionID</td>
-                    <td>@s.SessionName</td>
-                    <td>@s.SessionContent</td>
-                    <td>@s.SessionLocation</td>
-                    <td>@s.StartTime</td>
-                    <td>@s.EndTime</td>
-                    <td>@s.CreateDateTime</td>
-                    <td>
-                        <a href="/OchC020/Details/@s.SessionID" class="btn btn-sm btn-info">詳細</a>
-                        <a href="/OchC020/Edit/@s.SessionID" class="btn btn-sm btn-warning">編輯</a>
-                        <button class="btn btn-sm btn-danger" onclick="deleteSession(@s.SessionID)">刪除</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
 </div>
 
+<!-- JS -->
 <script>
     $(document).ready(function () {
         $('#sessionTable').DataTable({
             language: {
                 url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/zh-HANT.json"
-            }
+            },
+            pageLength: 10,
+            lengthMenu: [5, 10, 20],
         });
     });
 

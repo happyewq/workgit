@@ -5,29 +5,43 @@
 }
 
 <div class="container mt-5">
-    <h2>@ViewData["Title"]</h2>
-    <form asp-action="CreateData" asp-controller="OchC020" method="post">
-        <div class="mb-3">
-            <label class="form-label">場次名稱</label>
-            <input type="text" name="SessionName" class="form-control" value="@Model?.SessionName" required />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">內容</label>
-            <textarea name="SessionContent" class="form-control">@Model?.SessionContent</textarea>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">地點</label>
-            <input type="text" name="SessionLocation" class="form-control" value="@Model?.SessionLocation" />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">開始時間</label>
-            <input type="datetime-local" name="StartTime" class="form-control" value="@Model?.StartTime" />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">結束時間</label>
-            <input type="datetime-local" name="EndTime" class="form-control" value="@Model?.EndTime" />
-        </div>
-        <button type="submit" class="btn btn-primary">儲存</button>
-        <a href="/OchC020/Index" class="btn btn-secondary">返回</a>
-    </form>
+    <div class="card shadow-lg p-4 rounded-4">
+        <h2 class="text-center text-primary fw-bold mb-4">@ViewData["Title"]</h2>
+
+        <form asp-action="CreateData" asp-controller="OchC020" method="post">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">場次名稱</label>
+                <input type="text" name="SessionName" class="form-control rounded-pill px-3"
+                       value="@Model?.SessionName" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">內容</label>
+                <textarea name="SessionContent" class="form-control rounded-3 px-3" rows="3">@Model?.SessionContent</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">地點</label>
+                <input type="text" name="SessionLocation" class="form-control rounded-pill px-3"
+                       value="@Model?.SessionLocation" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">開始時間</label>
+                <input type="datetime-local" name="StartTime" class="form-control rounded-pill px-3"
+                       value="@Model.StartTime" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">結束時間</label>
+                <input type="datetime-local" name="EndTime" class="form-control rounded-pill px-3"
+                       value="@Model.EndTime" />
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm me-3">💾 儲存</button>
+                <a href="/OchC020/Index" class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm">返回</a>
+            </div>
+        </form>
+    </div>
 </div>

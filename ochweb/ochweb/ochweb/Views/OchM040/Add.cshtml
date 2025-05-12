@@ -9,29 +9,40 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }
 
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 rounded-4">
+        <h3 class="text-center text-primary fw-bold mb-4">🧾 新增使用者</h3>
 
-<div class="container mt-4">
-    <h3>新增使用者</h3>
-    <div class="mb-3">
-        <label asp-for="UserID" class="form-label"></label>
-        <input asp-for="UserID" id="UserID" class="form-control" />
+        <div class="mb-3">
+            <label asp-for="UserID" class="form-label fw-semibold">帳號</label>
+            <input asp-for="UserID" id="UserID" class="form-control rounded-pill px-3" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label fw-semibold">密碼</label>
+            <input asp-for="Password" id="Password" type="password" class="form-control rounded-pill px-3" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="UserNMC" class="form-label fw-semibold">名稱</label>
+            <input asp-for="UserNMC" id="UserNMC" class="form-control rounded-pill px-3" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Permission" class="form-label fw-semibold">權限</label>
+            <select asp-for="Permission" class="form-select rounded-pill px-3" id="Permission">
+                <option value="" disabled selected>請選擇權限</option>
+                <option value="User">User</option>
+                <option value="Admin">Admin</option>
+            </select>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="button" class="btn btn-success btn-lg px-5 rounded-pill shadow-sm me-3"
+                    onclick="ochm040.SaveUser()">💾 儲存</button>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm">
+                返回列表
+            </a>
+        </div>
     </div>
-    <div class="mb-3">
-        <label asp-for="Password" class="form-label"></label>
-        <input asp-for="Password" id="Password" type="password" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="UserNMC" class="form-label"></label>
-        <input asp-for="UserNMC" id="UserNMC" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="Permission" class="form-label"></label>
-        <select asp-for="Permission" class="form-select" id="Permission">
-            <option value="" disabled selected>請選擇權限</option>
-            <option value="User">User</option>
-            <option value="Admin">Admin</option>
-        </select>
-    </div>
-    <button type="button" class="btn btn-success" onclick="ochm040.SaveUser()">儲存</button>
-    <a asp-action="Index" class="btn btn-secondary">返回列表</a>
 </div>

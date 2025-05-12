@@ -1,45 +1,61 @@
-﻿<!-- 使用者管理頁面：免費版（DataTables + Bootstrap Modal + SweetAlert2） -->
-@model IEnumerable<ochweb.Models.OchM040View>
+﻿@model IEnumerable<ochweb.Models.OchM040View>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 
 @section Scripts {
     <script src="/Script/ochm040.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }
 
+<!-- 使用者管理區塊 -->
+<div class="container mt-5">
+    <div class="card shadow-lg rounded-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="text-primary fw-bold">
+                👥 使用者清單
+            </h4>
+            <button class="btn btn-success btn-lg rounded-pill px-4 shadow-sm"
+                    onclick="ochm040.goAddPage()">
+                ＋ 新增使用者
+            </button>
+        </div>
 
-<!-- Bootstrap Table + 按鈕區 -->
-<div class="container mt-4">
-    <h4>使用者清單</h4>
-    <button class="btn btn-primary mb-3" onclick="ochm040.goAddPage()">新增使用者</button>
-    <table id="userTable" class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>帳號</th>
-                <th>名稱</th>
-                <th>權限</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model)
-            {
-                <tr>
-                    <td>@user.UserID</td>
-                    <td>@user.UserNMC</td>
-                    <td>@user.Permission</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning" data-userid="@user.UserID" onclick="ochm040.onEditClick(event)">編輯</button>
+        <div class="table-responsive">
+            <table id="userTable" class="table table-bordered table-hover table-striped align-middle text-center">
+                <thead class="table-primary">
+                    <tr>
+                        <th>帳號</th>
+                        <th>名稱</th>
+                        <th>權限</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>@user.UserID</td>
+                            <td>@user.UserNMC</td>
+                            <td>@user.Permission</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm rounded-pill px-3 me-1"
+                                        data-userid="@user.UserID"
+                                        onclick="ochm040.onEditClick(event)">
+                                    ✏️ 編輯
+                                </button>
 
-                        <button class="btn btn-sm btn-danger" data-userid="@user.UserID" onclick="ochm040.DeleteUser(event)">刪除</button>
-
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                                <button class="btn btn-danger btn-sm rounded-pill px-3"
+                                        data-userid="@user.UserID"
+                                        onclick="ochm040.DeleteUser(event)">
+                                    🗑️ 刪除
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
