@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System;
 using System.Net.Http.Headers;
+using Npgsql;
+using ochweb.Helpers;
 
 namespace ochweb.ApiController
 {
@@ -26,12 +28,34 @@ namespace ochweb.ApiController
 
                     Console.WriteLine($"收到 {userId} 說：{message}");
 
-                    // 自己用 HttpClient 呼叫 LINE Messaging API 回覆訊息
+                    // ✅ 寫入 PostgreSQL 資料庫
+                    SaveMessageToDb(userId, message);
+
+                    // 回覆
                     await ReplyToLineUser(replyToken, "你說的是：" + message);
                 }
             }
+
             return Ok();
         }
+
+        private void SaveMessageToDb(string userId, string message)
+        {
+            string connstring = DBHelper.GetConnectionString(); // 從 appsettings.json 抓
+            using (var conn = new NpgsqlConnection(connstring))
+            {
+                conn.Open();
+                string sql = @"INSERT INTO ""OCHUSER"".""linemessages"" (""UserID"", ""Message"") VALUES (@UserID, @Message)";
+
+                using (var cmd = new NpgsqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserID", userId);
+                    cmd.Parameters.AddWithValue("@Message", message);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
 
         private async Task ReplyToLineUser(string replyToken, string message)
         {
@@ -56,3 +80,6 @@ namespace ochweb.ApiController
         }
     }
 }
+
+
+//https://hook.eu2.make.com/1obevqa6h6d3ne5hef4zpadrv4d5wbhv
