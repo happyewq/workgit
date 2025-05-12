@@ -36,7 +36,7 @@ namespace ochweb.ApiController
                     // ✅ 拿使用者的暱稱
                     var displayName = await GetDisplayNameAsync(userId);
                     // ✅ 寫入 PostgreSQL 資料庫
-                    SaveMessageToDb(userId, displayName, message);
+                    SaveMessageToDb(userId, message, displayName );
 
                     // 回覆
                     await ReplyToLineUser(replyToken, $"哈囉 {displayName}，你說的是：{message}");
