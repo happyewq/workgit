@@ -26,31 +26,48 @@ namespace ochweb.ApiController
                     var message = ev.GetProperty("message").GetProperty("text").GetString();
                     var replyToken = ev.GetProperty("replyToken").GetString();
 
-                    Console.WriteLine($"收到 {userId} 說：{message}");
-
+                    // ✅ 拿使用者的暱稱
+                    var displayName = await GetDisplayNameAsync(userId);
                     // ✅ 寫入 PostgreSQL 資料庫
-                    SaveMessageToDb(userId, message);
+                    SaveMessageToDb(userId, displayName, message);
 
                     // 回覆
-                    await ReplyToLineUser(replyToken, "你說的是：" + message);
+                    await ReplyToLineUser(replyToken, $"哈囉 {displayName}，你說的是：{message}");
                 }
             }
 
             return Ok();
         }
 
-        private void SaveMessageToDb(string userId, string message)
+        //取得他的名稱
+        public async Task<string> GetDisplayNameAsync(string userId)
+        {
+            var token = "sfw8nHDe12BGGoWpUobiL/P5j/dWl7HDWbQPxrfptaR3pApp0ZR2FO2ovpOVxB79LdJl9Nhy6qN8p9D2BHqaxMtQLUbFEY95IfvIpCIm/TuebEy4HCH7OmVjFV/xKnN4ReocVChKkobNcpNzWFjVhgdB04t89/1O/w1cDnyilFU="; // 注意：要用 Messaging API 的 Token
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await client.GetAsync($"https://api.line.me/v2/bot/profile/{userId}");
+            var content = await response.Content.ReadAsStringAsync();
+
+            using var doc = JsonDocument.Parse(content);
+            var displayName = doc.RootElement.GetProperty("displayName").GetString();
+            return displayName;
+        }
+
+        private void SaveMessageToDb(string userId, string message,string name)
         {
             string connstring = DBHelper.GetConnectionString(); // 從 appsettings.json 抓
             using (var conn = new NpgsqlConnection(connstring))
             {
                 conn.Open();
-                string sql = @"INSERT INTO ""OCHUSER"".""linemessages"" (""UserID"", ""Message"") VALUES (@UserID, @Message)";
+                string sql = @"INSERT INTO ""OCHUSER"".""linemessages"" (""UserID"", ""Message"",""UserName"") VALUES (@UserID, @Message, @UserName)";
 
                 using (var cmd = new NpgsqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@UserID", userId);
                     cmd.Parameters.AddWithValue("@Message", message);
+
+                    cmd.Parameters.AddWithValue("@UserName", name);
                     cmd.ExecuteNonQuery();
                 }
             }
