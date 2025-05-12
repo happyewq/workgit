@@ -7,11 +7,18 @@ using System;
 using System.Net.Http.Headers;
 using Npgsql;
 using ochweb.Helpers;
+using Microsoft.Extensions.Configuration;
 
 namespace ochweb.ApiController
 {
     public class LineWebhookController : Controller
     {
+        private readonly IConfiguration _config;
+
+        public LineWebhookController(IConfiguration config)
+        {
+            _config = config;
+        }
         [HttpPost]
         [Route("line/webhook")]
         public async Task<IActionResult> Post([FromBody] JsonElement json)
@@ -39,10 +46,24 @@ namespace ochweb.ApiController
             return Ok();
         }
 
-        //取得他的名稱
+        ////取得他的名稱
+        //public async Task<string> GetDisplayNameAsync(string userId)
+        //{
+        //    var token = "sfw8nHDe12BGGoWpUobiL/P5j/dWl7HDWbQPxrfptaR3pApp0ZR2FO2ovpOVxB79LdJl9Nhy6qN8p9D2BHqaxMtQLUbFEY95IfvIpCIm/TuebEy4HCH7OmVjFV/xKnN4ReocVChKkobNcpNzWFjVhgdB04t89/1O/w1cDnyilFU="; // 注意：要用 Messaging API 的 Token
+        //    using var client = new HttpClient();
+        //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        //    var response = await client.GetAsync($"https://api.line.me/v2/bot/profile/{userId}");
+        //    var content = await response.Content.ReadAsStringAsync();
+
+        //    using var doc = JsonDocument.Parse(content);
+        //    var displayName = doc.RootElement.GetProperty("displayName").GetString();
+        //    return displayName;
+        //}
+
         public async Task<string> GetDisplayNameAsync(string userId)
         {
-            var token = "sfw8nHDe12BGGoWpUobiL/P5j/dWl7HDWbQPxrfptaR3pApp0ZR2FO2ovpOVxB79LdJl9Nhy6qN8p9D2BHqaxMtQLUbFEY95IfvIpCIm/TuebEy4HCH7OmVjFV/xKnN4ReocVChKkobNcpNzWFjVhgdB04t89/1O/w1cDnyilFU="; // 注意：要用 Messaging API 的 Token
+            var token = _config["LineBot:ChannelAccessToken"]; // 從環境變數或 appsettings 讀取
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -77,8 +98,8 @@ namespace ochweb.ApiController
         private async Task ReplyToLineUser(string replyToken, string message)
         {
             var httpClient = new HttpClient();
-            string channelAccessToken = "sfw8nHDe12BGGoWpUobiL/P5j/dWl7HDWbQPxrfptaR3pApp0ZR2FO2ovpOVxB79LdJl9Nhy6qN8p9D2BHqaxMtQLUbFEY95IfvIpCIm/TuebEy4HCH7OmVjFV/xKnN4ReocVChKkobNcpNzWFjVhgdB04t89/1O/w1cDnyilFU=";
-
+            //string channelAccessToken = "sfw8nHDe12BGGoWpUobiL/P5j/dWl7HDWbQPxrfptaR3pApp0ZR2FO2ovpOVxB79LdJl9Nhy6qN8p9D2BHqaxMtQLUbFEY95IfvIpCIm/TuebEy4HCH7OmVjFV/xKnN4ReocVChKkobNcpNzWFjVhgdB04t89/1O/w1cDnyilFU=";
+            string channelAccessToken = _config["LineBot:ChannelAccessToken"]; // ✅ 從設定讀取
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", channelAccessToken);
 
             var payload = new
