@@ -32,14 +32,16 @@
             <label asp-for="Permission" class="form-label fw-semibold">權限</label>
             <select asp-for="Permission" class="form-select rounded-pill px-3" id="Permission">
                 <option value="" disabled selected>請選擇權限</option>
-                <option value="User">User</option>
-                <option value="Admin">Admin</option>
+                <option value="User">使用者</option>
+                <option value="Admin">系統管理員</option>
             </select>
         </div>
 
         <div class="text-center mt-4">
             <button type="button" class="btn btn-success btn-lg px-5 rounded-pill shadow-sm me-3"
-                    onclick="ochm040.SaveUser()">💾 儲存</button>
+                    onclick="ochm040.SaveUser()">
+                💾 儲存
+            </button>
             <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm">
                 返回列表
             </a>

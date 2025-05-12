@@ -27,8 +27,8 @@
         <div class="mb-3">
             <label for="Permission" class="form-label fw-semibold">權限</label>
             <select asp-for="Permission" class="form-select rounded-pill px-3">
-                <option value="User" selected="@((Model.Permission == "User"))">User</option>
-                <option value="Admin" selected="@((Model.Permission == "Admin"))">Admin</option>
+                <option value="User" selected="@((Model.Permission == "User"))">使用者</option>
+                <option value="Admin" selected="@((Model.Permission == "Admin"))">系統管理員</option>
             </select>
         </div>
 
