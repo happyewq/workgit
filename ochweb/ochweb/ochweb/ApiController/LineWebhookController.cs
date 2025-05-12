@@ -60,7 +60,7 @@ namespace ochweb.ApiController
         private async Task ReplyToLineUser(string replyToken, string message)
         {
             var httpClient = new HttpClient();
-            string channelAccessToken = "6ZhfXTSOnByDZm+3YwzmqIa8oTI9XwVm6sUuhQYZ/QsMa2dLpIODQ1z0RJsquPrUoLImy7rU/qwHbsNsXjfeiDSv0mAcRHkpswjuzDI1Er1GdhCjd1Qg24vghxSWzFA7nbZxHB8AoO1Gm7qvl6AW1wdB04t89/1O/w1cDnyilFU=";
+            string channelAccessToken = "sfw8nHDe12BGGoWpUobiL/P5j/dWl7HDWbQPxrfptaR3pApp0ZR2FO2ovpOVxB79LdJl9Nhy6qN8p9D2BHqaxMtQLUbFEY95IfvIpCIm/TuebEy4HCH7OmVjFV/xKnN4ReocVChKkobNcpNzWFjVhgdB04t89/1O/w1cDnyilFU=";
 
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", channelAccessToken);
 
@@ -81,5 +81,12 @@ namespace ochweb.ApiController
     }
 }
 
-
+//https://workgit.onrender.com/line/webhook
 //https://hook.eu2.make.com/1obevqa6h6d3ne5hef4zpadrv4d5wbhv
+
+
+//阿坤1號channelAccessToken
+//6ZhfXTSOnByDZm+3YwzmqIa8oTI9XwVm6sUuhQYZ/QsMa2dLpIODQ1z0RJsquPrUoLImy7rU/qwHbsNsXjfeiDSv0mAcRHkpswjuzDI1Er1GdhCjd1Qg24vghxSWzFA7nbZxHB8AoO1Gm7qvl6AW1wdB04t89/1O/w1cDnyilFU=
+
+//阿坤2號channelAccessToken
+//sfw8nHDe12BGGoWpUobiL/P5j/dWl7HDWbQPxrfptaR3pApp0ZR2FO2ovpOVxB79LdJl9Nhy6qN8p9D2BHqaxMtQLUbFEY95IfvIpCIm/TuebEy4HCH7OmVjFV/xKnN4ReocVChKkobNcpNzWFjVhgdB04t89/1O/w1cDnyilFU=
