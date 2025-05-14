@@ -56,7 +56,7 @@ namespace ochweb.ApiController
 
                                     if (message == "報名")
                                     {
-                                        await INSERTOchregist(userId, conn);
+                                        await INSERTOchregist(userId,displayName, conn);
                                         returnMessage = $"🎉 恭喜 {displayName}，您已成功完成報名！我們期待與您見面！";
                                     }
                                     else
@@ -83,15 +83,16 @@ namespace ochweb.ApiController
             return Ok();
         }
 
-        private async Task INSERTOchregist(string userId, NpgsqlConnection conn)
+        private async Task INSERTOchregist(string userId, string displayName, NpgsqlConnection conn)
         {
             string sql = @"INSERT INTO ""OCHUSER"".""ochregist"" 
-                       (""UserID"", ""UserType"", ""PaidYN"",""CancelYN"", ""SessionID"", ""RegisterTime"") 
-                       VALUES (@UserID, @UserType, @PaidYN, @CancelYN, @SessionID, @RegisterTime)";
+                       (""UserID"", ""UserNMC"",""UserType"", ""PaidYN"",""CancelYN"", ""SessionID"", ""RegisterTime"") 
+                       VALUES (@UserID, @UserNMC, @UserType, @PaidYN, @CancelYN, @SessionID, @RegisterTime)";
 
             using (var cmd = new NpgsqlCommand(sql, conn))
             {
                 cmd.Parameters.AddWithValue("@UserID", userId);
+                cmd.Parameters.AddWithValue("@UserNMC", displayName);
                 cmd.Parameters.AddWithValue("@UserType", "w");
                 cmd.Parameters.AddWithValue("@PaidYN", "N");
                 cmd.Parameters.AddWithValue("@CancelYN", "N");
