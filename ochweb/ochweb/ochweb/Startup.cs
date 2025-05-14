@@ -76,6 +76,8 @@ namespace ochweb
 
             // 啟用 Hangfire Dashboard（可加權限）
             app.UseHangfireDashboard("/hangfire");
+            // ✅ 加這一行！不然 Dashboard 會顯示「沒有執行中的伺服器」
+            app.UseHangfireServer();
 
             // 🔻 這行必須加上（你目前可能沒呼叫這個方法）
             CronJobConfig.Register(env, Configuration);
@@ -104,7 +106,6 @@ namespace ochweb
                     RequestPath = "/Script"
                 });
             }
-
         }
     }
 }

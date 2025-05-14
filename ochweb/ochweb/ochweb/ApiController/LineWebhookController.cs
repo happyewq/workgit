@@ -88,14 +88,15 @@ namespace ochweb.ApiController
             {
                 conn.Open();
                 string sql = @"INSERT INTO ""OCHUSER"".""ochregist"" 
-                       (""UserID"", ""UserType"", ""PaidYN"", ""SessionID"", ""RegisterTime"") 
-                       VALUES (@UserID, @UserType, @PaidYN, @SessionID, @RegisterTime)";
+                       (""UserID"", ""UserType"", ""PaidYN"",""CancelYN"", ""SessionID"", ""RegisterTime"") 
+                       VALUES (@UserID, @UserType, @PaidYN, @CancelYN, @SessionID, @RegisterTime)";
 
                 using (var cmd = new NpgsqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@UserID", userId);
                     cmd.Parameters.AddWithValue("@UserType", "w");
                     cmd.Parameters.AddWithValue("@PaidYN", "N");
+                    cmd.Parameters.AddWithValue("@CancelYN", "N");
                     cmd.Parameters.AddWithValue("@SessionID", 3);
                     cmd.Parameters.AddWithValue("@RegisterTime", DateTime.Now);
                     cmd.ExecuteNonQuery();
