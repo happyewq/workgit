@@ -33,53 +33,54 @@ namespace ochweb.ApiController
                     var userId = ev.GetProperty("source").GetProperty("userId").GetString();
                     var message = ev.GetProperty("message").GetProperty("text").GetString();
                     var replyToken = ev.GetProperty("replyToken").GetString();
-                    var ReturnMessage = message;
-  
 
-                    // ✅ 拿使用者的暱稱
                     var displayName = await GetDisplayNameAsync(userId);
+                    var connstring = DBHelper.GetConnectionString();
+                    string returnMessage;
 
-                    string connstring = DBHelper.GetConnectionString(); // 從 appsettings.json 抓
                     using (var conn = new NpgsqlConnection(connstring))
                     {
                         conn.Open();
-                        string sql = @"SELECT * FROM ""OCHUSER"".""linemessages""where UserID = @userId";
+                        string sql = @"SELECT * FROM ""OCHUSER"".""linemessages"" WHERE ""UserID"" = @UserID";
 
                         using (var cmd = new NpgsqlCommand(sql, conn))
                         {
                             cmd.Parameters.AddWithValue("@UserID", userId);
+
                             using (var reader = cmd.ExecuteReader())
                             {
                                 if (reader.Read())
                                 {
+                                    // ✅ 已存在於 linemessages 表
                                     if (message == "報名")
                                     {
-                                        ReturnMessage = $"🎉 恭喜 {displayName}，您已成功完成報名！我們期待與您見面！";
                                         INSERTOchregist(userId);
+                                        returnMessage = $"🎉 恭喜 {displayName}，您已成功完成報名！我們期待與您見面！";
                                     }
                                     else
                                     {
-                                        ReturnMessage = $"📩 您輸入的是：「{message}」\n若要參加活動，請回覆「報名」兩字。";
+                                        returnMessage = $"📩 您輸入的是：「{message}」\n若要參加活動，請回覆「報名」兩字。";
                                     }
                                 }
                                 else
                                 {
-                                    // ❌ 沒有找到資料
+                                    // ✅ 沒有資料，先新增 linemessages 記錄與註冊
                                     SaveMessageToDb(userId, message, displayName);
                                     INSERTOchregist(userId);
+                                    returnMessage = $"👋 嗨 {displayName}，我們已為您建立資料並完成報名！";
                                 }
                             }
                         }
-
                     }
 
-                    // 回覆
-                    await ReplyToLineUser(replyToken, $"哈囉 {displayName}，你說的是：{message}");
+                    // ✅ 使用正確訊息回覆
+                    await ReplyToLineUser(replyToken, returnMessage);
                 }
             }
 
             return Ok();
         }
+
 
         private void INSERTOchregist(string userId)
         {
