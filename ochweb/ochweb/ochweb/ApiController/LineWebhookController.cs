@@ -153,3 +153,13 @@ namespace ochweb.ApiController
 
 // https://workgit.onrender.com/line/webhook
 // https://hook.eu2.make.com/1obevqa6h6d3ne5hef4zpadrv4d5wbhv
+
+
+//SELECT pid, usename, client_addr, state
+//FROM pg_stat_activity
+//WHERE datname = 'ochdb'
+//  AND pid <> pg_backend_pid(); -- 🔒 排除自己
+
+//SELECT pg_terminate_backend(pid)
+//FROM pg_stat_activity
+//WHERE client_addr = '10.223.148.33'; --指定 IP
