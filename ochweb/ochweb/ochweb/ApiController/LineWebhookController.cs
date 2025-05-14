@@ -19,6 +19,7 @@ namespace ochweb.ApiController
         {
             _config = config;
         }
+
         [HttpPost]
         [Route("line/webhook")]
         public async Task<IActionResult> Post([FromBody] JsonElement json)
@@ -32,11 +33,45 @@ namespace ochweb.ApiController
                     var userId = ev.GetProperty("source").GetProperty("userId").GetString();
                     var message = ev.GetProperty("message").GetProperty("text").GetString();
                     var replyToken = ev.GetProperty("replyToken").GetString();
+                    var ReturnMessage = message;
+  
 
                     // ✅ 拿使用者的暱稱
                     var displayName = await GetDisplayNameAsync(userId);
-                    // ✅ 寫入 PostgreSQL 資料庫
-                    SaveMessageToDb(userId, message, displayName );
+
+                    string connstring = DBHelper.GetConnectionString(); // 從 appsettings.json 抓
+                    using (var conn = new NpgsqlConnection(connstring))
+                    {
+                        conn.Open();
+                        string sql = @"SELECT * FROM ""OCHUSER"".""linemessages""where UserID = @userId";
+
+                        using (var cmd = new NpgsqlCommand(sql, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@UserID", userId);
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    if (message == "報名")
+                                    {
+                                        ReturnMessage = $"🎉 恭喜 {displayName}，您已成功完成報名！我們期待與您見面！";
+                                        INSERTOchregist(userId);
+                                    }
+                                    else
+                                    {
+                                        ReturnMessage = $"📩 您輸入的是：「{message}」\n若要參加活動，請回覆「報名」兩字。";
+                                    }
+                                }
+                                else
+                                {
+                                    // ❌ 沒有找到資料
+                                    SaveMessageToDb(userId, message, displayName);
+                                    INSERTOchregist(userId);
+                                }
+                            }
+                        }
+
+                    }
 
                     // 回覆
                     await ReplyToLineUser(replyToken, $"哈囉 {displayName}，你說的是：{message}");
@@ -46,36 +81,28 @@ namespace ochweb.ApiController
             return Ok();
         }
 
-        ////取得他的名稱
-        //public async Task<string> GetDisplayNameAsync(string userId)
-        //{
-        //    var token = "sfw8nHDe12BGGoWpUobiL/P5j/dWl7HDWbQPxrfptaR3pApp0ZR2FO2ovpOVxB79LdJl9Nhy6qN8p9D2BHqaxMtQLUbFEY95IfvIpCIm/TuebEy4HCH7OmVjFV/xKnN4ReocVChKkobNcpNzWFjVhgdB04t89/1O/w1cDnyilFU="; // 注意：要用 Messaging API 的 Token
-        //    using var client = new HttpClient();
-        //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-        //    var response = await client.GetAsync($"https://api.line.me/v2/bot/profile/{userId}");
-        //    var content = await response.Content.ReadAsStringAsync();
-
-        //    using var doc = JsonDocument.Parse(content);
-        //    var displayName = doc.RootElement.GetProperty("displayName").GetString();
-        //    return displayName;
-        //}
-
-        public async Task<string> GetDisplayNameAsync(string userId)
+        private void INSERTOchregist(string userId)
         {
-            var token = _config["LineBot:ChannelAccessToken"]; // 從環境變數或 appsettings 讀取
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            string connstring = DBHelper.GetConnectionString(); // 從 appsettings.json 抓
+            using (var conn = new NpgsqlConnection(connstring))
+            {
+                conn.Open();
+                string sql = @"INSERT INTO ""OCHUSER"".""ochregist"" (""UserID"", ""UserType"",""PaidYN"",""SessionID"",""RegisterTime"") VALUES (@UserID, @Message, @UserName, @SessionID, @RegisterTime)";
 
-            var response = await client.GetAsync($"https://api.line.me/v2/bot/profile/{userId}");
-            var content = await response.Content.ReadAsStringAsync();
+                using (var cmd = new NpgsqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserID", userId);
+                    cmd.Parameters.AddWithValue("@UserType", "w");
 
-            using var doc = JsonDocument.Parse(content);
-            var displayName = doc.RootElement.GetProperty("displayName").GetString();
-            return displayName;
+                    cmd.Parameters.AddWithValue("@PaidYN", "N");
+                    cmd.Parameters.AddWithValue("@SessionID", 2);
+                    cmd.Parameters.AddWithValue("@RegisterTime", DateTime.Now); // 改成現在時間
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
 
-        private void SaveMessageToDb(string userId, string message,string name)
+        private void SaveMessageToDb(string userId, string message, string name)
         {
             string connstring = DBHelper.GetConnectionString(); // 從 appsettings.json 抓
             using (var conn = new NpgsqlConnection(connstring))
@@ -93,6 +120,22 @@ namespace ochweb.ApiController
                 }
             }
         }
+
+        public async Task<string> GetDisplayNameAsync(string userId)
+        {
+            var token = _config["LineBot:ChannelAccessToken"]; // 從環境變數或 appsettings 讀取
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await client.GetAsync($"https://api.line.me/v2/bot/profile/{userId}");
+            var content = await response.Content.ReadAsStringAsync();
+
+            using var doc = JsonDocument.Parse(content);
+            var displayName = doc.RootElement.GetProperty("displayName").GetString();
+            return displayName;
+        }
+
+       
 
 
         private async Task ReplyToLineUser(string replyToken, string message)
@@ -121,10 +164,3 @@ namespace ochweb.ApiController
 
 //https://workgit.onrender.com/line/webhook
 //https://hook.eu2.make.com/1obevqa6h6d3ne5hef4zpadrv4d5wbhv
-
-
-//阿坤1號channelAccessToken
-//6ZhfXTSOnByDZm+3YwzmqIa8oTI9XwVm6sUuhQYZ/QsMa2dLpIODQ1z0RJsquPrUoLImy7rU/qwHbsNsXjfeiDSv0mAcRHkpswjuzDI1Er1GdhCjd1Qg24vghxSWzFA7nbZxHB8AoO1Gm7qvl6AW1wdB04t89/1O/w1cDnyilFU=
-
-//阿坤2號channelAccessToken
-//sfw8nHDe12BGGoWpUobiL/P5j/dWl7HDWbQPxrfptaR3pApp0ZR2FO2ovpOVxB79LdJl9Nhy6qN8p9D2BHqaxMtQLUbFEY95IfvIpCIm/TuebEy4HCH7OmVjFV/xKnN4ReocVChKkobNcpNzWFjVhgdB04t89/1O/w1cDnyilFU=

@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using CcpBatch.Jobs;
+using Hangfire;
+using Hangfire.PostgreSql;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,10 +24,18 @@ namespace ochweb
         }
 
         public IConfiguration Configuration { get; }
+        
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            // 註冊 Hangfire，使用 PostgreSQL 作為儲存（請根據你的資料庫修改連線字串）
+            services.AddHangfire(config =>
+                config.UsePostgreSqlStorage(Configuration.GetConnectionString("DefaultConnection")));
+
+            // 啟用背景工作伺服器
+            services.AddHangfireServer();
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation(); // ✅ 加這行;
             services.AddSwaggerGen(c =>
@@ -61,6 +73,13 @@ namespace ochweb
             app.UseSession();
 
             app.UseAuthorization();
+
+            // 啟用 Hangfire Dashboard（可加權限）
+            app.UseHangfireDashboard("/hangfire");
+
+            // 🔻 這行必須加上（你目前可能沒呼叫這個方法）
+            CronJobConfig.Register(env, Configuration);
+
 
             app.UseSwagger(); // 加這行：產生 swagger.json
             app.UseSwaggerUI(c =>
