@@ -95,6 +95,8 @@ namespace ochweb
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Login}/{action=Index}/{id?}");
+
+                endpoints.MapHangfireDashboard(); // ⭐⭐ ← 加這行！！為 .NET Core 3.1 確保 endpoint 有被註冊
             });
             // 額外開放 Script 資料夾裡面放JS
             var scriptPath = Path.Combine(env.ContentRootPath, "Script");
