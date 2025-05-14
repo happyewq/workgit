@@ -81,23 +81,23 @@ namespace ochweb.ApiController
             return Ok();
         }
 
-
         private void INSERTOchregist(string userId)
         {
             string connstring = DBHelper.GetConnectionString(); // 從 appsettings.json 抓
             using (var conn = new NpgsqlConnection(connstring))
             {
                 conn.Open();
-                string sql = @"INSERT INTO ""OCHUSER"".""ochregist"" (""UserID"", ""UserType"",""PaidYN"",""SessionID"",""RegisterTime"") VALUES (@UserID, @Message, @UserName, @SessionID, @RegisterTime)";
+                string sql = @"INSERT INTO ""OCHUSER"".""ochregist"" 
+                       (""UserID"", ""UserType"", ""PaidYN"", ""SessionID"", ""RegisterTime"") 
+                       VALUES (@UserID, @UserType, @PaidYN, @SessionID, @RegisterTime)";
 
                 using (var cmd = new NpgsqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@UserID", userId);
                     cmd.Parameters.AddWithValue("@UserType", "w");
-
                     cmd.Parameters.AddWithValue("@PaidYN", "N");
-                    cmd.Parameters.AddWithValue("@SessionID", 2);
-                    cmd.Parameters.AddWithValue("@RegisterTime", DateTime.Now); // 改成現在時間
+                    cmd.Parameters.AddWithValue("@SessionID", 3);
+                    cmd.Parameters.AddWithValue("@RegisterTime", DateTime.Now);
                     cmd.ExecuteNonQuery();
                 }
             }
