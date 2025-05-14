@@ -76,6 +76,7 @@ namespace ochweb.Controllers
                             model.Registrants.Add(new SessionDetailViewModel.RegistrantInfo
                             {
                                 UserID = reader["UserID"].ToString(),
+                                UserNMC = reader["UserNMC"].ToString(),
                                 UserType = reader["UserType"].ToString(),
                                 FeeAmount = Convert.ToDecimal(reader["FeeAmount"]),
                                 PaidYN = reader["PaidYN"].ToString(),

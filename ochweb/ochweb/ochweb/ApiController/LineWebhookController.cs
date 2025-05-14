@@ -25,36 +25,38 @@ namespace ochweb.ApiController
         public async Task<IActionResult> Post([FromBody] JsonElement json)
         {
             var events = json.GetProperty("events");
-            foreach (var ev in events.EnumerateArray())
+            string connstring = DBHelper.GetConnectionString();
+
+            using (var conn = new NpgsqlConnection(connstring))
             {
-                var type = ev.GetProperty("type").GetString();
-                if (type == "message")
+                await conn.OpenAsync();
+
+                foreach (var ev in events.EnumerateArray())
                 {
-                    var userId = ev.GetProperty("source").GetProperty("userId").GetString();
-                    var message = ev.GetProperty("message").GetProperty("text").GetString();
-                    var replyToken = ev.GetProperty("replyToken").GetString();
-
-                    var displayName = await GetDisplayNameAsync(userId);
-                    var connstring = DBHelper.GetConnectionString();
-                    string returnMessage;
-
-                    using (var conn = new NpgsqlConnection(connstring))
+                    var type = ev.GetProperty("type").GetString();
+                    if (type == "message")
                     {
-                        conn.Open();
-                        string sql = @"SELECT * FROM ""OCHUSER"".""linemessages"" WHERE ""UserID"" = @UserID";
+                        var userId = ev.GetProperty("source").GetProperty("userId").GetString();
+                        var message = ev.GetProperty("message").GetProperty("text").GetString();
+                        var replyToken = ev.GetProperty("replyToken").GetString();
 
+                        var displayName = await GetDisplayNameAsync(userId);
+                        string returnMessage;
+
+                        string sql = @"SELECT * FROM ""OCHUSER"".""linemessages"" WHERE ""UserID"" = @UserID";
                         using (var cmd = new NpgsqlCommand(sql, conn))
                         {
                             cmd.Parameters.AddWithValue("@UserID", userId);
 
-                            using (var reader = cmd.ExecuteReader())
+                            using (var reader = await cmd.ExecuteReaderAsync())
                             {
-                                if (reader.Read())
+                                if (await reader.ReadAsync())
                                 {
-                                    // ✅ 已存在於 linemessages 表
+                                    await reader.CloseAsync();
+
                                     if (message == "報名")
                                     {
-                                        INSERTOchregist(userId);
+                                        await INSERTOchregist(userId, conn);
                                         returnMessage = $"🎉 恭喜 {displayName}，您已成功完成報名！我們期待與您見面！";
                                     }
                                     else
@@ -64,68 +66,57 @@ namespace ochweb.ApiController
                                 }
                                 else
                                 {
-                                    // ✅ 沒有資料，先新增 linemessages 記錄與註冊
-                                    SaveMessageToDb(userId, message, displayName);
-                                    INSERTOchregist(userId);
+                                    await reader.CloseAsync();
+
+                                    await SaveMessageToDb(userId, message, displayName, conn);
+                                    await INSERTOchregist(userId, conn);
                                     returnMessage = $"👋 嗨 {displayName}，我們已為您建立資料並完成報名！";
                                 }
                             }
                         }
-                    }
 
-                    // ✅ 使用正確訊息回覆
-                    await ReplyToLineUser(replyToken, returnMessage);
+                        await ReplyToLineUser(replyToken, returnMessage);
+                    }
                 }
             }
 
             return Ok();
         }
 
-        private void INSERTOchregist(string userId)
+        private async Task INSERTOchregist(string userId, NpgsqlConnection conn)
         {
-            string connstring = DBHelper.GetConnectionString(); // 從 appsettings.json 抓
-            using (var conn = new NpgsqlConnection(connstring))
-            {
-                conn.Open();
-                string sql = @"INSERT INTO ""OCHUSER"".""ochregist"" 
+            string sql = @"INSERT INTO ""OCHUSER"".""ochregist"" 
                        (""UserID"", ""UserType"", ""PaidYN"",""CancelYN"", ""SessionID"", ""RegisterTime"") 
                        VALUES (@UserID, @UserType, @PaidYN, @CancelYN, @SessionID, @RegisterTime)";
 
-                using (var cmd = new NpgsqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@UserID", userId);
-                    cmd.Parameters.AddWithValue("@UserType", "w");
-                    cmd.Parameters.AddWithValue("@PaidYN", "N");
-                    cmd.Parameters.AddWithValue("@CancelYN", "N");
-                    cmd.Parameters.AddWithValue("@SessionID", 3);
-                    cmd.Parameters.AddWithValue("@RegisterTime", DateTime.Now);
-                    cmd.ExecuteNonQuery();
-                }
+            using (var cmd = new NpgsqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@UserID", userId);
+                cmd.Parameters.AddWithValue("@UserType", "w");
+                cmd.Parameters.AddWithValue("@PaidYN", "N");
+                cmd.Parameters.AddWithValue("@CancelYN", "N");
+                cmd.Parameters.AddWithValue("@SessionID", 3);
+                cmd.Parameters.AddWithValue("@RegisterTime", DateTime.Now);
+                await cmd.ExecuteNonQueryAsync();
             }
         }
 
-        private void SaveMessageToDb(string userId, string message, string name)
+        private async Task SaveMessageToDb(string userId, string message, string name, NpgsqlConnection conn)
         {
-            string connstring = DBHelper.GetConnectionString(); // 從 appsettings.json 抓
-            using (var conn = new NpgsqlConnection(connstring))
+            string sql = @"INSERT INTO ""OCHUSER"".""linemessages"" (""UserID"", ""Message"",""UserName"") VALUES (@UserID, @Message, @UserName)";
+
+            using (var cmd = new NpgsqlCommand(sql, conn))
             {
-                conn.Open();
-                string sql = @"INSERT INTO ""OCHUSER"".""linemessages"" (""UserID"", ""Message"",""UserName"") VALUES (@UserID, @Message, @UserName)";
-
-                using (var cmd = new NpgsqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@UserID", userId);
-                    cmd.Parameters.AddWithValue("@Message", message);
-
-                    cmd.Parameters.AddWithValue("@UserName", name);
-                    cmd.ExecuteNonQuery();
-                }
+                cmd.Parameters.AddWithValue("@UserID", userId);
+                cmd.Parameters.AddWithValue("@Message", message);
+                cmd.Parameters.AddWithValue("@UserName", name);
+                await cmd.ExecuteNonQueryAsync();
             }
         }
 
         public async Task<string> GetDisplayNameAsync(string userId)
         {
-            var token = _config["LineBot:ChannelAccessToken"]; // 從環境變數或 appsettings 讀取
+            var token = _config["LineBot:ChannelAccessToken"];
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -137,14 +128,10 @@ namespace ochweb.ApiController
             return displayName;
         }
 
-       
-
-
         private async Task ReplyToLineUser(string replyToken, string message)
         {
             var httpClient = new HttpClient();
-            //string channelAccessToken = "sfw8nHDe12BGGoWpUobiL/P5j/dWl7HDWbQPxrfptaR3pApp0ZR2FO2ovpOVxB79LdJl9Nhy6qN8p9D2BHqaxMtQLUbFEY95IfvIpCIm/TuebEy4HCH7OmVjFV/xKnN4ReocVChKkobNcpNzWFjVhgdB04t89/1O/w1cDnyilFU=";
-            string channelAccessToken = _config["LineBot:ChannelAccessToken"]; // ✅ 從設定讀取
+            string channelAccessToken = _config["LineBot:ChannelAccessToken"];
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", channelAccessToken);
 
             var payload = new
@@ -152,8 +139,8 @@ namespace ochweb.ApiController
                 replyToken = replyToken,
                 messages = new[]
                 {
-                new { type = "text", text = message }
-            }
+                    new { type = "text", text = message }
+                }
             };
 
             var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
@@ -164,5 +151,5 @@ namespace ochweb.ApiController
     }
 }
 
-//https://workgit.onrender.com/line/webhook
-//https://hook.eu2.make.com/1obevqa6h6d3ne5hef4zpadrv4d5wbhv
+// https://workgit.onrender.com/line/webhook
+// https://hook.eu2.make.com/1obevqa6h6d3ne5hef4zpadrv4d5wbhv

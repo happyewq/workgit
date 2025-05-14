@@ -34,6 +34,9 @@ namespace ochweb.Models
         public class RegistrantInfo
         {
             public string UserID { get; set; }
+
+            public string UserNMC { get; set; }
+            
             public string UserType { get; set; }
             public decimal FeeAmount { get; set; }
             public string PaidYN { get; set; }
