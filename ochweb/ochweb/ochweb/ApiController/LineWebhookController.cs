@@ -69,7 +69,7 @@ namespace ochweb.ApiController
                                     await reader.CloseAsync();
 
                                     await SaveMessageToDb(userId, message, displayName, conn);
-                                    await INSERTOchregist(userId, conn);
+                                    await INSERTOchregist(userId, displayName,conn);
                                     returnMessage = $"👋 嗨 {displayName}，我們已為您建立資料並完成報名！";
                                 }
                             }
