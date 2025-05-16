@@ -3,6 +3,7 @@ using ochweb.OchBatchService;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Runtime.InteropServices;
 
 namespace CcpBatch.Jobs
 {
@@ -15,10 +16,14 @@ namespace CcpBatch.Jobs
             OchBatchService1 NewCcpBatchService = new OchBatchService1(config);
 
             // 如果是線上系統區域，註冊定期任務 每天16點20分
+            var taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById(
+                RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Taipei Standard Time" : "Asia/Taipei"
+            );
+
             RecurringJob.AddOrUpdate<OchBatchService1>(
                 service => service.SendLine(),
-                "20 16 * * *",
-                TimeZoneInfo.Local
+                "40 11 * * *",
+                taiwanTimeZone
             );
         }
     }
