@@ -4,6 +4,7 @@ using System.Text;
 using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace ochweb.OchBatchService
 {
@@ -11,10 +12,16 @@ namespace ochweb.OchBatchService
     {
         private static readonly HttpClient httpClient = new HttpClient();
 
-        public static async Task SendLine()
+        private readonly IConfiguration _config;
+
+        public OchBatchService1(IConfiguration config)
+        {
+            _config = config;
+        }
+        public async Task SendLine()
         {
             string userID = "Ue2422631cd76bfdebd2249811a1d2de6";
-            string channelAccessToken = "sfw8nHDe12BGGoWpUobiL/P5j/dWl7HDWbQPxrfptaR3pApp0ZR2FO2ovpOVxB79LdJl9Nhy6qN8p9D2BHqaxMtQLUbFEY95IfvIpCIm/TuebEy4HCH7OmVjFV/xKnN4ReocVChKkobNcpNzWFjVhgdB04t89/1O/w1cDnyilFU=";
+            string channelAccessToken = _config["LineBot:ChannelAccessToken"];
             string message = "請繳費";
 
             httpClient.DefaultRequestHeaders.Authorization =
