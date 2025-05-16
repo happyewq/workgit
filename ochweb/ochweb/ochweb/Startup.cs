@@ -1,5 +1,6 @@
 ﻿using CcpBatch.Jobs;
 using Hangfire;
+using Hangfire.Dashboard;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -52,6 +53,15 @@ namespace ochweb
             services.AddHttpContextAccessor();
         }
 
+        public class AllowAllDashboardAuthorizationFilter : IDashboardAuthorizationFilter
+        {
+            public bool Authorize(DashboardContext context)
+            {
+                return true; // 👈 允許所有人存取 Dashboard
+            }
+        }
+
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -75,7 +85,10 @@ namespace ochweb
             app.UseAuthorization();
 
             // 啟用 Hangfire Dashboard（可加權限）
-            app.UseHangfireDashboard("/hangfire");
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new AllowAllDashboardAuthorizationFilter() }
+            });
             // ✅ 加這一行！不然 Dashboard 會顯示「沒有執行中的伺服器」
             app.UseHangfireServer();
 
@@ -98,6 +111,8 @@ namespace ochweb
 
                 endpoints.MapHangfireDashboard(); // ⭐⭐ ← 加這行！！為 .NET Core 3.1 確保 endpoint 有被註冊
             });
+
+
             // 額外開放 Script 資料夾裡面放JS
             var scriptPath = Path.Combine(env.ContentRootPath, "Script");
             if (Directory.Exists(scriptPath))
