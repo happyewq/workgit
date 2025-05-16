@@ -57,7 +57,11 @@ namespace ochweb.ApiController
                                     if (message == "報名")
                                     {
                                         await INSERTOchregist(userId,displayName, conn);
-                                        returnMessage = $"🎉 恭喜 {displayName}，您已成功完成報名！我們期待與您見面！";
+                                        returnMessage = $"🎉 恭喜 {displayName}，您已成功完成報名！請於2025/5/10之前完成繳費！";
+                                    }
+                                    else if(message == "繳費")
+                                    {
+                                        returnMessage = $"🎉 恭喜 {displayName}，繳費完成！我們期待與您見面！";
                                     }
                                     else
                                     {
