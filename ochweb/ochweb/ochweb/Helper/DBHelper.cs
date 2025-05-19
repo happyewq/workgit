@@ -12,7 +12,7 @@ namespace ochweb.Helpers
         public static void Init(IConfiguration configuration)
         {
             // 改為取環境變數
-            _connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            _connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
 
             // 可選：如果環境變數沒有設定，就 fallback 到 appsettings.json
             if (string.IsNullOrEmpty(_connectionString))
