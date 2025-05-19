@@ -27,65 +27,65 @@ namespace ochweb.ApiController
             var events = json.GetProperty("events");
             string connstring = DBHelper.GetConnectionString();
 
-            using (var conn = new NpgsqlConnection(connstring))
+            foreach (var ev in events.EnumerateArray())
             {
-                await conn.OpenAsync();
+                var type = ev.GetProperty("type").GetString();
+                if (type != "message") continue;
 
-                foreach (var ev in events.EnumerateArray())
+                var userId = ev.GetProperty("source").GetProperty("userId").GetString();
+                var message = ev.GetProperty("message").GetProperty("text").GetString();
+                var replyToken = ev.GetProperty("replyToken").GetString();
+                var displayName = await GetDisplayNameAsync(userId);
+                string returnMessage;
+
+                using (var conn = new NpgsqlConnection(connstring))
                 {
-                    var type = ev.GetProperty("type").GetString();
-                    if (type == "message")
+                    await conn.OpenAsync();
+
+                    string sql = @"SELECT * FROM ""OCHUSER"".""linemessages"" WHERE ""UserID"" = @UserID";
+                    using (var cmd = new NpgsqlCommand(sql, conn))
                     {
-                        var userId = ev.GetProperty("source").GetProperty("userId").GetString();
-                        var message = ev.GetProperty("message").GetProperty("text").GetString();
-                        var replyToken = ev.GetProperty("replyToken").GetString();
+                        cmd.Parameters.AddWithValue("@UserID", userId);
 
-                        var displayName = await GetDisplayNameAsync(userId);
-                        string returnMessage;
-
-                        string sql = @"SELECT * FROM ""OCHUSER"".""linemessages"" WHERE ""UserID"" = @UserID";
-                        using (var cmd = new NpgsqlCommand(sql, conn))
+                        await using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            cmd.Parameters.AddWithValue("@UserID", userId);
-
-                            using (var reader = await cmd.ExecuteReaderAsync())
+                            if (await reader.ReadAsync())
                             {
-                                if (await reader.ReadAsync())
+                                // 有紀錄過這個 userId
+                                if (message == "報名")
                                 {
-                                    await reader.CloseAsync();
-
-                                    if (message == "報名")
-                                    {
-                                        await INSERTOchregist(userId,displayName, conn);
-                                        returnMessage = $"🎉 恭喜 {displayName}，您已成功完成報名！請於2025/5/10之前完成繳費！";
-                                    }
-                                    else if(message == "繳費")
-                                    {
-                                        returnMessage = $"🎉 恭喜 {displayName}，繳費完成！我們期待與您見面！";
-                                    }
-                                    else
-                                    {
-                                        returnMessage = $"📩 您輸入的是：「{message}」\n若要參加活動，請回覆「報名」兩字。";
-                                    }
+                                    // 關掉 reader 後可用 conn
+                                    await reader.DisposeAsync(); // 或 break reader 用另一個 conn
+                                    await INSERTOchregist(userId, displayName, conn);
+                                    returnMessage = $"🎉 恭喜 {displayName}，您已成功完成報名！請於2025/5/10之前完成繳費！";
+                                }
+                                else if (message == "繳費")
+                                {
+                                    returnMessage = $"🎉 恭喜 {displayName}，繳費完成！我們期待與您見面！";
                                 }
                                 else
                                 {
-                                    await reader.CloseAsync();
-
-                                    await SaveMessageToDb(userId, message, displayName, conn);
-                                    await INSERTOchregist(userId, displayName,conn);
-                                    returnMessage = $"👋 嗨 {displayName}，我們已為您建立資料並完成報名！";
+                                    returnMessage = $"📩 您輸入的是：「{message}」\n若要參加活動，請回覆「報名」兩字。";
                                 }
                             }
+                            else
+                            {
+                                // 首次使用者，紀錄資料＋報名
+                                await reader.DisposeAsync();
+                                await SaveMessageToDb(userId, message, displayName, conn);
+                                await INSERTOchregist(userId, displayName, conn);
+                                returnMessage = $"👋 嗨 {displayName}，我們已為您建立資料並完成報名！";
+                            }
                         }
-
-                        await ReplyToLineUser(replyToken, returnMessage);
                     }
                 }
+
+                await ReplyToLineUser(replyToken, returnMessage);
             }
 
             return Ok();
         }
+
 
         private async Task INSERTOchregist(string userId, string displayName, NpgsqlConnection conn)
         {
