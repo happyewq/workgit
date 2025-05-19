@@ -36,10 +36,13 @@ namespace ochweb.ApiController
                 var message = ev.GetProperty("message").GetProperty("text").GetString();
                 var replyToken = ev.GetProperty("replyToken").GetString();
                 var displayName = await GetDisplayNameAsync(userId);
-                string returnMessage;
+                string returnMessage = "❗ 發生未知錯誤，請稍後再試";
 
-                using (var conn = new NpgsqlConnection(connstring))
+                NpgsqlConnection conn = null;
+
+                try
                 {
+                    conn = new NpgsqlConnection(connstring);
                     await conn.OpenAsync();
 
                     string sql = @"SELECT * FROM ""OCHUSER"".""linemessages"" WHERE ""UserID"" = @UserID";
@@ -52,11 +55,11 @@ namespace ochweb.ApiController
                             if (await reader.ReadAsync())
                             {
                                 // 有紀錄過這個 userId
+                                await reader.DisposeAsync();
+
                                 if (message == "報名")
                                 {
-                                    // 關掉 reader 後可用 conn
-                                    await reader.DisposeAsync(); // 或 break reader 用另一個 conn
-                                    await INSERTOchregist(userId, displayName, conn);
+                                    await INSERTOchregist(userId, displayName); // 不用再傳 conn
                                     returnMessage = $"🎉 恭喜 {displayName}，您已成功完成報名！請於2025/5/10之前完成繳費！";
                                 }
                                 else if (message == "繳費")
@@ -73,11 +76,22 @@ namespace ochweb.ApiController
                                 // 首次使用者，紀錄資料＋報名
                                 await reader.DisposeAsync();
                                 await SaveMessageToDb(userId, message, displayName, conn);
-                                await INSERTOchregist(userId, displayName, conn);
+                                await INSERTOchregist(userId, displayName); // 不用再傳 conn
                                 returnMessage = $"👋 嗨 {displayName}，我們已為您建立資料並完成報名！";
                             }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    // 你可以換成寫入 log，或是加上 Slack/LineBot 推播通知
+                    Console.WriteLine($"❌ 發生例外：{ex.Message}");
+                    returnMessage = $"⚠️ 發生錯誤，請稍後再試。";
+                }
+                finally
+                {
+                    if (conn != null && conn.State == System.Data.ConnectionState.Open)
+                        await conn.CloseAsync();
                 }
 
                 await ReplyToLineUser(replyToken, returnMessage);
@@ -86,26 +100,28 @@ namespace ochweb.ApiController
             return Ok();
         }
 
+ private async Task INSERTOchregist(string userId, string displayName)
+{
+    string connstring = DBHelper.GetConnectionString();
 
-        private async Task INSERTOchregist(string userId, string displayName, NpgsqlConnection conn)
-        {
-            string sql = @"INSERT INTO ""OCHUSER"".""ochregist"" 
-                       (""UserID"", ""UserNMC"",""UserType"", ""PaidYN"",""CancelYN"", ""SessionID"", ""RegisterTime"") 
-                       VALUES (@UserID, @UserNMC, @UserType, @PaidYN, @CancelYN, @SessionID, @RegisterTime)";
+    await using var conn = new NpgsqlConnection(connstring);
+    await conn.OpenAsync();
 
-            using (var cmd = new NpgsqlCommand(sql, conn))
-            {
-                cmd.Parameters.AddWithValue("@UserID", userId);
-                cmd.Parameters.AddWithValue("@UserNMC", displayName);
-                cmd.Parameters.AddWithValue("@UserType", "w");
-                cmd.Parameters.AddWithValue("@PaidYN", "N");
-                cmd.Parameters.AddWithValue("@CancelYN", "N");
-                cmd.Parameters.AddWithValue("@SessionID", 3);
-                cmd.Parameters.AddWithValue("@RegisterTime", DateTime.Now);
-                await cmd.ExecuteNonQueryAsync();
-            }
-        }
+    string sql = @"INSERT INTO ""OCHUSER"".""ochregist"" 
+                   (""UserID"", ""UserNMC"", ""UserType"", ""PaidYN"", ""CancelYN"", ""SessionID"", ""RegisterTime"") 
+                   VALUES (@UserID, @UserNMC, @UserType, @PaidYN, @CancelYN, @SessionID, @RegisterTime)";
 
+    using var cmd = new NpgsqlCommand(sql, conn);
+    cmd.Parameters.AddWithValue("@UserID", userId);
+    cmd.Parameters.AddWithValue("@UserNMC", displayName);
+    cmd.Parameters.AddWithValue("@UserType", "w");
+    cmd.Parameters.AddWithValue("@PaidYN", "N");
+    cmd.Parameters.AddWithValue("@CancelYN", "N");
+    cmd.Parameters.AddWithValue("@SessionID", 3);
+    cmd.Parameters.AddWithValue("@RegisterTime", DateTime.Now);
+
+    await cmd.ExecuteNonQueryAsync();
+}
         private async Task SaveMessageToDb(string userId, string message, string name, NpgsqlConnection conn)
         {
             string sql = @"INSERT INTO ""OCHUSER"".""linemessages"" (""UserID"", ""Message"",""UserName"") VALUES (@UserID, @Message, @UserName)";
