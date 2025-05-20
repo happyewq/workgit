@@ -183,7 +183,7 @@ namespace ochweb.ApiController
             string dateText = DateTime.Now.ToString("yyyyMMdd"); // 20250520
 
             // ✅ 先檢查是否已存在今天的紀錄
-            string checkSql = @"SELECT 1 FROM ""OCHUSER"".""ochbuible"" 
+            string checkSql = @"SELECT 1 FROM ""OCHUSER"".""ochbible"" 
                         WHERE ""UserID"" = @UserID AND ""CreateDateTime"" = @CreateDateTime";
             using (var checkCmd = new NpgsqlCommand(checkSql, conn))
             {
@@ -199,7 +199,7 @@ namespace ochweb.ApiController
             }
 
             // ✅ 若尚未記錄，則插入資料
-            string insertSql = @"INSERT INTO ""OCHUSER"".""ochbuible"" (""UserID"", ""CreateDateTime"") 
+            string insertSql = @"INSERT INTO ""OCHUSER"".""ochbible"" (""UserID"", ""CreateDateTime"") 
                          VALUES (@UserID, @CreateDateTime)";
             using var insertCmd = new NpgsqlCommand(insertSql, conn);
             insertCmd.Parameters.AddWithValue("@UserID", userId);

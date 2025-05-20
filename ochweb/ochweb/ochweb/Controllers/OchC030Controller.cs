@@ -36,7 +36,7 @@ namespace ochweb.Controllers
             FROM ""OCHUSER"".""linemessages"" m
             LEFT JOIN (
                 SELECT DISTINCT ""UserID""
-                FROM ""OCHUSER"".""ochbuible""
+                FROM ""OCHUSER"".""ochbible""
                 WHERE ""CreateDateTime"" = @today
             ) b ON m.""UserID"" = b.""UserID""
             WHERE m.""Message"" = '加入好友'
