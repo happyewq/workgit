@@ -19,120 +19,142 @@ namespace ochweb.ApiController
         {
             _config = config;
         }
-
         [HttpPost]
         [Route("line/webhook")]
         public async Task<IActionResult> Post([FromBody] JsonElement json)
         {
-            var events = json.GetProperty("events");
+            Console.WriteLine("📥 收到 LINE Webhook：");
+            Console.WriteLine(json.ToString());
+
+            if (!json.TryGetProperty("events", out var events))
+            {
+                Console.WriteLine("⚠️ 無 events 陣列，Webhook 格式錯誤！");
+                return BadRequest();
+            }
+
             string connstring = DBHelper.GetConnectionString();
 
             foreach (var ev in events.EnumerateArray())
             {
-                var type = ev.GetProperty("type").GetString();
-                var userId = ev.GetProperty("source").GetProperty("userId").GetString();
-                var message = ev.GetProperty("message").GetProperty("text").GetString();
-                var replyToken = ev.GetProperty("replyToken").GetString();
-                var displayName = await GetDisplayNameAsync(userId);
-                string returnMessage;
-                if (type == "follow")
+                if (!ev.TryGetProperty("type", out var typeProp))
                 {
-                    userId = ev.GetProperty("source").GetProperty("userId").GetString();
-                    displayName = await GetDisplayNameAsync(userId);
-                    replyToken = ev.GetProperty("replyToken").GetString();
+                    Console.WriteLine("⚠️ 缺少 type 屬性，跳過");
+                    continue;
+                }
 
-                    using (var conn = new NpgsqlConnection(connstring))
-                    {
-                        await conn.OpenAsync();
-                        await SaveMessageToDb(userId, "加入好友", displayName, conn);
-                    }
+                var type = typeProp.GetString();
+                Console.WriteLine($"🔍 處理事件類型：{type}");
 
+                if (!ev.TryGetProperty("source", out var source) ||
+                    !source.TryGetProperty("userId", out var userIdProp))
+                {
+                    Console.WriteLine("⚠️ 缺少 userId，跳過");
+                    continue;
+                }
+
+                var userId = userIdProp.GetString();
+                var replyToken = ev.TryGetProperty("replyToken", out var rt) ? rt.GetString() : null;
+                var displayName = await GetDisplayNameAsync(userId);
+
+                if (type == "follow" && replyToken != null)
+                {
+                    Console.WriteLine($"✅ 使用者加入好友：{userId} ({displayName})");
+
+                    using var conn = new NpgsqlConnection(connstring);
+                    await conn.OpenAsync();
+                    await SaveMessageToDb(userId, "加入好友", displayName, conn);
                     await ReplyToLineUser(replyToken, $"👋 歡迎 {displayName} 加入我們的 LINE！您可以輸入「報名」參加活動～");
                     continue;
                 }
 
-
-                if (type != "message") continue;
-
-                using (var conn = new NpgsqlConnection(connstring))
+                if (type == "message")
                 {
+                    Console.WriteLine("💬 處理文字訊息事件");
+
+                    if (!ev.TryGetProperty("message", out var msgObj) ||
+                        !msgObj.TryGetProperty("text", out var textProp))
+                    {
+                        Console.WriteLine("⚠️ 缺少 message.text");
+                        continue;
+                    }
+
+                    var message = textProp.GetString();
+                    string returnMessage;
+
+                    using var conn = new NpgsqlConnection(connstring);
                     await conn.OpenAsync();
 
-                    string sql = @"SELECT * FROM ""OCHUSER"".""linemessages"" WHERE ""UserID"" = @UserID";
-                    using (var cmd = new NpgsqlCommand(sql, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@UserID", userId);
+                    string sql = @"SELECT 1 FROM ""OCHUSER"".""linemessages"" WHERE ""UserID"" = @UserID";
+                    using var cmd = new NpgsqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("@UserID", userId);
 
-                        await using (var reader = await cmd.ExecuteReaderAsync())
+                    var isKnownUser = await cmd.ExecuteScalarAsync() != null;
+
+                    if (isKnownUser)
+                    {
+                        Console.WriteLine($"👤 已知使用者：{userId} 傳來：「{message}」");
+
+                        if (message == "報名")
                         {
-                            if (await reader.ReadAsync())
-                            {
-                                // 有紀錄過這個 userId
-                                if (message == "報名")
-                                {
-                                    // 關掉 reader 後可用 conn
-                                    await reader.DisposeAsync(); // 或 break reader 用另一個 conn
-                                    await INSERTOchregist(userId, displayName, conn);
-                                    returnMessage = $"🎉 恭喜 {displayName}，您已成功完成報名！請於2025/5/10之前完成繳費！";
-                                }
-                                else if (message == "繳費")
-                                {
-                                    returnMessage = $"🎉 恭喜 {displayName}，繳費完成！我們期待與您見面！";
-                                }
-                                else
-                                {
-                                    returnMessage = $"📩 您輸入的是：「{message}」\n若要參加活動，請回覆「報名」兩字。";
-                                }
-                            }
-                            else
-                            {
-                                // 首次使用者，紀錄資料＋報名
-                                await reader.DisposeAsync();
-                                await SaveMessageToDb(userId, message, displayName, conn);
-                                await INSERTOchregist(userId, displayName, conn);
-                                returnMessage = $"👋 嗨 {displayName}，我們已為您建立資料並完成報名！";
-                            }
+                            await INSERTOchregist(userId, displayName, conn);
+                            returnMessage = $"🎉 恭喜 {displayName}，您已成功完成報名！請於2025/5/10之前完成繳費！";
+                        }
+                        else if (message == "繳費")
+                        {
+                            returnMessage = $"🎉 恭喜 {displayName}，繳費完成！我們期待與您見面！";
+                        }
+                        else
+                        {
+                            returnMessage = $"📩 您輸入的是：「{message}」\n若要參加活動，請回覆「報名」兩字。";
                         }
                     }
-                }
+                    else
+                    {
+                        Console.WriteLine($"👤 首次使用者：{userId} 訊息：「{message}」");
+                        await SaveMessageToDb(userId, message, displayName, conn);
+                        await INSERTOchregist(userId, displayName, conn);
+                        returnMessage = $"👋 嗨 {displayName}，我們已為您建立資料並完成報名！";
+                    }
 
-                await ReplyToLineUser(replyToken, returnMessage);
+                    if (replyToken != null)
+                    {
+                        Console.WriteLine($"📤 回覆訊息給 {userId}");
+                        await ReplyToLineUser(replyToken, returnMessage);
+                    }
+                }
             }
 
             return Ok();
         }
 
-
         private async Task INSERTOchregist(string userId, string displayName, NpgsqlConnection conn)
         {
             string sql = @"INSERT INTO ""OCHUSER"".""ochregist"" 
-                       (""UserID"", ""UserNMC"",""UserType"", ""PaidYN"",""CancelYN"", ""SessionID"", ""RegisterTime"") 
-                       VALUES (@UserID, @UserNMC, @UserType, @PaidYN, @CancelYN, @SessionID, @RegisterTime)";
+                        (""UserID"", ""UserNMC"", ""UserType"", ""PaidYN"", ""CancelYN"", ""SessionID"", ""RegisterTime"") 
+                        VALUES (@UserID, @UserNMC, @UserType, @PaidYN, @CancelYN, @SessionID, @RegisterTime)";
 
-            using (var cmd = new NpgsqlCommand(sql, conn))
-            {
-                cmd.Parameters.AddWithValue("@UserID", userId);
-                cmd.Parameters.AddWithValue("@UserNMC", displayName);
-                cmd.Parameters.AddWithValue("@UserType", "w");
-                cmd.Parameters.AddWithValue("@PaidYN", "N");
-                cmd.Parameters.AddWithValue("@CancelYN", "N");
-                cmd.Parameters.AddWithValue("@SessionID", 3);
-                cmd.Parameters.AddWithValue("@RegisterTime", DateTime.Now);
-                await cmd.ExecuteNonQueryAsync();
-            }
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@UserID", userId);
+            cmd.Parameters.AddWithValue("@UserNMC", displayName);
+            cmd.Parameters.AddWithValue("@UserType", "w");
+            cmd.Parameters.AddWithValue("@PaidYN", "N");
+            cmd.Parameters.AddWithValue("@CancelYN", "N");
+            cmd.Parameters.AddWithValue("@SessionID", 3);
+            cmd.Parameters.AddWithValue("@RegisterTime", DateTime.Now);
+            await cmd.ExecuteNonQueryAsync();
         }
 
         private async Task SaveMessageToDb(string userId, string message, string name, NpgsqlConnection conn)
         {
-            string sql = @"INSERT INTO ""OCHUSER"".""linemessages"" (""UserID"", ""Message"",""UserName"") VALUES (@UserID, @Message, @UserName)";
+            string sql = @"INSERT INTO ""OCHUSER"".""linemessages"" 
+                        (""UserID"", ""Message"", ""UserName"") 
+                        VALUES (@UserID, @Message, @UserName)";
 
-            using (var cmd = new NpgsqlCommand(sql, conn))
-            {
-                cmd.Parameters.AddWithValue("@UserID", userId);
-                cmd.Parameters.AddWithValue("@Message", message);
-                cmd.Parameters.AddWithValue("@UserName", name);
-                await cmd.ExecuteNonQueryAsync();
-            }
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@UserID", userId);
+            cmd.Parameters.AddWithValue("@Message", message);
+            cmd.Parameters.AddWithValue("@UserName", name);
+            await cmd.ExecuteNonQueryAsync();
         }
 
         public async Task<string> GetDisplayNameAsync(string userId)
@@ -145,23 +167,19 @@ namespace ochweb.ApiController
             var content = await response.Content.ReadAsStringAsync();
 
             using var doc = JsonDocument.Parse(content);
-            var displayName = doc.RootElement.GetProperty("displayName").GetString();
-            return displayName;
+            return doc.RootElement.GetProperty("displayName").GetString();
         }
 
         private async Task ReplyToLineUser(string replyToken, string message)
         {
-            var httpClient = new HttpClient();
+            using var httpClient = new HttpClient();
             string channelAccessToken = _config["LineBot:ChannelAccessToken"];
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", channelAccessToken);
 
             var payload = new
             {
-                replyToken = replyToken,
-                messages = new[]
-                {
-                    new { type = "text", text = message }
-                }
+                replyToken,
+                messages = new[] { new { type = "text", text = message } }
             };
 
             var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
@@ -171,6 +189,7 @@ namespace ochweb.ApiController
         }
     }
 }
+
 
 // https://workgit.onrender.com/line/webhook
 // https://hook.eu2.make.com/1obevqa6h6d3ne5hef4zpadrv4d5wbhv
