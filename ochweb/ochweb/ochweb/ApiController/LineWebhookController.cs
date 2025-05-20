@@ -84,6 +84,19 @@ namespace ochweb.ApiController
                     using var conn = new NpgsqlConnection(connstring);
                     await conn.OpenAsync();
 
+                    // ✅ 判斷是否為群組且包含聖經書名
+                    if (source.GetProperty("type").GetString() == "group" &&
+                        source.TryGetProperty("groupId", out var groupIdProp) &&
+                        groupIdProp.GetString() == "Cbbe6d510fa802ec9a756d9f96a2393ba")
+                    {
+                        var detectedBook = DetectBibleBook(message); // 👈 這裡是偵測書名
+                        if (detectedBook != null)
+                        {
+                            Console.WriteLine($"📌 群組發言提到聖經書卷：{detectedBook}，來自 {userId}");
+                            await InsertGroupSpeakLog(userId, conn);
+                        }
+                    }
+
                     string sql = @"SELECT 1 FROM ""OCHUSER"".""linemessages"" WHERE ""UserID"" = @UserID";
                     using var cmd = new NpgsqlCommand(sql, conn);
                     cmd.Parameters.AddWithValue("@UserID", userId);
@@ -125,6 +138,52 @@ namespace ochweb.ApiController
             }
 
             return Ok();
+        }
+
+        private string? DetectBibleBook(string message)
+        {
+            foreach (var book in BibleBooks)
+            {
+                if (message.Contains(book))
+                {
+                    return book;
+                }
+            }
+            return null;
+        }
+
+        private static readonly string[] BibleBooks = new[]
+        {
+            // 舊約 39 卷
+            "創世紀", "出埃及記", "利未記", "民數記", "申命記",
+            "約書亞記", "士師記", "路得記",
+            "撒母耳記上", "撒母耳記下", "列王記上", "列王記下",
+            "歷代志上", "歷代志下", "以斯拉記", "尼希米記", "以斯帖記",
+            "約伯記", "詩篇", "箴言", "傳道書", "雅歌",
+            "以賽亞書", "耶利米書", "耶利米哀歌", "以西結書", "但以理書",
+            "何西阿書", "約珥書", "阿摩司書", "俄巴底亞書", "約拿書",
+            "彌迦書", "那鴻書", "哈巴谷書", "西番雅書", "哈該書", "撒迦利亞書", "瑪拉基書",
+        
+            // 新約 27 卷
+            "馬太福音", "馬可福音", "路加福音", "約翰福音", "使徒行傳",
+            "羅馬書", "哥林多前書", "哥林多後書", "加拉太書",
+            "以弗所書", "腓立比書", "歌羅西書",
+            "帖撒羅尼迦前書", "帖撒羅尼迦後書",
+            "提摩太前書", "提摩太後書", "提多書", "腓利門書",
+            "希伯來書", "雅各書", "彼得前書", "彼得後書",
+            "約翰一書", "約翰二書", "約翰三書", "猶大書", "啟示錄"
+        };
+
+        private async Task InsertGroupSpeakLog(string userId, NpgsqlConnection conn)
+        {
+            string dateText = DateTime.Now.ToString("yyyyMMdd"); // 👈 格式化為 20250520
+
+            string sql = @"INSERT INTO ""OCHUSER"".""ochbuible"" (""UserID"", ""CreateDateTime"") 
+                   VALUES (@UserID, @CreateDateTime)";
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@UserID", userId);
+            cmd.Parameters.AddWithValue("@CreateDateTime", dateText);
+            await cmd.ExecuteNonQueryAsync();
         }
 
         private async Task INSERTOchregist(string userId, string displayName, NpgsqlConnection conn)
