@@ -30,13 +30,29 @@ namespace ochweb.ApiController
             foreach (var ev in events.EnumerateArray())
             {
                 var type = ev.GetProperty("type").GetString();
-                if (type != "message") continue;
-
                 var userId = ev.GetProperty("source").GetProperty("userId").GetString();
                 var message = ev.GetProperty("message").GetProperty("text").GetString();
                 var replyToken = ev.GetProperty("replyToken").GetString();
                 var displayName = await GetDisplayNameAsync(userId);
                 string returnMessage;
+                if (type == "follow")
+                {
+                    userId = ev.GetProperty("source").GetProperty("userId").GetString();
+                    displayName = await GetDisplayNameAsync(userId);
+                    replyToken = ev.GetProperty("replyToken").GetString();
+
+                    using (var conn = new NpgsqlConnection(connstring))
+                    {
+                        await conn.OpenAsync();
+                        await SaveMessageToDb(userId, "加入好友", displayName, conn);
+                    }
+
+                    await ReplyToLineUser(replyToken, $"👋 歡迎 {displayName} 加入我們的 LINE！您可以輸入「報名」參加活動～");
+                    continue;
+                }
+
+
+                if (type != "message") continue;
 
                 using (var conn = new NpgsqlConnection(connstring))
                 {
