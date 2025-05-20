@@ -98,6 +98,7 @@
         <h4 class="p-3 mb-0 border-bottom">och管理系統</h4>
         <a asp-area="" asp-controller="Home" asp-action="Index">首頁</a>
         <a asp-area="" asp-controller="OchC010" asp-action="Index">福音紀錄管理</a>
+        <a asp-area="" asp-controller="OchC030" asp-action="Index">讀經管理</a>
         @if (HttpContextAccessor.HttpContext.Session.GetString("Permission") == "Admin")
         {
             <a asp-area="" asp-controller="OchM040" asp-action="Index">帳號管理</a>

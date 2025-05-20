@@ -129,10 +129,14 @@ namespace ochweb.ApiController
                         returnMessage = $"👋 嗨 {displayName}，我們已為您建立資料並完成報名！";
                     }
 
-                    if (replyToken != null)
+                    if (replyToken != null && source.GetProperty("type").GetString() != "group")
                     {
                         Console.WriteLine($"📤 回覆訊息給 {userId}");
                         await ReplyToLineUser(replyToken, returnMessage);
+                    }
+                    else
+                    {
+                        Console.WriteLine("🤫 來自群組，不回覆訊息");
                     }
                 }
             }
@@ -176,14 +180,33 @@ namespace ochweb.ApiController
 
         private async Task InsertGroupSpeakLog(string userId, NpgsqlConnection conn)
         {
-            string dateText = DateTime.Now.ToString("yyyyMMdd"); // 👈 格式化為 20250520
+            string dateText = DateTime.Now.ToString("yyyyMMdd"); // 20250520
 
-            string sql = @"INSERT INTO ""OCHUSER"".""ochbuible"" (""UserID"", ""CreateDateTime"") 
-                   VALUES (@UserID, @CreateDateTime)";
-            using var cmd = new NpgsqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@UserID", userId);
-            cmd.Parameters.AddWithValue("@CreateDateTime", dateText);
-            await cmd.ExecuteNonQueryAsync();
+            // ✅ 先檢查是否已存在今天的紀錄
+            string checkSql = @"SELECT 1 FROM ""OCHUSER"".""ochbuible"" 
+                        WHERE ""UserID"" = @UserID AND ""CreateDateTime"" = @CreateDateTime";
+            using (var checkCmd = new NpgsqlCommand(checkSql, conn))
+            {
+                checkCmd.Parameters.AddWithValue("@UserID", userId);
+                checkCmd.Parameters.AddWithValue("@CreateDateTime", dateText);
+
+                var exists = await checkCmd.ExecuteScalarAsync();
+                if (exists != null)
+                {
+                    Console.WriteLine($"📌 {userId} 今天已經記錄過，不重複 insert");
+                    return;
+                }
+            }
+
+            // ✅ 若尚未記錄，則插入資料
+            string insertSql = @"INSERT INTO ""OCHUSER"".""ochbuible"" (""UserID"", ""CreateDateTime"") 
+                         VALUES (@UserID, @CreateDateTime)";
+            using var insertCmd = new NpgsqlCommand(insertSql, conn);
+            insertCmd.Parameters.AddWithValue("@UserID", userId);
+            insertCmd.Parameters.AddWithValue("@CreateDateTime", dateText);
+            await insertCmd.ExecuteNonQueryAsync();
+
+            Console.WriteLine($"✅ 已新增讀經紀錄：{userId} - {dateText}");
         }
 
         private async Task INSERTOchregist(string userId, string displayName, NpgsqlConnection conn)
