@@ -1,37 +1,47 @@
 ﻿@model ochweb.Models.BibleLogViewModel
 
-<h2>📖 讀經狀況查詢</h2>
+<h2>📖 讀經狀況</h2>
 
 <form method="get" class="mb-3">
-    <label for="date">📅 查詢日期：</label>
-    <input type="date" name="date" id="date" value="@Model.QueryDate?.ToString("yyyy-MM-dd")" />
+    <label for="startDate">起始日期：</label>
+    <input type="date" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+
+    <label for="endDate">結束日期：</label>
+    <input type="date" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+
     <button type="submit" class="btn btn-primary">查詢</button>
 </form>
 
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>UserID</th>
+            <th style="display:none;">UserID</th> <!-- 👈 隱藏 -->
             <th>使用者名稱</th>
-            <th>今日是否讀經</th>
+            @foreach (var date in Model.DateList)
+            {
+                <th>@DateTime.ParseExact(date, "yyyyMMdd", null).ToString("MM/dd")</th>
+            }
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.Records)
         {
             <tr>
-                <td>@item.UserID</td>
+                <td style="display:none;">@item.UserID</td> <!-- 👈 隱藏 -->
                 <td>@item.UserName</td>
-                <td>
-                    @if (item.HasRead)
-                    {
-                        <span class="text-success">✅ 有</span>
-                    }
-                    else
-                    {
-                        <span class="text-danger">❌ 無</span>
-                    }
-                </td>
+                @foreach (var date in Model.DateList)
+                {
+                    <td>
+                        @if (item.DailyReadMap[date])
+                        {
+                            <span class="text-success">✅</span>
+                        }
+                        else
+                        {
+                            <span class="text-danger">❌</span>
+                        }
+                    </td>
+                }
             </tr>
         }
     </tbody>
