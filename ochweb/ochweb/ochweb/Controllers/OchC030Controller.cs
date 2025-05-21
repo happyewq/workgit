@@ -5,6 +5,7 @@ using ochweb.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
+using ochweb.Helpers;
 
 namespace ochweb.Controllers
 {
@@ -18,7 +19,6 @@ namespace ochweb.Controllers
 
         public async Task<IActionResult> Index(DateTime? date)
         {
-            var connectionString = _config.GetConnectionString("DefaultConnection");
             var model = new BibleLogViewModel
             {
                 QueryDate = date ?? DateTime.Today,
@@ -27,20 +27,25 @@ namespace ochweb.Controllers
 
             var dateStr = model.QueryDate.Value.ToString("yyyyMMdd");
 
-            using var conn = new NpgsqlConnection(connectionString);
+            // ✅ 統一使用 DBHelper 提供的連線字串
+            string connstring = DBHelper.GetConnectionString();
+
+            using var conn = new NpgsqlConnection(connstring);
+            Console.WriteLine($"✅ 正在連線到資料庫：{conn.Host}:{conn.Port} / {conn.Database}");
             await conn.OpenAsync();
 
             var cmd = new NpgsqlCommand(@"
-            SELECT m.""UserID"", m.""UserName"",
-                   CASE WHEN b.""UserID"" IS NOT NULL THEN true ELSE false END AS ""HasRead""
-            FROM ""OCHUSER"".""linemessages"" m
-            LEFT JOIN (
-                SELECT DISTINCT ""UserID""
-                FROM ""OCHUSER"".""ochbible""
-                WHERE ""CreateDateTime"" = @today
-            ) b ON m.""UserID"" = b.""UserID""
-            WHERE m.""Message"" = '加入好友'
-        ", conn);
+        SELECT m.""UserID"", m.""UserName"",
+               CASE WHEN b.""UserID"" IS NOT NULL THEN true ELSE false END AS ""HasRead""
+        FROM ""OCHUSER"".""linemessages"" m
+        LEFT JOIN (
+            SELECT DISTINCT ""UserID""
+            FROM ""OCHUSER"".""ochbible""
+            WHERE ""CreateDateTime"" = @today
+        ) b ON m.""UserID"" = b.""UserID""
+        WHERE m.""Message"" = '加入好友'
+    ", conn);
+
             cmd.Parameters.AddWithValue("@today", dateStr);
 
             using var reader = await cmd.ExecuteReaderAsync();
@@ -56,5 +61,6 @@ namespace ochweb.Controllers
 
             return View(model);
         }
+
     }
 }
