@@ -19,6 +19,7 @@ namespace ochweb.ApiController
         {
             _config = config;
         }
+
         [HttpPost]
         [Route("line/webhook")]
         public async Task<IActionResult> Post([FromBody] JsonElement json)
@@ -26,7 +27,20 @@ namespace ochweb.ApiController
             Console.WriteLine("📥 收到 LINE Webhook：");
             Console.WriteLine(json.ToString());
 
-            if (!json.TryGetProperty("events", out var events))
+
+            // ✅ 嘗試先從 events[0].source.groupId 印出群組ID
+            if (json.TryGetProperty("events", out var events) && events.GetArrayLength() > 0)
+            {
+                var firstEvent = events[0];
+                if (firstEvent.TryGetProperty("source", out var source) &&
+                    source.TryGetProperty("type", out var sourceType) &&
+                    sourceType.GetString() == "group" &&
+                    source.TryGetProperty("groupId", out var groupId))
+                {
+                    Console.WriteLine($"👥 第一筆事件來自群組：{groupId.GetString()}");
+                }
+            }
+            else
             {
                 Console.WriteLine("⚠️ 無 events 陣列，Webhook 格式錯誤！");
                 return BadRequest();
