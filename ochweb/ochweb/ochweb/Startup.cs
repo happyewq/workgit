@@ -3,6 +3,7 @@ using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,20 +26,27 @@ namespace ochweb
         }
 
         public IConfiguration Configuration { get; }
-        
+
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // 👉 加這段（解決金鑰錯誤）
+            services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), "keys")))
+                .SetApplicationName("ochweb");
 
-            // 註冊 Hangfire，使用 PostgreSQL 作為儲存（請根據你的資料庫修改連線字串）
             services.AddHangfire(config =>
                 config.UsePostgreSqlStorage(Configuration.GetConnectionString("DefaultConnection")));
 
-            // 啟用背景工作伺服器
-            services.AddHangfireServer();
+            services.AddHangfireServer(options =>
+            {
+                options.WorkerCount = 1;
+            });
+
             services.AddControllersWithViews()
-                .AddRazorRuntimeCompilation(); // ✅ 加這行;
+                .AddRazorRuntimeCompilation();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -52,6 +60,7 @@ namespace ochweb
             services.AddSession();
             services.AddHttpContextAccessor();
         }
+
 
         public class AllowAllDashboardAuthorizationFilter : IDashboardAuthorizationFilter
         {
