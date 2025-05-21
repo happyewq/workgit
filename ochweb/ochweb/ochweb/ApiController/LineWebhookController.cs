@@ -28,19 +28,8 @@ namespace ochweb.ApiController
             Console.WriteLine(json.ToString());
 
 
-            // ✅ 嘗試先從 events[0].source.groupId 印出群組ID
-            if (json.TryGetProperty("events", out var events) && events.GetArrayLength() > 0)
-            {
-                var firstEvent = events[0];
-                if (firstEvent.TryGetProperty("source", out var source) &&
-                    source.TryGetProperty("type", out var sourceType) &&
-                    sourceType.GetString() == "group" &&
-                    source.TryGetProperty("groupId", out var groupId))
-                {
-                    Console.WriteLine($"👥 第一筆事件來自群組：{groupId.GetString()}");
-                }
-            }
-            else
+
+            if (!json.TryGetProperty("events", out var events))
             {
                 Console.WriteLine("⚠️ 無 events 陣列，Webhook 格式錯誤！");
                 return BadRequest();
@@ -55,6 +44,7 @@ namespace ochweb.ApiController
                     Console.WriteLine("⚠️ 缺少 type 屬性，跳過");
                     continue;
                 }
+
 
                 var type = typeProp.GetString();
                 Console.WriteLine($"🔍 處理事件類型：{type}");
@@ -97,19 +87,26 @@ namespace ochweb.ApiController
 
                     using var conn = new NpgsqlConnection(connstring);
                     await conn.OpenAsync();
-
-                    // ✅ 判斷是否為群組且包含聖經書名
-                    if (source.GetProperty("type").GetString() == "group" &&
-                        source.TryGetProperty("groupId", out var groupIdProp) &&
-                        groupIdProp.GetString() == "Cbbe6d510fa802ec9a756d9f96a2393ba")
+                    // 👈 新增的 groupId 記錄段
+                    if (source.TryGetProperty("type", out var sourceTypeProp) &&
+                        sourceTypeProp.GetString() == "group" &&
+                        source.TryGetProperty("groupId", out var groupIdProp))
                     {
-                        var detectedBook = DetectBibleBook(message); // 👈 這裡是偵測書名
-                        if (detectedBook != null)
-                        {
-                            Console.WriteLine($"📌 群組發言提到聖經書卷：{detectedBook}，來自 {userId}");
-                            await InsertGroupSpeakLog(userId, conn);
-                        }
+                        var groupId = groupIdProp.GetString();
+                        Console.WriteLine($"👥 事件來自群組：{groupId}");
                     }
+                    // ✅ 判斷是否為群組且包含聖經書名
+                    //if (source.GetProperty("type").GetString() == "group" &&
+                    //    source.TryGetProperty("groupId", out var groupIdProp) &&
+                    //    groupIdProp.GetString() == "Cbbe6d510fa802ec9a756d9f96a2393ba")
+                    //{
+                    //    var detectedBook = DetectBibleBook(message); // 👈 這裡是偵測書名
+                    //    if (detectedBook != null)
+                    //    {
+                    //        Console.WriteLine($"📌 群組發言提到聖經書卷：{detectedBook}，來自 {userId}");
+                    //        await InsertGroupSpeakLog(userId, conn);
+                    //    }
+                    //}
 
                     string sql = @"SELECT 1 FROM ""OCHUSER"".""linemessages"" WHERE ""UserID"" = @UserID";
                     using var cmd = new NpgsqlCommand(sql, conn);
@@ -146,7 +143,7 @@ namespace ochweb.ApiController
                     if (replyToken != null && source.GetProperty("type").GetString() != "group")
                     {
                         Console.WriteLine($"📤 回覆訊息給 {userId}");
-                        await ReplyToLineUser(replyToken, returnMessage);
+                        //await ReplyToLineUser(replyToken, returnMessage);
                     }
                     else
                     {
