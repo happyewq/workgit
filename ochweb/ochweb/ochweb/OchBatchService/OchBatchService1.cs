@@ -134,19 +134,23 @@ namespace ochweb.OchBatchService
 
         private async Task SendToGroup(string message)
         {
-            var httpClient = new HttpClient();
             string token = _config["LineBot:ChannelAccessToken"];
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var payload = new
             {
-                to = "Cbbe6d510fa802ec9a756d9f96a2393ba", // 👈 請替換成你的群組 ID
+                to = "Cbbe6d510fa802ec9a756d9f96a2393ba", // ✅ 群組 ID
                 messages = new[] { new { type = "text", text = message } }
             };
 
             var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync("https://api.line.me/v2/bot/message/push", content);
             var result = await response.Content.ReadAsStringAsync();
+            // ✅ 成功或失敗訊息 Log
+            if (response.IsSuccessStatusCode)
+                Console.WriteLine("✅ 群組推播成功！");
+            else
+                Console.WriteLine("❌ 群組推播失敗：" + result);
             Console.WriteLine(result);
         }
 
