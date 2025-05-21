@@ -139,7 +139,7 @@ namespace ochweb.OchBatchService
 
             var payload = new
             {
-                to = "Cbbe6d510fa802ec9a756d9f96a2393ba", // ✅ 群組 ID
+                to = "Cf1cf1bb73a1980f358a7341b932c4f76", // ✅ 群組 ID
                 messages = new[] { new { type = "text", text = message } }
             };
 

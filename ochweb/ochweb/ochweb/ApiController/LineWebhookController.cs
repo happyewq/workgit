@@ -88,25 +88,25 @@ namespace ochweb.ApiController
                     using var conn = new NpgsqlConnection(connstring);
                     await conn.OpenAsync();
                     // 👈 新增的 groupId 記錄段
-                    if (source.TryGetProperty("type", out var sourceTypeProp) &&
-                        sourceTypeProp.GetString() == "group" &&
-                        source.TryGetProperty("groupId", out var groupIdProp))
-                    {
-                        var groupId = groupIdProp.GetString();
-                        Console.WriteLine($"👥 事件來自群組：{groupId}");
-                    }
-                    // ✅ 判斷是否為群組且包含聖經書名
-                    //if (source.GetProperty("type").GetString() == "group" &&
-                    //    source.TryGetProperty("groupId", out var groupIdProp) &&
-                    //    groupIdProp.GetString() == "Cbbe6d510fa802ec9a756d9f96a2393ba")
+                    //if (source.TryGetProperty("type", out var sourceTypeProp) &&
+                    //    sourceTypeProp.GetString() == "group" &&
+                    //    source.TryGetProperty("groupId", out var groupIdProp))
                     //{
-                    //    var detectedBook = DetectBibleBook(message); // 👈 這裡是偵測書名
-                    //    if (detectedBook != null)
-                    //    {
-                    //        Console.WriteLine($"📌 群組發言提到聖經書卷：{detectedBook}，來自 {userId}");
-                    //        await InsertGroupSpeakLog(userId, conn);
-                    //    }
+                    //    var groupId = groupIdProp.GetString();
+                    //    Console.WriteLine($"👥 事件來自群組：{groupId}");
                     //}
+                    // ✅ 判斷是否為群組且包含聖經書名
+                    if (source.GetProperty("type").GetString() == "group" &&
+                        source.TryGetProperty("groupId", out var groupIdProp) &&
+                        groupIdProp.GetString() == "Cf1cf1bb73a1980f358a7341b932c4f76")
+                    {
+                        var detectedBook = DetectBibleBook(message); // 👈 這裡是偵測書名
+                        if (detectedBook != null)
+                        {
+                            Console.WriteLine($"📌 群組發言提到聖經書卷：{detectedBook}，來自 {userId}");
+                            await InsertGroupSpeakLog(userId, conn);
+                        }
+                    }
 
                     string sql = @"SELECT 1 FROM ""OCHUSER"".""linemessages"" WHERE ""UserID"" = @UserID";
                     using var cmd = new NpgsqlCommand(sql, conn);
@@ -143,7 +143,7 @@ namespace ochweb.ApiController
                     if (replyToken != null && source.GetProperty("type").GetString() != "group")
                     {
                         Console.WriteLine($"📤 回覆訊息給 {userId}");
-                        //await ReplyToLineUser(replyToken, returnMessage);
+                        //await ReplyToLineUser(replyToken, returnMessage); 暫時不回訊息
                     }
                     else
                     {
