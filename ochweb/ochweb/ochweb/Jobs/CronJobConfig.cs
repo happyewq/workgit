@@ -25,6 +25,13 @@ namespace CcpBatch.Jobs
                 "40 11 * * *",
                 taiwanTimeZone
             );
+
+            RecurringJob.AddOrUpdate<OchBatchService1>(
+             service => service.SendUnReadYesterdayAsync(),
+             "0 9 * * *", // ✅ 每天早上 9 點
+             taiwanTimeZone
+         );
+
         }
     }
 }
