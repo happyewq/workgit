@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using ochweb.Helpers;
+using System.Linq;
 
 namespace ochweb.Controllers
 {
@@ -17,50 +18,93 @@ namespace ochweb.Controllers
             _config = config;
         }
 
-        public async Task<IActionResult> Index(DateTime? date)
+        public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate)
         {
+            var start = startDate ?? DateTime.Today.AddDays(-2); // 預設查近3天
+            var end = endDate ?? DateTime.Today;
+
             var model = new BibleLogViewModel
             {
-                QueryDate = date ?? DateTime.Today,
-                Records = new List<BibleLogRecord>()
+                StartDate = start,
+                EndDate = end
             };
 
-            var dateStr = model.QueryDate.Value.ToString("yyyyMMdd");
+            for (var d = start; d <= end; d = d.AddDays(1))
+                model.DateList.Add(d.ToString("yyyyMMdd"));
 
-            // ✅ 統一使用 DBHelper 提供的連線字串
-            string connstring = DBHelper.GetConnectionString();
-
-            using var conn = new NpgsqlConnection(connstring);
-            Console.WriteLine($"✅ 正在連線到資料庫：{conn.Host}:{conn.Port} / {conn.Database}");
+            var connStr = DBHelper.GetConnectionString();
+            using var conn = new NpgsqlConnection(connStr);
             await conn.OpenAsync();
 
-            var cmd = new NpgsqlCommand(@"
-        SELECT m.""UserID"", m.""UserName"",
-               CASE WHEN b.""UserID"" IS NOT NULL THEN true ELSE false END AS ""HasRead""
-        FROM ""OCHUSER"".""linemessages"" m
-        LEFT JOIN (
-            SELECT DISTINCT ""UserID""
-            FROM ""OCHUSER"".""ochbible""
-            WHERE ""CreateDateTime"" = @today
-        ) b ON m.""UserID"" = b.""UserID""
-        WHERE m.""Message"" = '加入好友'
+            // 先抓所有加入好友的用戶
+            var users = new Dictionary<string, string>(); // userID -> userName
+
+            var cmdUsers = new NpgsqlCommand(@"
+        SELECT DISTINCT ""UserID"", ""UserName""
+        FROM ""OCHUSER"".""linemessages""
+        WHERE ""Message"" = '加入好友';
     ", conn);
 
-            cmd.Parameters.AddWithValue("@today", dateStr);
-
-            using var reader = await cmd.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
+            using var reader1 = await cmdUsers.ExecuteReaderAsync();
+            while (await reader1.ReadAsync())
             {
-                model.Records.Add(new BibleLogRecord
-                {
-                    UserID = reader.GetString(0),
-                    UserName = reader.GetString(1),
-                    HasRead = reader.GetBoolean(2)
-                });
+                users[reader1.GetString(0)] = reader1.GetString(1);
             }
+            reader1.Close();
+
+            // 再查詢這段期間所有讀經紀錄
+            var cmdBible = new NpgsqlCommand(@"
+        SELECT ""UserID"", ""CreateDateTime""
+        FROM ""OCHUSER"".""ochbible""
+        WHERE ""CreateDateTime"" BETWEEN @start AND @end;
+    ", conn);
+
+            cmdBible.Parameters.AddWithValue("@start", start.ToString("yyyyMMdd"));
+            cmdBible.Parameters.AddWithValue("@end", end.ToString("yyyyMMdd"));
+
+            var userMap = new Dictionary<string, BibleLogRecord>();
+
+            using var reader2 = await cmdBible.ExecuteReaderAsync();
+            while (await reader2.ReadAsync())
+            {
+                var userId = reader2.GetString(0);
+                var dateStr = reader2.GetString(1);
+
+                if (!userMap.ContainsKey(userId))
+                {
+                    userMap[userId] = new BibleLogRecord
+                    {
+                        UserID = userId,
+                        UserName = users.ContainsKey(userId) ? users[userId] : "(未知)",
+                        DailyReadMap = model.DateList.ToDictionary(d => d, _ => false)
+                    };
+                }
+
+                if (userMap[userId].DailyReadMap.ContainsKey(dateStr))
+                {
+                    userMap[userId].DailyReadMap[dateStr] = true;
+                }
+            }
+
+            // 把沒讀的也補上（所有 user 要顯示）
+            foreach (var u in users)
+            {
+                if (!userMap.ContainsKey(u.Key))
+                {
+                    userMap[u.Key] = new BibleLogRecord
+                    {
+                        UserID = u.Key,
+                        UserName = u.Value,
+                        DailyReadMap = model.DateList.ToDictionary(d => d, _ => false)
+                    };
+                }
+            }
+
+            model.Records = userMap.Values.ToList();
 
             return View(model);
         }
+
 
     }
 }
