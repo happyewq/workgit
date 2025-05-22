@@ -20,7 +20,7 @@ namespace ochweb.Controllers
 
         public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate)
         {
-            var start = startDate ?? DateTime.Today.AddDays(-2); // 預設查近3天
+            var start = startDate ?? DateTime.Today.AddDays(-1); // 預設查近3天
             var end = endDate ?? DateTime.Today;
 
             var model = new BibleLogViewModel

@@ -1,48 +1,125 @@
 ﻿@model ochweb.Models.BibleLogViewModel
+@{
+    Layout = null;
+}
 
-<h2>📖 讀經狀況</h2>
-
-<form method="get" class="mb-3">
-    <label for="startDate">起始日期：</label>
-    <input type="date" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
-
-    <label for="endDate">結束日期：</label>
-    <input type="date" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
-
-    <button type="submit" class="btn btn-primary">查詢</button>
-</form>
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th style="display:none;">UserID</th> <!-- 👈 隱藏 -->
-            <th>使用者名稱</th>
-            @foreach (var date in Model.DateList)
-            {
-                <th>@DateTime.ParseExact(date, "yyyyMMdd", null).ToString("MM/dd")</th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Records)
-        {
-            <tr>
-                <td style="display:none;">@item.UserID</td> <!-- 👈 隱藏 -->
-                <td>@item.UserName</td>
-                @foreach (var date in Model.DateList)
-                {
-                    <td>
-                        @if (item.DailyReadMap[date])
-                        {
-                            <span class="text-success">✅</span>
-                        }
-                        else
-                        {
-                            <span class="text-danger">❌</span>
-                        }
-                    </td>
-                }
-            </tr>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8" />
+    <title>讀經狀況查詢</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            padding: 2rem;
+            font-family: "Microsoft JhengHei", sans-serif;
+            background-color: #f9f9fc;
         }
-    </tbody>
-</table>
+
+        h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #343a40;
+        }
+
+        form {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+            form .form-group {
+                align-items: center;
+            }
+
+        label {
+            margin-right: 0.5rem;
+        }
+
+        .table {
+            background-color: #fff;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .text-success {
+            font-size: 1.2rem;
+        }
+
+        .text-danger {
+            font-size: 1.2rem;
+        }
+
+        .btn-primary {
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h2>📖 讀經狀況</h2>
+
+    <form method="get" class="form-inline justify-content-center mb-3">
+        <div class="form-group mx-2 mb-0">
+            <label for="startDate" class="mr-2 mb-0">起始日期：</label>
+            <input type="date" name="startDate" class="form-control" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+        </div>
+
+        <div class="form-group mx-2 mb-0">
+            <label for="endDate" class="mr-2 mb-0">結束日期：</label>
+            <input type="date" name="endDate" class="form-control" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+        </div>
+
+        <div class="form-group mx-2 mb-0">
+            <button type="submit" class="btn btn-primary">查詢</button>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th style="display:none;">UserID</th>
+                    <th style="width: 200px;">使用者名稱</th>
+                    @foreach (var date in Model.DateList)
+                    {
+                        <th>@DateTime.ParseExact(date, "yyyyMMdd", null).ToString("MM/dd")</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Records)
+                {
+                    <tr>
+                        <td style="display:none;">@item.UserID</td>
+                        <td>@item.UserName</td>
+                        @foreach (var date in Model.DateList)
+                        {
+                            <td style="width: 120px;">
+                                @if (item.DailyReadMap[date])
+                                {
+                                    <span class="text-success">✅</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">❌</span>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
