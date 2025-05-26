@@ -67,7 +67,8 @@ namespace ochweb.ApiController
                     using var conn = new NpgsqlConnection(connstring);
                     await conn.OpenAsync();
                     await SaveMessageToDb(userId, "加入好友", displayName, conn);
-                    await ReplyToLineUser(replyToken, $"👋 歡迎 {displayName} 加入我們的 LINE！您可以輸入「報名」參加活動～");
+                    await ReplyToLineUser(replyToken, $"👋 歡迎 {displayName} 加入天天讀經的行列! 神的話語必成為你腳前的燈和路上的光");
+                    //await ReplyToLineUser(replyToken, $"👋 歡迎 {displayName} 加入我們的 LINE！您可以輸入「報名」參加活動～");
                     continue;
                 }
 
