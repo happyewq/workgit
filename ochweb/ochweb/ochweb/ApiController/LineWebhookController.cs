@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using Npgsql;
 using ochweb.Helpers;
 using Microsoft.Extensions.Configuration;
+using System.Runtime.InteropServices;
 
 namespace ochweb.ApiController
 {
@@ -192,7 +193,13 @@ namespace ochweb.ApiController
 
         private async Task InsertGroupSpeakLog(string userId, NpgsqlConnection conn)
         {
-            TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+            
+
+            string tzId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? "Taipei Standard Time"      // Windows 時區 ID
+                : "Asia/Taipei";              // Linux/macOS 時區 ID
+
+            TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById(tzId);
             DateTime taiwanNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, taiwanTimeZone);
             string dateText = taiwanNow.ToString("yyyyMMdd");
             // ✅ 先檢查是否已存在今天的紀錄
