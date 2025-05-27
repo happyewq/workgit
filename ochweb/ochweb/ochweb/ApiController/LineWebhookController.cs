@@ -202,6 +202,9 @@ namespace ochweb.ApiController
             TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById(tzId);
             DateTime taiwanNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, taiwanTimeZone);
             string dateText = taiwanNow.ToString("yyyyMMdd");
+            string dateTextlog = taiwanNow.ToString("yyyyMMddHHmmss");
+            Console.WriteLine($"📌 {dateTextlog} 紀錄時間");
+
             // ✅ 先檢查是否已存在今天的紀錄
             string checkSql = @"SELECT 1 FROM ""OCHUSER"".""ochbible"" 
                         WHERE ""UserID"" = @UserID AND ""CreateDateTime"" = @CreateDateTime";
