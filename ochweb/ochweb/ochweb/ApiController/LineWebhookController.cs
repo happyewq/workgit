@@ -192,8 +192,9 @@ namespace ochweb.ApiController
 
         private async Task InsertGroupSpeakLog(string userId, NpgsqlConnection conn)
         {
-            string dateText = DateTime.Now.ToString("yyyyMMdd"); // 20250520
-
+            TimeZoneInfo taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+            DateTime taiwanNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, taiwanTimeZone);
+            string dateText = taiwanNow.ToString("yyyyMMdd");
             // ✅ 先檢查是否已存在今天的紀錄
             string checkSql = @"SELECT 1 FROM ""OCHUSER"".""ochbible"" 
                         WHERE ""UserID"" = @UserID AND ""CreateDateTime"" = @CreateDateTime";
