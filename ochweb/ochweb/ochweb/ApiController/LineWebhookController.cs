@@ -48,19 +48,53 @@ namespace ochweb.ApiController
                     continue;
                 }
 
-
                 var type = typeProp.GetString();
                 Console.WriteLine($"🔍 處理事件類型：{type}");
 
-                if (!ev.TryGetProperty("source", out var source) ||
-                    !source.TryGetProperty("userId", out var userIdProp))
+                var replyToken = ev.TryGetProperty("replyToken", out var rt) ? rt.GetString() : null;
+
+                if (!ev.TryGetProperty("source", out var source))
+                {
+                    Console.WriteLine("⚠️ 缺少 source，跳過");
+                    continue;
+                }
+
+                if (type == "join" && replyToken != null)
+                {
+                    var groupId = source.GetProperty("groupId").GetString();
+                    Console.WriteLine($"✅ Bot 加入群組，GroupId：{groupId}");
+                    await ReplyToLineUser(replyToken, "👋 我加入群組囉，有需要可以打『請發』來呼叫我！");
+                    continue;
+                }
+
+                if (type == "leave")
+                {
+                    var groupId = source.GetProperty("groupId").GetString();
+                    Console.WriteLine($"⚠️ Bot 被移出群組，GroupId：{groupId}");
+                    continue;
+                }
+
+                if (type == "memberJoined")
+                {
+                    var newUserId = ev.GetProperty("joined").GetProperty("members")[0].GetProperty("userId").GetString();
+                    Console.WriteLine($"👤 有人加入群組：{newUserId}");
+                    continue;
+                }
+
+                if (type == "memberLeft")
+                {
+                    var leftUserId = ev.GetProperty("left").GetProperty("members")[0].GetProperty("userId").GetString();
+                    Console.WriteLine($"👤 有人離開群組：{leftUserId}");
+                    continue;
+                }
+
+                if (!source.TryGetProperty("userId", out var userIdProp))
                 {
                     Console.WriteLine("⚠️ 缺少 userId，跳過");
                     continue;
                 }
 
                 var userId = userIdProp.GetString();
-                var replyToken = ev.TryGetProperty("replyToken", out var rt) ? rt.GetString() : null;
                 var displayName = await GetDisplayNameAsync(userId);
 
                 if (type == "follow" && replyToken != null)
@@ -71,7 +105,6 @@ namespace ochweb.ApiController
                     await conn.OpenAsync();
                     await SaveMessageToDb(userId, "加入好友", displayName, conn);
                     await ReplyToLineUser(replyToken, $"👋 歡迎 {displayName} 加入天天讀經的行列! 神的話語必成為你腳前的燈和路上的光");
-                    //await ReplyToLineUser(replyToken, $"👋 歡迎 {displayName} 加入我們的 LINE！您可以輸入「報名」參加活動～");
                     continue;
                 }
 
