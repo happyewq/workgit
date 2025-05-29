@@ -9,6 +9,8 @@ using Npgsql;
 using ochweb.Helpers;
 using Microsoft.Extensions.Configuration;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ochweb.ApiController
 {
@@ -99,8 +101,8 @@ namespace ochweb.ApiController
                     {
                         Console.WriteLine("🎯 指定人員在群組下遞『請發』命令，準備推播未讀清單");
                         var batchService = new ochweb.OchBatchService.OchBatchService1(_config);
-                        await batchService.SendUnReadYesterdayAsync();
-                        return Ok();
+                        string message1 = await GetUnreadMessageAsync(); // 🆕 我幫你新增的只組訊息的方法
+                        await ReplyToLineUser(replyToken, message1); // 🆗 直接回覆到該群組
                     }
                     // 👈 新增的 groupId 記錄段
                     //if (source.TryGetProperty("type", out var sourceTypeProp) &&
@@ -169,6 +171,72 @@ namespace ochweb.ApiController
 
             return Ok();
         }
+
+        public async Task<string> GetUnreadMessageAsync()
+        {
+            string connStr = DBHelper.GetConnectionString();
+            string yesterday = DateTime.Today.AddDays(-1).ToString("yyyyMMdd");
+
+            var userMap = new Dictionary<string, string>(); // userId -> userName
+            var unreadList = new List<string>();
+
+            using var conn = new NpgsqlConnection(connStr);
+            await conn.OpenAsync();
+
+            // 加入好友者
+            var cmdUsers = new NpgsqlCommand(@"
+                SELECT DISTINCT ""UserID"", ""UserName""
+                FROM ""OCHUSER"".""linemessages""
+                WHERE ""Message"" = '加入好友';
+            ", conn);
+            using (var reader = await cmdUsers.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    userMap[reader.GetString(0)] = reader.GetString(1);
+                }
+            }
+
+            // 有讀經的人
+            // 取得昨天有讀經的人
+            var cmdBible = new NpgsqlCommand(@"
+        SELECT DISTINCT ""UserID""
+        FROM ""OCHUSER"".""ochbible""
+        WHERE ""CreateDateTime"" = @date;
+    ", conn);
+            cmdBible.Parameters.AddWithValue("@date", yesterday);
+
+            var readSet = new HashSet<string>();
+            using (var reader = await cmdBible.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    readSet.Add(reader.GetString(0));
+                }
+            }
+
+            foreach (var kv in userMap)
+            {
+                if (!readSet.Contains(kv.Key))
+                {
+                    unreadList.Add(kv.Value);
+                }
+            }
+
+            string message;
+            if (unreadList.Count == 0)
+            {
+                message = $"✅ 昨日 ({yesterday}) 全員皆有讀經，感謝主！";
+            }
+            else
+            {
+                var nameList = string.Join("\\n", unreadList.Select(n => $"❌ {n}"));
+                message = $"📋 昨日未讀經清單（{yesterday}）共 {unreadList.Count} 人：\\n{nameList}\\n\\n📖 繼續加油！讓祂的話語成為你腳前的燈、路上的光。";
+            }
+
+            return message;
+        }
+
 
         private string? DetectBibleBook(string message)
         {
