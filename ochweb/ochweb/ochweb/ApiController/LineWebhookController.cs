@@ -100,7 +100,6 @@ namespace ochweb.ApiController
                         && gidProp.GetString() == "Cf1cf1bb73a1980f358a7341b932c4f76")
                     {
                         Console.WriteLine("🎯 指定人員在群組下遞『請發』命令，準備推播未讀清單");
-                        var batchService = new ochweb.OchBatchService.OchBatchService1(_config);
                         string message1 = await GetUnreadMessageAsync(); // 🆕 我幫你新增的只組訊息的方法
                         await ReplyToLineUser(replyToken, message1); // 🆗 直接回覆到該群組
                     }
