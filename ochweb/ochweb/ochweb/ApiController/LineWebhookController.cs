@@ -89,6 +89,19 @@ namespace ochweb.ApiController
 
                     using var conn = new NpgsqlConnection(connstring);
                     await conn.OpenAsync();
+
+                    // ✔️ 指定人 + 指定訊息 + 指定群組觸發未讀經清單推播
+                    if (message.Trim() == "請發"
+                        && userId == "Ue2422631cd76bfdebd2249811a1d2de6"
+                        && source.GetProperty("type").GetString() == "group"
+                        && source.TryGetProperty("groupId", out var gidProp)
+                        && gidProp.GetString() == "Cf1cf1bb73a1980f358a7341b932c4f76")
+                    {
+                        Console.WriteLine("🎯 指定人員在群組下遞『請發』命令，準備推播未讀清單");
+                        var batchService = new ochweb.OchBatchService.OchBatchService1(_config);
+                        await batchService.SendUnReadYesterdayAsync();
+                        return Ok();
+                    }
                     // 👈 新增的 groupId 記錄段
                     //if (source.TryGetProperty("type", out var sourceTypeProp) &&
                     //    sourceTypeProp.GetString() == "group" &&
