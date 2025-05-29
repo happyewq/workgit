@@ -262,8 +262,8 @@ namespace ochweb.ApiController
             }
             else
             {
-                var nameList = string.Join("\\n", unreadList.Select(n => $"❌ {n}"));
-                message = $"📋 昨日未讀經清單（{yesterday}）共 {unreadList.Count} 人：\\n{nameList}\\n\\n📖 繼續加油！讓祂的話語成為你腳前的燈、路上的光。";
+                var nameList = string.Join("\n", unreadList.Select(n => $"❌ {n}"));
+                message = $"📋 昨日未讀經清單（{yesterday}）共 {unreadList.Count} 人：\n{nameList}\n\n📖 繼續加油！讓祂的話語成為你腳前的燈、路上的光。";
             }
 
             return message;
