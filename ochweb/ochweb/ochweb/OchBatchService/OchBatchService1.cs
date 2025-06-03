@@ -200,13 +200,15 @@ namespace ochweb.OchBatchService
             await SendToGroup1(message);
         }
 
-        private async Task SendToGroup1(string message) // 阿坤2號
+        private async Task SendToGroup1(string message)
         {
+            // Token A: 預設帳號
+            string token1 = _config["LineBot:ChannelAccessToken1"];
             // Token B: 備用帳號（第二個 Bot）
             string token2 = _config["LineBot:ChannelAccessToken1"];
 
             // 嘗試使用兩個 Token 依序發送
-            var tokens = token2;
+            var tokens = new[] { token1, token2 };
 
             foreach (var token in tokens)
             {
