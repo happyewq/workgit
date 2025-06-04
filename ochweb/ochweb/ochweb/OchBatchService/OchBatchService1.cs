@@ -134,46 +134,30 @@ namespace ochweb.OchBatchService
 
         private async Task SendToGroup(string message)
         {
-            // Token A: 預設帳號
-            string token1 = _config["LineBot:ChannelAccessToken"];
-            // Token B: 備用帳號（第二個 Bot）
-            string token2 = _config["LineBot:ChannelAccessToken1"];
+            // 使用預設帳號的 Token
+            string token = _config["LineBot:ChannelAccessToken"];
 
-            // 嘗試使用兩個 Token 依序發送
-            var tokens = new[] { token1, token2 };
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            foreach (var token in tokens)
+            var payload = new
             {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                to = "Cf1cf1bb73a1980f358a7341b932c4f76", // ✅ 群組 ID
+                messages = new[] { new { type = "text", text = message } }
+            };
 
-                var payload = new
-                {
-                    to = "Cf1cf1bb73a1980f358a7341b932c4f76", // ✅ 群組 ID
-                    messages = new[] { new { type = "text", text = message } }
-                };
+            var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync("https://api.line.me/v2/bot/message/push", content);
+            var result = await response.Content.ReadAsStringAsync();
 
-                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-                var response = await httpClient.PostAsync("https://api.line.me/v2/bot/message/push", content);
-                var result = await response.Content.ReadAsStringAsync();
-
-                if (response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine($"✅ 群組推播成功！（使用 Token：{token}）");
-                    return; // 成功就不再嘗試其他 token
-                }
-
-                Console.WriteLine($"❌ 使用 Token 失敗：{token}");
-                Console.WriteLine(result);
-
-                // 如果是額度用盡，就嘗試下個 token
-                if (!result.Contains("You have reached your monthly limit"))
-                {
-                    // 若是其他錯誤，不再嘗試
-                    break;
-                }
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("✅ 群組推播成功！");
             }
-
-            Console.WriteLine("⛔ 所有帳號推播皆失敗！");
+            else
+            {
+                Console.WriteLine("❌ 群組推播失敗！");
+                Console.WriteLine(result);
+            }
         }
 
 

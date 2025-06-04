@@ -306,7 +306,7 @@ namespace ochweb.ApiController
 
         private async Task InsertGroupSpeakLog(string userId, NpgsqlConnection conn)
         {
-            
+
 
             string tzId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? "Taipei Standard Time"      // Windows 時區 ID
