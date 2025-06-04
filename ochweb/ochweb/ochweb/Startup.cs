@@ -37,7 +37,7 @@ namespace ochweb
                 .SetApplicationName("ochweb");
 
             services.AddHangfire(config =>
-                config.UsePostgreSqlStorage(Configuration.GetConnectionString("DefaultConnection")));
+                config.UsePostgreSqlStorage(Environment.GetEnvironmentVariable("DefaultConnection")));
 
             services.AddHangfireServer(options =>
             {
