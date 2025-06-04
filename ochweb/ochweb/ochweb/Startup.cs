@@ -36,8 +36,8 @@ namespace ochweb
                 .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), "keys")))
                 .SetApplicationName("ochweb");
 
-            services.AddHangfire(config =>
-                config.UsePostgreSqlStorage(Environment.GetEnvironmentVariable("DefaultConnection")));
+            //services.AddHangfire(config =>
+            //    config.UsePostgreSqlStorage(Environment.GetEnvironmentVariable("DefaultConnection")));
 
             services.AddHangfireServer(options =>
             {
