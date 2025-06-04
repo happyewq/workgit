@@ -77,10 +77,10 @@ namespace ochweb.OchBatchService
 
             // 取得所有加入好友者
             var cmdUsers = new NpgsqlCommand(@"
-                SELECT DISTINCT ""UserID"", ""UserName""
-                FROM ""OCHUSER"".""linemessages""
-                WHERE ""Message"" = '加入好友';
-            ", conn);
+        SELECT DISTINCT ""UserID"", ""UserName""
+        FROM ""OCHUSER"".""linemessages""
+        WHERE ""Message"" = '加入好友';
+    ", conn);
 
             using (var reader = await cmdUsers.ExecuteReaderAsync())
             {
@@ -125,11 +125,11 @@ namespace ochweb.OchBatchService
             else
             {
                 var nameList = string.Join("\n", unreadList.Select(n => $"❌ {n}"));
-                message = $"📋 昨日未讀經清單（{yesterday}）共 {unreadList.Count} 人：\n{nameList}\n\n📖 繼續加油！讓祂的話語成為你腳前的燈、路上的光。";
+                message = $"📋 昨日未讀經清單（{yesterday}）共 {unreadList.Count} 人：\n{nameList}";
             }
 
             // 傳送到群組
-            await SendToGroup(message);
+            //await SendToGroup(message);
         }
 
         private async Task SendToGroup(string message)
