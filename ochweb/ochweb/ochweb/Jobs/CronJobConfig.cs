@@ -16,10 +16,16 @@ namespace CcpBatch.Jobs
                 // ✅ 建立服務實體
                 var batchService = new OchBatchService1(config);
 
-                // ✅ 根據作業系統取得正確的台灣時區
-                var taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById(
-                    RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Taipei Standard Time" : "Asia/Taipei"
-                );
+                // ✅ 跨平台取得台灣時區（Linux: Asia/Taipei, Windows: Taipei Standard Time）
+                TimeZoneInfo taiwanTimeZone;
+                try
+                {
+                    taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Taipei");
+                }
+                catch (TimeZoneNotFoundException)
+                {
+                    taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+                }
 
                 // ✅ 每天 11:40 台灣時間發送群組提醒
                 RecurringJob.AddOrUpdate<OchBatchService1>(
