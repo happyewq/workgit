@@ -129,7 +129,7 @@ namespace ochweb.OchBatchService
             }
 
             // 傳送到群組
-            //await SendToGroup(message);
+            await SendToGroup(message);
         }
 
         private async Task SendToGroup(string message)
