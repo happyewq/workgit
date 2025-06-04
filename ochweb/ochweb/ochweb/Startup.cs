@@ -36,8 +36,16 @@ namespace ochweb
                 .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), "keys")))
                 .SetApplicationName("ochweb");
 
-            //services.AddHangfire(config =>
-            //    config.UsePostgreSqlStorage(Environment.GetEnvironmentVariable("DefaultConnection")));
+            services.AddHangfire(config =>
+                config.UsePostgreSqlStorage(
+                    Environment.GetEnvironmentVariable("DefaultConnection"),
+                    new PostgreSqlStorageOptions
+                    {
+                        QueuePollInterval = TimeSpan.FromSeconds(30),     // 減少資料庫輪詢頻率（建議 15~60 秒）
+                        InvisibilityTimeout = TimeSpan.FromMinutes(5),    // 任務執行逾時時重試
+                        PrepareSchemaIfNecessary = true                   // 自動建表（可選）
+                    }
+                ));
 
             services.AddHangfireServer(options =>
             {
