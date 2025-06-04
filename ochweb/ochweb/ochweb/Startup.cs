@@ -9,12 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ochweb
 {
@@ -27,21 +23,30 @@ namespace ochweb
 
         public IConfiguration Configuration { get; }
 
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // ✅ 加這段：避免金鑰錯誤（保留 Session、AntiForgery 安全）
+            // ✅ 避免金鑰錯誤（Session、AntiForgery）
             services.AddDataProtection()
                 .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), "keys")))
                 .SetApplicationName("ochweb");
 
+            // ✅ Hangfire 設定（控制連線池與逾時）
             services.AddHangfire(config =>
-                config.UsePostgreSqlStorage(Environment.GetEnvironmentVariable("DefaultConnection")));
+            {
+                var connStr = Environment.GetEnvironmentVariable("DefaultConnection");
+                config.UsePostgreSqlStorage(connStr, new PostgreSqlStorageOptions
+                {
+                    QueuePollInterval = TimeSpan.FromSeconds(30),     // 降低輪詢頻率
+                    InvisibilityTimeout = TimeSpan.FromMinutes(5),    // 任務鎖定時間
+                    PrepareSchemaIfNecessary = true,                  // 自動建立 Hangfire 表（可選）
+                    DistributedLockTimeout = TimeSpan.FromMinutes(1)  // 鎖定逾時保守設定
+                });
+            });
 
+            // ✅ 限制 worker，避免連線爆掉
             services.AddHangfireServer(options =>
             {
-                options.WorkerCount = 1; // 減少佔用連線
+                options.WorkerCount = 1;
             });
 
             services.AddControllersWithViews()
@@ -61,56 +66,52 @@ namespace ochweb
             services.AddHttpContextAccessor();
         }
 
-
         public class AllowAllDashboardAuthorizationFilter : IDashboardAuthorizationFilter
         {
-            public bool Authorize(DashboardContext context)
-            {
-                return true; // 👈 允許所有人存取 Dashboard
-            }
+            public bool Authorize(DashboardContext context) => true;
         }
 
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
-            {
                 app.UseExceptionHandler("/Home/Error");
-            }
-            // ✅ 初始化DBHelper
+
+            // ✅ 初始化資料庫連線設定
             ochweb.Helpers.DBHelper.Init(Configuration);
 
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseSession();
-
             app.UseAuthorization();
 
-            // 啟用 Hangfire Dashboard（可加權限）
+            // ✅ 啟用 Hangfire Dashboard
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
                 Authorization = new[] { new AllowAllDashboardAuthorizationFilter() },
-                IgnoreAntiforgeryToken = true // ✅ 關掉 antiforgery 驗證
+                IgnoreAntiforgeryToken = true
             });
-            // ✅ 加這一行！不然 Dashboard 會顯示「沒有執行中的伺服器」
+
+            // ✅ 啟動 Hangfire Server
             app.UseHangfireServer();
 
-            // 🔻 這行必須加上（你目前可能沒呼叫這個方法）
-            CronJobConfig.Register(env, Configuration);
+            // ✅ 註冊排程任務，加上 try-catch 防止啟動失敗
+            try
+            {
+                CronJobConfig.Register(env, Configuration);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("⚠️ Cron 任務註冊失敗：" + ex.Message);
+            }
 
-
-            app.UseSwagger(); // 加這行：產生 swagger.json
+            // Swagger 設定
+            app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "OCH API v1");
-                c.RoutePrefix = "swagger"; // 存取網址為 /swagger
+                c.RoutePrefix = "swagger";
             });
 
             app.UseEndpoints(endpoints =>
@@ -119,11 +120,10 @@ namespace ochweb
                     name: "default",
                     pattern: "{controller=Login}/{action=Index}/{id?}");
 
-                endpoints.MapHangfireDashboard(); // ⭐⭐ ← 加這行！！為 .NET Core 3.1 確保 endpoint 有被註冊
+                endpoints.MapHangfireDashboard();
             });
 
-
-            // 額外開放 Script 資料夾裡面放JS
+            // 額外開放 Script 資料夾（自訂 JS）
             var scriptPath = Path.Combine(env.ContentRootPath, "Script");
             if (Directory.Exists(scriptPath))
             {
