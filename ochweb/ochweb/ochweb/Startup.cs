@@ -93,8 +93,6 @@ namespace ochweb
                 IgnoreAntiforgeryToken = true
             });
 
-            // ✅ 啟動 Hangfire Server
-            app.UseHangfireServer();
 
             // ✅ 註冊排程任務，加上 try-catch 防止啟動失敗
             try
