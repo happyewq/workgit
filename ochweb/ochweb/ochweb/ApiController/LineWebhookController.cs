@@ -63,7 +63,7 @@ namespace ochweb.ApiController
                 {
                     var groupId = source.GetProperty("groupId").GetString();
                     Console.WriteLine($"✅ Bot 加入群組，GroupId：{groupId}");
-                    await ReplyToLineUser(replyToken, "👋 我加入群組囉，有需要可以打『請發』來呼叫我！");
+                    await ReplyToLineUser(replyToken, "👋 我加入群組囉，有需要可以打『發』來呼叫我！");
                     continue;
                 }
 
@@ -126,13 +126,13 @@ namespace ochweb.ApiController
                     await conn.OpenAsync();
 
                     // ✔️ 指定人 + 指定訊息 + 指定群組觸發未讀經清單推播
-                    if (message.Trim() == "請發"
+                    if (message.Trim() == "發"
                         && userId == "Ue2422631cd76bfdebd2249811a1d2de6"
                         && source.GetProperty("type").GetString() == "group"
                         && source.TryGetProperty("groupId", out var gidProp)
                         && gidProp.GetString() == "Cf1cf1bb73a1980f358a7341b932c4f76")
                     {
-                        Console.WriteLine("🎯 指定人員在群組下遞『請發』命令，準備推播未讀清單");
+                        Console.WriteLine("🎯 指定人員在群組下遞『發』命令，準備推播未讀清單");
                         string message1 = await GetUnreadMessageAsync(); // 🆕 我幫你新增的只組訊息的方法
                         await ReplyToLineUser(replyToken, message1); // 🆗 直接回覆到該群組
                     }
