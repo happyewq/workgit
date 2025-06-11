@@ -9,6 +9,7 @@ using Npgsql;
 using ochweb.Helpers;
 using System.Collections.Generic;
 using System.Linq;
+using Hangfire;
 
 namespace ochweb.OchBatchService
 {
