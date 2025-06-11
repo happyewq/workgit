@@ -136,6 +136,7 @@ namespace ochweb.OchBatchService
         /// 三天未讀經
         /// </summary>
         /// <returns></returns>
+        [AutomaticRetry(Attempts = 0)]
         public async Task SendUnReadThreeDaysAsync()
         {
             string connStr = DBHelper.GetConnectionString();

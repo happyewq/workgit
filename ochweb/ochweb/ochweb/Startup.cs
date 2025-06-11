@@ -46,7 +46,7 @@ namespace ochweb
             // ✅ 限制 worker，避免連線爆掉
             services.AddHangfireServer(options =>
             {
-                options.WorkerCount = 1;
+                options.WorkerCount = 5;
             });
 
             services.AddControllersWithViews()
