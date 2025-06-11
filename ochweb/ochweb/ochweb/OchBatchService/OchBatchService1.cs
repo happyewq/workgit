@@ -254,7 +254,6 @@ namespace ochweb.OchBatchService
 
         public async Task SendToUser(string userId, string message)
         {
-
             var channelAccessToken = _config["LineBot:ChannelAccessToken"];
             var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", channelAccessToken);
@@ -269,8 +268,28 @@ namespace ochweb.OchBatchService
             };
 
             var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-            await client.PostAsync("https://api.line.me/v2/bot/message/push", content);
+
+            try
+            {
+                var response = await client.PostAsync("https://api.line.me/v2/bot/message/push", content);
+                Console.WriteLine($"📤 [Line Push] 發送給 {userId} - StatusCode: {(int)response.StatusCode} {response.ReasonPhrase}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"❗ [Line Push] 發送失敗內容：{error}");
+                }
+                else
+                {
+                    Console.WriteLine("✅ [Line Push] 發送成功");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❗ [Line Push] 發送時發生例外：{ex.Message}");
+            }
         }
+
 
 
 
