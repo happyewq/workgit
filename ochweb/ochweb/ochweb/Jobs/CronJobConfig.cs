@@ -35,11 +35,20 @@ namespace CcpBatch.Jobs
                 );
 
                 // ✅ 每天 09:00 台灣時間推播未讀經名單
+                //RecurringJob.AddOrUpdate<OchBatchService1>(
+                //    service => service.SendUnReadYesterdayAsync(),
+                //    "0 9 * * *",
+                //    taiwanTimeZone
+                //);
+
+                // ✅ 每天 09:00 台灣時間推播未讀經名單
                 RecurringJob.AddOrUpdate<OchBatchService1>(
-                    service => service.SendUnReadYesterdayAsync(),
+                    service => service.SendUnReadThreeDaysAsync(),
                     "0 9 * * *",
                     taiwanTimeZone
                 );
+
+                
 
                 Console.WriteLine("✅ Cron Job 註冊完成");
             }

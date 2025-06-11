@@ -132,6 +132,130 @@ namespace ochweb.OchBatchService
             await SendToGroup(message);
         }
 
+        /// <summary>
+        /// 三天未讀經
+        /// </summary>
+        /// <returns></returns>
+        public async Task SendUnReadThreeDaysAsync()
+        {
+            string connStr = DBHelper.GetConnectionString();
+            var today = DateTime.Today;
+            var dates = new List<string>
+    {
+        today.AddDays(-1).ToString("yyyyMMdd"),
+        today.AddDays(-2).ToString("yyyyMMdd"),
+        today.AddDays(-3).ToString("yyyyMMdd")
+    };
+
+            var userMap = new Dictionary<string, string>(); // userId -> userName
+            var readUserSet = new HashSet<string>(); // 三天內有讀經的人
+            var unreadUserList = new List<string>(); // 未讀者 UserID 清單
+
+            using var conn = new NpgsqlConnection(connStr);
+            await conn.OpenAsync();
+
+            // 所有加入好友的使用者
+            var cmdUsers = new NpgsqlCommand(@"
+        SELECT DISTINCT ""UserID"", ""UserName""
+        FROM ""OCHUSER"".""linemessages""
+        WHERE ""Message"" = '加入好友';
+    ", conn);
+
+            using (var reader = await cmdUsers.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    userMap[reader.GetString(0)] = reader.GetString(1);
+                }
+            }
+
+            // 三天內有讀經的使用者
+            var cmdBible = new NpgsqlCommand(@"
+        SELECT DISTINCT ""UserID""
+        FROM ""OCHUSER"".""ochbible""
+        WHERE ""CreateDateTime"" = ANY(@dates);
+    ", conn);
+            cmdBible.Parameters.AddWithValue("@dates", dates);
+
+            using (var reader = await cmdBible.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    readUserSet.Add(reader.GetString(0));
+                }
+            }
+
+            // 找出三天都沒讀經的使用者
+            foreach (var kv in userMap)
+            {
+                if (!readUserSet.Contains(kv.Key))
+                {
+                    unreadUserList.Add(kv.Key);
+                }
+            }
+
+            var scriptures = new List<string>
+            {
+                "以賽亞書 41:10\n「你不要害怕，因為我與你同在；不要驚惶，因為我是你的　神。我必堅固你，我必幫助你，我必用我公義的右手扶持你。」",
+                "耶利米書 29:11\n「耶和華說：我知道我向你們所懷的意念，是賜平安的意念，不是降災禍的意念，要叫你們末後有指望。」",
+                "腓立比書 4:13\n「我靠著那加給我力量的，凡事都能做。」",
+                "詩篇 46:1\n「神是我們的避難所，是我們的力量，是我們在患難中隨時的幫助。」",
+                "馬太福音 11:28\n「凡勞苦擔重擔的人可以到我這裡來，我就使你們得安息。」",
+                "約書亞記 1:9\n「我豈沒有吩咐你嗎？你當剛強壯膽！不要懼怕，也不要驚惶，因為你無論往哪裡去，耶和華你的神必與你同在。」",
+                "羅馬書 8:28\n「我們曉得萬事都互相效力，叫愛神的人得益處，就是按他旨意被召的人。」",
+                "詩篇 34:18\n「耶和華靠近傷心的人，拯救靈性痛悔的人。」",
+                "哥林多後書 12:9\n「他對我說：『我的恩典夠你用的，因為我的能力是在人的軟弱上顯得完全。』」",
+                "箴言 3:5-6\n「你要專心仰賴耶和華，不可倚靠自己的聰明。在你一切所行的事上都要認定他，他必指引你的路。」"
+            };
+
+
+            // 傳送提醒訊息
+            string dateRange = $"{dates[2]} ~ {dates[0]}";
+            var random = new Random(); // 可移到方法開頭以避免重複
+                                       //foreach (var userId in unreadUserList)
+                                       //{
+            var userId = "Ue2422631cd76bfdebd2249811a1d2de6";
+            var userName = userMap[userId];
+            string verse = scriptures[random.Next(scriptures.Count)];
+
+            string message = $"愛主的 {userName}，你在 {dateRange} 這三天內沒有讀經紀錄 📖\n\n" +
+                             "鼓勵你天天親近主，祂的話語是我們生命的糧！加油 💪\n\n" +
+                             $"📖 今日經文：\n{verse}";
+
+            try
+            {
+                await SendToUser(userId, message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❗ 傳送給 {userName} 失敗: {ex.Message}");
+            }
+            //}
+        }
+
+
+        public async Task SendToUser(string userId, string message)
+        {
+
+            var channelAccessToken = _config["LineBot:ChannelAccessToken"];
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", channelAccessToken);
+
+            var payload = new
+            {
+                to = userId,
+                messages = new[]
+                {
+            new { type = "text", text = message }
+        }
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+            await client.PostAsync("https://api.line.me/v2/bot/message/push", content);
+        }
+
+
+
         private async Task SendToGroup(string message)
         {
             // 使用預設帳號的 Token
