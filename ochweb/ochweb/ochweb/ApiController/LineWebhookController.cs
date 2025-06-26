@@ -127,8 +127,8 @@ namespace ochweb.ApiController
 
                     // ✔️ 指定人 + 指定訊息 + 指定群組觸發未讀經清單推播
                     if (message.Trim() == "發"
-                        && userId == "Ue2422631cd76bfdebd2249811a1d2de6"
-                        && source.GetProperty("type").GetString() == "group"
+                        && (userId == "Ue2422631cd76bfdebd2249811a1d2de6" || userId == "Uef8f04e103efee7b95667b11672adbf8")
+						&& source.GetProperty("type").GetString() == "group"
                         && source.TryGetProperty("groupId", out var gidProp)
                         && gidProp.GetString() == "Cf1cf1bb73a1980f358a7341b932c4f76")
                     {
