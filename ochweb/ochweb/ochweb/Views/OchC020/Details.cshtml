@@ -5,11 +5,28 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
 <div class="container mt-5">
     <div class="card shadow-lg p-4 rounded-4">
         <h3 class="text-center text-primary fw-bold mb-4">
             📋 場次詳細：@Model.SessionName (ID: @Model.SessionID)
         </h3>
+
+        <!-- 新增按鈕 -->
+        <div class="mb-3 text-end">
+            <a asp-action="CreateDetail" asp-route-sessionId="@Model.SessionID" class="btn btn-success fw-bold">
+                <i class="bi bi-plus-circle"></i> 新增報名者
+            </a>
+        </div>
 
         <div class="table-responsive">
             <table class="table table-bordered table-hover table-striped align-middle text-center">
@@ -20,6 +37,7 @@
                         <th>費用</th>
                         <th>是否繳交</th>
                         <th>報名時間</th>
+                        <th style="width: 160px;">操作</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,6 +67,31 @@
                                 }
                             </td>
                             <td>@r.RegisterTime.ToString()</td>
+
+                            <!-- 操作 -->
+                            <td>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <!-- 編輯 -->
+                                    <a asp-action="EditDetail"
+                                       asp-route-id="@r.UserID"
+                                       asp-route-sessionId="@Model.SessionID"
+                                       class="btn btn-sm btn-primary">
+                                        編輯
+                                    </a>
+
+                                    <!-- 刪除 -->
+                                    <form asp-action="DeleteDetail"
+                                          asp-route-id="@r.UserID"
+                                          asp-route-sessionId="@Model.SessionID"
+                                          method="post" class="m-0"
+                                          onsubmit="return confirm('確定要刪除這位報名者嗎？');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            刪除
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                     }
                 </tbody>
