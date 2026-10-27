@@ -1,0 +1,102 @@
+@model IEnumerable<ochweb.Models.OchC040View>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+        async function setShowUnread(checkbox) {
+            const userId = checkbox.dataset.userid;
+            const show = checkbox.checked;
+            checkbox.disabled = true;
+
+            try {
+                const body = new URLSearchParams({ userId: userId, show: show });
+                const res = await fetch('/OchC040/SetShowUnread', {
+                    method: 'POST',
+                    headers: { 'RequestVerificationToken': token },
+                    body: body
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message || '儲存失敗');
+
+                document.getElementById('label-' + userId).textContent = show ? '列出' : '不列出';
+                updateCount();
+            } catch (err) {
+                checkbox.checked = !show; // 還原
+                Swal.fire('錯誤', err.message, 'error');
+            } finally {
+                checkbox.disabled = false;
+            }
+        }
+
+        function updateCount() {
+            const all = document.querySelectorAll('.show-switch');
+            const on = Array.from(all).filter(c => c.checked).length;
+            document.getElementById('countText').textContent = `會列出 ${on} 人／共 ${all.length} 人`;
+        }
+
+        function filterTable() {
+            const kw = document.getElementById('searchBox').value.trim().toLowerCase();
+            document.querySelectorAll('#settingTable tbody tr').forEach(tr => {
+                tr.style.display = tr.dataset.name.toLowerCase().includes(kw) ? '' : 'none';
+            });
+        }
+
+        updateCount();
+    </script>
+}
+
+@Html.AntiForgeryToken()
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+            <h4 class="text-primary fw-bold mb-0">📋 讀經名單設定</h4>
+            <span id="countText" class="text-muted"></span>
+        </div>
+        <p class="text-muted">在群組打「發」時，只有打開開關的人會出現在昨日未讀名單上。修改後馬上生效。</p>
+
+        <input id="searchBox" type="text" class="form-control mb-3" placeholder="搜尋名稱…" oninput="filterTable()" />
+
+        <div class="table-responsive">
+            <table id="settingTable" class="table table-bordered table-hover table-striped align-middle text-center">
+                <thead class="table-primary">
+                    <tr>
+                        <th>名稱</th>
+                        <th style="width:180px;">打「發」時列出</th>
+                        <th>最後修改</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr data-name="@item.UserName">
+                            <td>@item.UserName</td>
+                            <td>
+                                <div class="custom-control custom-switch">
+                                    <input class="custom-control-input show-switch" type="checkbox"
+                                           id="sw-@item.UserID" data-userid="@item.UserID"
+                                           @(item.ShowUnread ? "checked" : "")
+                                           onchange="setShowUnread(this)" />
+                                    <label class="custom-control-label" for="sw-@item.UserID"
+                                           id="label-@item.UserID">@(item.ShowUnread ? "列出" : "不列出")</label>
+                                </div>
+                            </td>
+                            <td class="text-muted small">
+                                @if (!string.IsNullOrEmpty(item.UpdateDateTime))
+                                {
+                                    @($"{item.UpdateUser} {item.UpdateDateTime}")
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

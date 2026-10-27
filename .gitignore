@@ -1,0 +1,5 @@
+# Visual Studio / .NET 編譯產出
+bin/
+obj/
+.vs/
+*.user

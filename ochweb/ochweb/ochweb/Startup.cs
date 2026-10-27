@@ -1,10 +1,6 @@
-﻿using CcpBatch.Jobs;
-using Hangfire;
-using Hangfire.Dashboard;
-using Hangfire.PostgreSql;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -25,29 +21,14 @@ namespace ochweb
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // ✅ 避免金鑰錯誤（Session、AntiForgery）
+            // 避免金鑰錯誤（Session、AntiForgery）
             services.AddDataProtection()
                 .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), "keys")))
                 .SetApplicationName("ochweb");
 
-            // ✅ Hangfire 設定（控制連線池與逾時）
-            services.AddHangfire(config =>
-            {
-                var connStr = Environment.GetEnvironmentVariable("DefaultConnection");
-                config.UsePostgreSqlStorage(connStr, new PostgreSqlStorageOptions
-                {
-                    QueuePollInterval = TimeSpan.FromSeconds(30),     // 降低輪詢頻率
-                    InvisibilityTimeout = TimeSpan.FromMinutes(5),    // 任務鎖定時間
-                    PrepareSchemaIfNecessary = true,                  // 自動建立 Hangfire 表（可選）
-                    DistributedLockTimeout = TimeSpan.FromMinutes(1)  // 鎖定逾時保守設定
-                });
-            });
-
-            // ✅ 限制 worker，避免連線爆掉
-            services.AddHangfireServer(options =>
-            {
-                options.WorkerCount = 5;
-            });
+            // 暫時停用 Hangfire
+            // services.AddHangfire(...)
+            // services.AddHangfireServer(...)
 
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation();
@@ -66,11 +47,6 @@ namespace ochweb
             services.AddHttpContextAccessor();
         }
 
-        public class AllowAllDashboardAuthorizationFilter : IDashboardAuthorizationFilter
-        {
-            public bool Authorize(DashboardContext context) => true;
-        }
-
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -78,7 +54,7 @@ namespace ochweb
             else
                 app.UseExceptionHandler("/Home/Error");
 
-            // ✅ 初始化資料庫連線設定
+            // 初始化資料庫連線設定
             ochweb.Helpers.DBHelper.Init(Configuration);
 
             app.UseStaticFiles();
@@ -86,25 +62,23 @@ namespace ochweb
             app.UseSession();
             app.UseAuthorization();
 
-            // ✅ 啟用 Hangfire Dashboard
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions
-            {
-                Authorization = new[] { new AllowAllDashboardAuthorizationFilter() },
-                IgnoreAntiforgeryToken = true
-            });
+            // 暫時停用 Hangfire Dashboard
+            // app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            // {
+            //     Authorization = new[] { new AllowAllDashboardAuthorizationFilter() },
+            //     IgnoreAntiforgeryToken = true
+            // });
 
+            // 暫時停用排程註冊
+            // try
+            // {
+            //     CronJobConfig.Register(env, Configuration);
+            // }
+            // catch (Exception ex)
+            // {
+            //     Console.WriteLine("⚠️ Cron 任務註冊失敗：" + ex.Message);
+            // }
 
-            // ✅ 註冊排程任務，加上 try-catch 防止啟動失敗
-            try
-            {
-                CronJobConfig.Register(env, Configuration);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("⚠️ Cron 任務註冊失敗：" + ex.Message);
-            }
-
-            // Swagger 設定
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -118,7 +92,8 @@ namespace ochweb
                     name: "default",
                     pattern: "{controller=Login}/{action=Index}/{id?}");
 
-                endpoints.MapHangfireDashboard();
+                // 暫時停用 Hangfire Dashboard 路由
+                // endpoints.MapHangfireDashboard();
             });
 
             // 額外開放 Script 資料夾（自訂 JS）

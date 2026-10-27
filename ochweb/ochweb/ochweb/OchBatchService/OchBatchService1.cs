@@ -76,11 +76,15 @@ namespace ochweb.OchBatchService
             using var conn = new NpgsqlConnection(connStr);
             await conn.OpenAsync();
 
-            // 取得所有加入好友者
+            // 取得所有加入好友者（排除在「讀經名單設定」頁關掉的人）
             var cmdUsers = new NpgsqlCommand(@"
-        SELECT DISTINCT ""UserID"", ""UserName""
-        FROM ""OCHUSER"".""linemessages""
-        WHERE ""Message"" = '加入好友';
+        SELECT DISTINCT m.""UserID"", m.""UserName""
+        FROM ""OCHUSER"".""linemessages"" m
+        WHERE m.""Message"" = '加入好友'
+          AND NOT EXISTS (
+              SELECT 1 FROM ""OCHUSER"".""lineuser_setting"" s
+              WHERE s.""UserID"" = m.""UserID"" AND s.""ShowUnreadYN"" = 'N'
+          );
     ", conn);
 
             using (var reader = await cmdUsers.ExecuteReaderAsync())
@@ -160,11 +164,15 @@ namespace ochweb.OchBatchService
                 using var conn = new NpgsqlConnection(connStr);
                 await conn.OpenAsync();
 
-                // 所有加入好友的使用者
+                // 所有加入好友的使用者（排除在「讀經名單設定」頁關掉的人）
                 var cmdUsers = new NpgsqlCommand(@"
-                    SELECT DISTINCT ""UserID"", ""UserName""
-                    FROM ""OCHUSER"".""linemessages""
-                    WHERE ""Message"" = '加入好友';
+                    SELECT DISTINCT m.""UserID"", m.""UserName""
+                    FROM ""OCHUSER"".""linemessages"" m
+                    WHERE m.""Message"" = '加入好友'
+                      AND NOT EXISTS (
+                          SELECT 1 FROM ""OCHUSER"".""lineuser_setting"" s
+                          WHERE s.""UserID"" = m.""UserID"" AND s.""ShowUnreadYN"" = 'N'
+                      );
                 ", conn);
 
                 using (var reader = await cmdUsers.ExecuteReaderAsync())
