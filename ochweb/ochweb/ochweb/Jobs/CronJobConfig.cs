@@ -27,12 +27,9 @@ namespace CcpBatch.Jobs
                     taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
                 }
 
-                // ✅ 每天 11:40 台灣時間發送群組提醒
-                RecurringJob.AddOrUpdate<OchBatchService1>(
-                    service => service.SendLine(),
-                    "40 11 * * *",
-                    taiwanTimeZone
-                );
+                // ⛔ 已停用：每天 11:40 私訊「請繳費」
+                // 排程存在 Hangfire 資料庫裡，要主動刪除，不然之前註冊的還是會跑
+                RecurringJob.RemoveIfExists("OchBatchService1.SendLine");
 
                 // ✅ 每天 09:00 台灣時間推播未讀經名單
                 //RecurringJob.AddOrUpdate<OchBatchService1>(
@@ -41,10 +38,17 @@ namespace CcpBatch.Jobs
                 //    taiwanTimeZone
                 //);
 
-                // ✅ 每天 09:00 台灣時間推播未讀經名單
+                // ✅ 每天 10:00 台灣時間：連續沒讀滿 3、6、9…天的人私訊提醒
                 RecurringJob.AddOrUpdate<OchBatchService1>(
                     service => service.SendUnReadThreeDaysAsync(),
                     "0 10 * * *",
+                    taiwanTimeZone
+                );
+
+                // ✅ 每月 1 號 10:00 台灣時間：上個月全勤的人私訊恭喜
+                RecurringJob.AddOrUpdate<OchBatchService1>(
+                    service => service.SendMonthlyPerfectAsync(),
+                    "0 10 1 * *",
                     taiwanTimeZone
                 );
 

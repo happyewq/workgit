@@ -149,64 +149,54 @@ namespace ochweb.OchBatchService
             try
             {
                 string connStr = DBHelper.GetConnectionString();
-                var today = DateTime.Today;
-                var dates = new List<string>
-                {
-                    today.AddDays(-1).ToString("yyyyMMdd"),
-                    today.AddDays(-2).ToString("yyyyMMdd"),
-                    today.AddDays(-3).ToString("yyyyMMdd")
-                };
-
-                var userMap = new Dictionary<string, string>(); // userId -> userName
-                var readUserSet = new HashSet<string>(); // 三天內有讀經的人
-                var unreadUserList = new List<string>(); // 未讀者 UserID 清單
+                var today = TaiwanToday();
+                var yesterday = today.AddDays(-1);
 
                 using var conn = new NpgsqlConnection(connStr);
                 await conn.OpenAsync();
 
                 // 所有加入好友的使用者（排除在「讀經名單設定」頁關掉的人）
-                var cmdUsers = new NpgsqlCommand(@"
-                    SELECT DISTINCT m.""UserID"", m.""UserName""
-                    FROM ""OCHUSER"".""linemessages"" m
-                    WHERE m.""Message"" = '加入好友'
-                      AND NOT EXISTS (
-                          SELECT 1 FROM ""OCHUSER"".""lineuser_setting"" s
-                          WHERE s.""UserID"" = m.""UserID"" AND s.""ShowUnreadYN"" = 'N'
-                      );
-                ", conn);
+                var userMap = await GetActiveUsersAsync(conn); // userId -> userName
 
-                using (var reader = await cmdUsers.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync())
-                    {
-                        userMap[reader.GetString(0)] = reader.GetString(1);
-                    }
-                }
-
-                // 三天內有讀經的使用者
-                var cmdBible = new NpgsqlCommand(@"
-                    SELECT DISTINCT ""UserID""
+                // 每個人最後一次讀經的日期
+                var lastReadMap = new Dictionary<string, DateTime>();
+                using (var cmd = new NpgsqlCommand(@"
+                    SELECT ""UserID"", MAX(""CreateDateTime"")
                     FROM ""OCHUSER"".""ochbible""
-                    WHERE ""CreateDateTime"" = ANY(@dates);
-                ", conn);
-                cmdBible.Parameters.AddWithValue("@dates", dates);
-
-                using (var reader = await cmdBible.ExecuteReaderAsync())
+                    GROUP BY ""UserID"";", conn))
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
                     {
-                        readUserSet.Add(reader.GetString(0));
+                        if (TryParseYmd(reader.GetString(1), out var d))
+                            lastReadMap[reader.GetString(0)] = d;
                     }
                 }
 
-                // 找出三天都沒讀經的使用者
+                // 從來沒讀過的人，從系統最早的一筆讀經紀錄起算
+                DateTime? systemStart = null;
+                using (var cmd = new NpgsqlCommand(@"SELECT MIN(""CreateDateTime"") FROM ""OCHUSER"".""ochbible"";", conn))
+                {
+                    var v = await cmd.ExecuteScalarAsync();
+                    if (v is string s && TryParseYmd(s, out var d)) systemStart = d.AddDays(-1);
+                }
+
+                // 連續沒讀滿 3、6、9…天的人才提醒（每三天提醒一次）
+                var unreadUserList = new List<(string UserId, int Days, DateTime From)>();
                 foreach (var kv in userMap)
                 {
-                    if (!readUserSet.Contains(kv.Key))
+                    DateTime lastRead;
+                    if (lastReadMap.TryGetValue(kv.Key, out var lr)) lastRead = lr;
+                    else if (systemStart.HasValue) lastRead = systemStart.Value;
+                    else continue;
+
+                    int unreadDays = (yesterday - lastRead).Days; // 最後一次讀經的隔天到昨天
+                    if (unreadDays >= 3 && unreadDays % 3 == 0)
                     {
-                        unreadUserList.Add(kv.Key);
+                        unreadUserList.Add((kv.Key, unreadDays, lastRead.AddDays(1)));
                     }
                 }
+                Console.WriteLine($"📋 今日需提醒 {unreadUserList.Count} 人");
 
                 var scriptures = new List<string>
                 {
@@ -222,22 +212,16 @@ namespace ochweb.OchBatchService
                     "箴言 3:5-6\n「你要專心仰賴耶和華，不可倚靠自己的聰明。在你一切所行的事上都要認定他，他必指引你的路。」"
                 };
 
-                // 傳送提醒訊息（目前只測試一人）
-                string dateRange = $"{dates[2]} ~ {dates[0]}";
+                // 傳送提醒訊息
                 var random = new Random();
 
-                foreach (var userId in unreadUserList)
+                foreach (var (userId, unreadDays, from) in unreadUserList)
                 {
-                    if (!userMap.ContainsKey(userId))
-                    {
-                        Console.WriteLine($"⚠️ 找不到 userId：{userId} 對應的名稱");
-                        continue;
-                    }
-
                     var userName = userMap[userId];
                     string verse = scriptures[random.Next(scriptures.Count)];
+                    string dateRange = $"{from:yyyy/MM/dd} ~ {yesterday:yyyy/MM/dd}";
 
-                    string message = $"愛主的 {userName}，你在 {dateRange} 這三天內沒有讀經紀錄 📖\n\n" +
+                    string message = $"愛主的 {userName}，你在 {dateRange} 這 {unreadDays} 天內沒有讀經紀錄 📖\n\n" +
                                      "鼓勵你天天親近主，祂的話語是我們生命的糧！加油 💪\n\n" +
                                      $"📖 今日經文：\n{verse}";
 
@@ -285,6 +269,96 @@ namespace ochweb.OchBatchService
         }
 
 
+
+        /// <summary>
+        /// 每月 1 號：上個月每天都有讀經的人，私訊恭喜並發飲料券
+        /// </summary>
+        [AutomaticRetry(Attempts = 0)]
+        public async Task SendMonthlyPerfectAsync()
+        {
+            Console.WriteLine("進入來 SendMonthlyPerfectAsync");
+
+            try
+            {
+                var thisMonth = TaiwanToday();
+                thisMonth = new DateTime(thisMonth.Year, thisMonth.Month, 1);
+                var firstDay = thisMonth.AddMonths(-1);
+                var lastDay = thisMonth.AddDays(-1);
+                int daysInMonth = DateTime.DaysInMonth(firstDay.Year, firstDay.Month);
+
+                using var conn = new NpgsqlConnection(DBHelper.GetConnectionString());
+                await conn.OpenAsync();
+
+                var userMap = await GetActiveUsersAsync(conn);
+
+                // 上個月有讀經的天數（同一天只會有一筆，仍用 DISTINCT 保險）
+                var perfectUsers = new List<string>();
+                using (var cmd = new NpgsqlCommand(@"
+                    SELECT ""UserID"", COUNT(DISTINCT ""CreateDateTime"")
+                    FROM ""OCHUSER"".""ochbible""
+                    WHERE ""CreateDateTime"" BETWEEN @start AND @end
+                    GROUP BY ""UserID"";", conn))
+                {
+                    cmd.Parameters.AddWithValue("@start", firstDay.ToString("yyyyMMdd"));
+                    cmd.Parameters.AddWithValue("@end", lastDay.ToString("yyyyMMdd"));
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
+                    {
+                        if (reader.GetInt64(1) >= daysInMonth && userMap.ContainsKey(reader.GetString(0)))
+                            perfectUsers.Add(reader.GetString(0));
+                    }
+                }
+
+                Console.WriteLine($"🏆 {firstDay:yyyy/MM} 全勤 {perfectUsers.Count} 人");
+
+                foreach (var userId in perfectUsers)
+                {
+                    var userName = userMap[userId];
+                    string message =
+                        $"🎉 愛主的 {userName}，恭喜你上個月（{firstDay:yyyy年M月}）每日堅持閱讀神的話語！\n\n" +
+                        "請截圖此訊息並傳給永紳，在主日禮拜的時候找永紳領取一杯50元的飲料 !!! 🧋";
+
+                    Console.WriteLine($"✅ 準備傳送全勤恭喜給 {userName}");
+                    await SendToUser(userId, message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❗ 全勤恭喜任務失敗：{ex.Message}");
+            }
+        }
+
+        // 加入好友的使用者（排除在「讀經名單設定」頁關掉的人）userId -> userName
+        private static async Task<Dictionary<string, string>> GetActiveUsersAsync(NpgsqlConnection conn)
+        {
+            var map = new Dictionary<string, string>();
+            using var cmd = new NpgsqlCommand(@"
+                SELECT DISTINCT m.""UserID"", m.""UserName""
+                FROM ""OCHUSER"".""linemessages"" m
+                WHERE m.""Message"" = '加入好友'
+                  AND NOT EXISTS (
+                      SELECT 1 FROM ""OCHUSER"".""lineuser_setting"" s
+                      WHERE s.""UserID"" = m.""UserID"" AND s.""ShowUnreadYN"" = 'N'
+                  );", conn);
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                map[reader.GetString(0)] = reader.GetString(1);
+            }
+            return map;
+        }
+
+        // 台灣時間的今天（Render 主機是 UTC，不能直接用 DateTime.Today）
+        private static DateTime TaiwanToday()
+        {
+            TimeZoneInfo tz;
+            try { tz = TimeZoneInfo.FindSystemTimeZoneById("Asia/Taipei"); }
+            catch (TimeZoneNotFoundException) { tz = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time"); }
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz).Date;
+        }
+
+        private static bool TryParseYmd(string s, out DateTime d) =>
+            DateTime.TryParseExact(s, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out d);
 
         public async Task SendToUser(string userId, string message)
         {

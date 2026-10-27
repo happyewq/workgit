@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using CcpBatch.Jobs;
+using Hangfire;
+using Hangfire.Dashboard;
+using Hangfire.PostgreSql;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
@@ -26,9 +31,27 @@ namespace ochweb
                 .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), "keys")))
                 .SetApplicationName("ochweb");
 
-            // 暫時停用 Hangfire
-            // services.AddHangfire(...)
-            // services.AddHangfireServer(...)
+            // Hangfire 設定（控制連線池與逾時）
+            var connStr = Environment.GetEnvironmentVariable("DefaultConnection");
+            if (string.IsNullOrEmpty(connStr))
+                connStr = Configuration.GetConnectionString("DefaultConnection");
+
+            services.AddHangfire(config =>
+            {
+                config.UsePostgreSqlStorage(connStr, new PostgreSqlStorageOptions
+                {
+                    QueuePollInterval = TimeSpan.FromSeconds(30),     // 降低輪詢頻率
+                    InvisibilityTimeout = TimeSpan.FromMinutes(5),    // 任務鎖定時間
+                    PrepareSchemaIfNecessary = true,                  // 自動建立 Hangfire 表
+                    DistributedLockTimeout = TimeSpan.FromMinutes(1)  // 鎖定逾時保守設定
+                });
+            });
+
+            // 限制 worker，避免連線爆掉
+            services.AddHangfireServer(options =>
+            {
+                options.WorkerCount = 5;
+            });
 
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation();
@@ -47,6 +70,16 @@ namespace ochweb
             services.AddHttpContextAccessor();
         }
 
+        // 只允許已登入、權限為 Admin 的人看 Hangfire Dashboard
+        public class AdminDashboardAuthorizationFilter : IDashboardAuthorizationFilter
+        {
+            public bool Authorize(DashboardContext context)
+            {
+                var http = context.GetHttpContext();
+                return http.Session.GetString("Permission") == "Admin";
+            }
+        }
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -62,22 +95,21 @@ namespace ochweb
             app.UseSession();
             app.UseAuthorization();
 
-            // 暫時停用 Hangfire Dashboard
-            // app.UseHangfireDashboard("/hangfire", new DashboardOptions
-            // {
-            //     Authorization = new[] { new AllowAllDashboardAuthorizationFilter() },
-            //     IgnoreAntiforgeryToken = true
-            // });
+            // Hangfire Dashboard：只有登入的 Admin 可以進入
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new AdminDashboardAuthorizationFilter() }
+            });
 
-            // 暫時停用排程註冊
-            // try
-            // {
-            //     CronJobConfig.Register(env, Configuration);
-            // }
-            // catch (Exception ex)
-            // {
-            //     Console.WriteLine("⚠️ Cron 任務註冊失敗：" + ex.Message);
-            // }
+            // 註冊排程任務，加上 try-catch 防止啟動失敗
+            try
+            {
+                CronJobConfig.Register(env, Configuration);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("⚠️ Cron 任務註冊失敗：" + ex.Message);
+            }
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -91,9 +123,6 @@ namespace ochweb
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Login}/{action=Index}/{id?}");
-
-                // 暫時停用 Hangfire Dashboard 路由
-                // endpoints.MapHangfireDashboard();
             });
 
             // 額外開放 Script 資料夾（自訂 JS）
